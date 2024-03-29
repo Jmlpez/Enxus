@@ -68,7 +68,7 @@ private:
 
     float m_CameraSpeed = 1.5f, m_CameraRotationSpeed = 60.0f;
 
-    float yaw = -90.0f, pitch = 0.0f; // roll omitted by now
+    float m_Yaw = -90.0f, m_Pitch = 0.0f; // roll omitted by now
 
     glm::vec3 m_CameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
     glm::vec3 m_CameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -77,6 +77,20 @@ private:
 public:
     FreeCameraController(Camera *camera);
     void ProcessInput(GLFWwindow *window, float deltaTime);
+
+    void RecalculateFront();
+
+    void SetYaw(float degree);
+    // void SetCameraPos(glm::vec3 cameraPos)
+    // {
+    //     m_CameraPos = cameraPos;
+    //     m_MainCamera->SetPos(m_CameraPos);
+    // }
+    // void SetCameraFront(glm::vec3 cameraFront)
+    // {
+    //     m_CameraFront = cameraFront;
+    //     m_MainCamera->SetFront(m_CameraFront);
+    // }
 
     ~FreeCameraController(){};
 };

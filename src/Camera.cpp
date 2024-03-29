@@ -1,4 +1,5 @@
 #include "Camera.h"
+#include <iostream>
 // #include "glm/glm.hpp"
 // #include "glm/gtc/matrix_transform.hpp"
 // #include "glm/gtc/type_ptr.hpp"
@@ -107,6 +108,17 @@ FreeCameraController::FreeCameraController(Camera *camera)
     m_MainCamera->SetFront(m_CameraFront);
 };
 
+void FreeCameraController::RecalculateFront()
+{
+    glm::vec3 frontAux;
+    frontAux.x = cos(glm::radians(m_Yaw)) * cos(glm::radians(m_Pitch));
+    frontAux.y = sin(glm::radians(m_Pitch));
+    frontAux.z = sin(glm::radians(m_Yaw)) * cos(glm::radians(m_Pitch));
+
+    m_CameraFront = glm::normalize(frontAux);
+    m_MainCamera->SetFront(m_CameraFront);
+}
+
 void FreeCameraController::ProcessInput(GLFWwindow *window, float deltaTime)
 {
 
@@ -144,38 +156,38 @@ void FreeCameraController::ProcessInput(GLFWwindow *window, float deltaTime)
     }
 
     // camera rotations
-    bool cameraRotate = false;
-    //----------------- YAW ROTATIONS (around Y-axis) -------------------//
 
+    //----------------- YAW ROTATIONS (around Y-axis) -------------------//
+    bool cameraRotationKeyPress = false;
     if (glfwGetKey(window, GLFW_KEY_KP_4) == GLFW_PRESS)
     {
-        yaw -= cameraRotationSpeed;
-        cameraRotate = true;
+        m_Yaw -= cameraRotationSpeed;
+        cameraRotationKeyPress = true;
     }
     if (glfwGetKey(window, GLFW_KEY_KP_6) == GLFW_PRESS)
     {
-        yaw += cameraRotationSpeed;
-        cameraRotate = true;
+        m_Yaw += cameraRotationSpeed;
+        cameraRotationKeyPress = true;
     }
     //----------------- PITCH ROTATIONS (around X-axis) -------------------//
     if (glfwGetKey(window, GLFW_KEY_KP_2) == GLFW_PRESS)
     {
-        pitch -= cameraRotationSpeed;
-        cameraRotate = true;
+        m_Pitch -= cameraRotationSpeed;
+        cameraRotationKeyPress = true;
     }
     if (glfwGetKey(window, GLFW_KEY_KP_8) == GLFW_PRESS)
     {
-        pitch += cameraRotationSpeed;
-        cameraRotate = true;
+        m_Pitch += cameraRotationSpeed;
+        cameraRotationKeyPress = true;
     }
 
-    if (!cameraRotate)
+    if (!cameraRotationKeyPress)
         return;
-    glm::vec3 frontAux;
-    frontAux.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-    frontAux.y = sin(glm::radians(pitch));
-    frontAux.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+    RecalculateFront();
+}
 
-    m_CameraFront = glm::normalize(frontAux);
-    m_MainCamera->SetFront(m_CameraFront);
+void FreeCameraController::SetYaw(float degree)
+{
+    m_Yaw = degree;
+    RecalculateFront();
 }

@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <cmath>
 
 #include "utils.h"
 #include "VertexBuffer.h"
@@ -20,6 +21,11 @@
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void processInput(GLFWwindow *window);
+
+void printVec3(glm::vec3 &vec)
+{
+    std::cout << vec.x << " " << vec.y << " " << vec.z << std::endl;
+}
 
 unsigned int viewportWidth = 800, viewportHeight = 600;
 
@@ -52,7 +58,7 @@ int main()
     GLCall(glViewport(0, 0, viewportWidth, viewportHeight));
     GLCall(glEnable(GL_DEPTH_TEST));
 
-    // set VSync to false (study later...)
+    // set VSync to true (study later...)
     glfwSwapInterval(1);
     // for resize window event
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
@@ -110,7 +116,6 @@ int main()
         processInput(window);
         cameraController.ProcessInput(window, deltaTime);
 
-        // update viewport to recalcute aspect ratio
         mainCamera.SetViewport(viewportWidth, viewportHeight);
 
         // clear screen color
@@ -127,7 +132,7 @@ int main()
         textureFace.Bind(1); // activate and bind texture unit (1)
 
         // First Object -- on the left (perspective)
-        model = glm::rotate(model, 0.01f, glm::vec3(1.0f, 0.0f, 0.0f));
+        // model = glm::rotate(model, 0.01f, glm::vec3(1.0f, 0.0f, 0.0f));
         // model and view matrix remains unchanged but generally that would not be the case
         shader.SetMat4("u_Model", model);
         mainCamera.SetViewProjMatrix(shader);
