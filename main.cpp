@@ -15,9 +15,10 @@
 #include "Camera.h"
 #include "cube.h"
 
-// #include "glm/glm.hpp"
-// #include "glm/gtc/matrix_transform.hpp"
-// #include "glm/gtc/type_ptr.hpp"
+// Imgui includes
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_glfw.h"
+#include "imgui/imgui_impl_opengl3.h"
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void processInput(GLFWwindow *window);
@@ -102,9 +103,18 @@ int main()
     VBO.Unbind();
     // IBO.Unbind();
 
-    float alpha = 0.2;
+    //----------------- IMGUI -------------------//
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO &io = ImGui::GetIO();
+    (void)io;
+    ImGui::StyleColorsDark();
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init("#version 330");
+
     float deltaTime = 0.0f;
     float lastFrame = 0.0f;
+    float f = 0.5f;
 
     while (!glfwWindowShouldClose(window))
     {
@@ -119,38 +129,46 @@ int main()
         mainCamera.SetViewport(viewportWidth, viewportHeight);
 
         // clear screen color
-        // GLCall(glClearColor(0.2f, 0.3f, 0.3f, 1.0f));
         GLCall(glClearColor(0.11f, 0.11f, 0.11f, 1.0f));
         GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
+        //----------------- IMGUI START NEW FRAME -------------------//
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
         //----------------- BIND EVERYTHING BEFORE A DRAW CALL -------------------//
 
-        shader.Bind();                   // bind shaders
-        shader.SetFloat("alpha", alpha); // set alpha uniform
-
+        shader.Bind();       // bind shaders
         textureWood.Bind(0); // activate and bind texture unit (0)
         textureFace.Bind(1); // activate and bind texture unit (1)
-
-        // First Object -- on the left (perspective)
-        // model = glm::rotate(model, 0.01f, glm::vec3(1.0f, 0.0f, 0.0f));
-        // model and view matrix remains unchanged but generally that would not be the case
         shader.SetMat4("u_Model", model);
         mainCamera.SetViewProjMatrix(shader);
-
         VAO.Bind(); // bind VAO
 
         // GLCall(glDrawElements(GL_TRIANGLES, IBO.GetCount(), GL_UNSIGNED_INT, nullptr));
         GLCall(glDrawArrays(GL_TRIANGLES, 0, 36));
 
-        // unbind VAO
-        VAO.UnBind();
+        VAO.UnBind(); // unbind VAO
 
-        // swap buffers
-        glfwSwapBuffers(window);
+        {
+            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
+        }
 
-        // I/O events, mouse events etc
-        glfwPollEvents();
+        //----------------- IMGUI RENDER -------------------//
+
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+        glfwSwapBuffers(window); // swap buffers
+
+        glfwPollEvents(); // I/O events, mouse events etc
     }
+
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    // ImGui::DestroyContext();
+    ImGui::DestroyContext(nullptr);
 
     glfwTerminate();
 

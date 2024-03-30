@@ -4,7 +4,6 @@ out vec4 FragColor;
 
 in vec2 TexCoord;
 
-uniform float alpha;
 uniform sampler2D u_TextureWood;
 uniform sampler2D u_TextureFace;
 
@@ -13,6 +12,6 @@ void main() {
     //FragColor = vertexColor;
     //FragColor = uColor;
     //FragColor = ourVertexColor;
-    FragColor = mix(texture(u_TextureWood, TexCoord), texture(u_TextureFace, TexCoord), alpha);
+    FragColor = mix(texture(u_TextureWood, TexCoord), texture(u_TextureFace, TexCoord), 0.2);
 
 }
