@@ -114,7 +114,6 @@ int main()
 
     float deltaTime = 0.0f;
     float lastFrame = 0.0f;
-    float f = 0.5f;
 
     while (!glfwWindowShouldClose(window))
     {
@@ -124,9 +123,9 @@ int main()
 
         // process user input
         processInput(window);
-        cameraController.ProcessInput(window, deltaTime);
-
         mainCamera.SetViewport(viewportWidth, viewportHeight);
+
+        cameraController.ProcessInput(window, deltaTime);
 
         // clear screen color
         GLCall(glClearColor(0.11f, 0.11f, 0.11f, 1.0f));
@@ -147,12 +146,24 @@ int main()
         VAO.Bind(); // bind VAO
 
         // GLCall(glDrawElements(GL_TRIANGLES, IBO.GetCount(), GL_UNSIGNED_INT, nullptr));
+
         GLCall(glDrawArrays(GL_TRIANGLES, 0, 36));
 
         VAO.UnBind(); // unbind VAO
 
         {
-            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
+            ImGui::Begin("Camera");
+            const glm::vec3 cameraPos = cameraController.GetCameraPos();
+            const glm::vec3 cameraFront = cameraController.GetCameraFront();
+            ImGui::Text("Position x: %.1f  y: %.1f  z: %.1f", cameraPos.x, cameraPos.y, cameraPos.z);
+            ImGui::Text("Direction x: %.1f  y: %.1f  z: %.1f", cameraFront.x, cameraFront.y, cameraFront.z);
+            ImGui::Text("Yaw %.1fº", cameraController.GetYaw());
+            ImGui::Text("Pitch %.1fº", cameraController.GetPitch());
+            ImGui::End();
+
+            ImGui::Begin("FPS");
+            ImGui::Text("App average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+            ImGui::End();
         }
 
         //----------------- IMGUI RENDER -------------------//

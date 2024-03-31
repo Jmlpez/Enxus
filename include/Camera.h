@@ -38,9 +38,9 @@ public:
     void SetViewProjMatrix(Shader &shader);
 
     // set Camera Vectors
-    void SetPos(glm::vec3 &position);
-    void SetUp(glm::vec3 &up);
-    void SetFront(glm::vec3 &front);
+    void SetPos(glm::vec3 position);
+    void SetUp(glm::vec3 up);
+    void SetFront(glm::vec3 front);
 
     // get Camera Matrices
     const glm::mat4 &GetProjectionMatrix() const { return m_Proj; }
@@ -76,21 +76,28 @@ private:
 
 public:
     FreeCameraController(Camera *camera);
+
+    Camera *GetCamera() { return m_MainCamera; }
+
     void ProcessInput(GLFWwindow *window, float deltaTime);
 
     void RecalculateFront();
 
+    // camera vectors setters/getter
+    void SetCameraPos(glm::vec3 position);
+    void SetCameraUp(glm::vec3 up);
+    void SetCameraFront(glm::vec3 front);
+
+    glm::vec3 GetCameraPos() { return m_CameraPos; }
+    glm::vec3 GetCameraUp() { return m_CameraUp; }
+    glm::vec3 GetCameraFront() { return m_CameraFront; }
+
+    // camera angles
     void SetYaw(float degree);
-    // void SetCameraPos(glm::vec3 cameraPos)
-    // {
-    //     m_CameraPos = cameraPos;
-    //     m_MainCamera->SetPos(m_CameraPos);
-    // }
-    // void SetCameraFront(glm::vec3 cameraFront)
-    // {
-    //     m_CameraFront = cameraFront;
-    //     m_MainCamera->SetFront(m_CameraFront);
-    // }
+    void SetPitch(float degree);
+
+    float GetYaw() { return m_Yaw; }
+    float GetPitch() { return m_Pitch; }
 
     ~FreeCameraController(){};
 };

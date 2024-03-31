@@ -82,17 +82,17 @@ void Camera::SetViewProjMatrix(Shader &shader)
     shader.SetMat4("u_View", m_View);
 }
 
-void Camera::SetPos(glm::vec3 &position)
+void Camera::SetPos(glm::vec3 position)
 {
     m_Pos = position;
     cameraChanged = true;
 }
-void Camera::SetUp(glm::vec3 &up)
+void Camera::SetUp(glm::vec3 up)
 {
     m_Up = up;
     cameraChanged = true;
 }
-void Camera::SetFront(glm::vec3 &front)
+void Camera::SetFront(glm::vec3 front)
 {
     m_Front = front;
     cameraChanged = true;
@@ -162,11 +162,15 @@ void FreeCameraController::ProcessInput(GLFWwindow *window, float deltaTime)
     if (glfwGetKey(window, GLFW_KEY_KP_4) == GLFW_PRESS)
     {
         m_Yaw -= cameraRotationSpeed;
+        if (m_Yaw <= -360.0f)
+            m_Yaw += 360.0f;
         cameraRotationKeyPress = true;
     }
     if (glfwGetKey(window, GLFW_KEY_KP_6) == GLFW_PRESS)
     {
         m_Yaw += cameraRotationSpeed;
+        if (m_Yaw >= 360.0f)
+            m_Yaw -= 360.0f;
         cameraRotationKeyPress = true;
     }
     //----------------- PITCH ROTATIONS (around X-axis) -------------------//
@@ -180,14 +184,40 @@ void FreeCameraController::ProcessInput(GLFWwindow *window, float deltaTime)
         m_Pitch += cameraRotationSpeed;
         cameraRotationKeyPress = true;
     }
+    // to avoid flip (euler angles has this drawback)
+    if (m_Pitch > 89.0f)
+        m_Pitch = 89.0f;
+    if (m_Pitch < -89.0f)
+        m_Pitch = -89.0f;
 
     if (!cameraRotationKeyPress)
         return;
     RecalculateFront();
 }
 
+void FreeCameraController::SetCameraPos(glm::vec3 position)
+{
+    m_CameraPos = position;
+    m_MainCamera->SetPos(m_CameraPos);
+}
+void FreeCameraController::SetCameraUp(glm::vec3 up)
+{
+    m_CameraUp = up;
+    m_MainCamera->SetUp(m_CameraUp);
+}
+void FreeCameraController::SetCameraFront(glm::vec3 front)
+{
+    m_CameraFront = front;
+    m_MainCamera->SetFront(m_CameraFront);
+}
+
 void FreeCameraController::SetYaw(float degree)
 {
     m_Yaw = degree;
+    RecalculateFront();
+}
+void FreeCameraController::SetPitch(float degree)
+{
+    m_Pitch = degree;
     RecalculateFront();
 }
