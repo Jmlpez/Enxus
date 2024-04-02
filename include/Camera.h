@@ -16,6 +16,8 @@ enum CAMERA_MOVEMENT : unsigned short
 {
     BACKWARD,
     FORWARD,
+    UP,
+    DOWN,
     LEFT,
     RIGHT,
     LEFT_ROTATION,  // Euler Angles
@@ -91,6 +93,8 @@ public:
     ~FreeCameraController(){};
 
     //    Camera *GetCamera() { return m_MainCamera; }
+
+    void ResetCameraLocation();
 
     void ProcessKeyboardInput(CAMERA_MOVEMENT direction, float deltaTime);
 

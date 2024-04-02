@@ -108,6 +108,20 @@ FreeCameraController::FreeCameraController(Camera *camera)
     m_MainCamera->SetFront(m_CameraFront);
 };
 
+void FreeCameraController::ResetCameraLocation()
+{
+    m_CameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+    m_CameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+    m_CameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+
+    m_MainCamera->SetPos(m_CameraPos);
+    m_MainCamera->SetUp(m_CameraUp);
+    m_MainCamera->SetFront(m_CameraFront);
+
+    SetYaw(-90.0f);
+    SetPitch(0.0f);
+}
+
 void FreeCameraController::UpdateFront()
 {
     glm::vec3 frontAux;
@@ -138,6 +152,16 @@ void FreeCameraController::ProcessKeyboardInput(CAMERA_MOVEMENT direction, float
     if (direction == BACKWARD)
     {
         m_CameraPos -= m_CameraFront * cameraSpeed;
+        cameraMove = true;
+    }
+    if (direction == UP)
+    {
+        m_CameraPos += m_CameraUp * cameraSpeed;
+        cameraMove = true;
+    }
+    if (direction == DOWN)
+    {
+        m_CameraPos -= m_CameraUp * cameraSpeed;
         cameraMove = true;
     }
     if (direction == LEFT)
