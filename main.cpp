@@ -23,12 +23,11 @@
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void processInput(GLFWwindow *window);
 
-void printVec3(glm::vec3 &vec)
-{
-    std::cout << vec.x << " " << vec.y << " " << vec.z << std::endl;
-}
-
 unsigned int viewportWidth = 800, viewportHeight = 600;
+float deltaTime = 0.0f;
+
+Camera mainCamera(viewportWidth, viewportHeight, CAMERA_PROJECTION::PERSPECTIVE);
+FreeCameraController cameraController(&mainCamera);
 
 int main()
 {
@@ -91,9 +90,6 @@ int main()
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::scale(model, glm::vec3(0.5f));
 
-    Camera mainCamera(viewportWidth, viewportHeight, CAMERA_PROJECTION::PERSPECTIVE);
-    FreeCameraController cameraController(&mainCamera);
-
     shader.SetMat4("u_Model", model);
     mainCamera.SetViewProjMatrix(shader);
 
@@ -112,7 +108,6 @@ int main()
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 330");
 
-    float deltaTime = 0.0f;
     float lastFrame = 0.0f;
 
     while (!glfwWindowShouldClose(window))
@@ -124,8 +119,6 @@ int main()
         // process user input
         processInput(window);
         mainCamera.SetViewport(viewportWidth, viewportHeight);
-
-        cameraController.ProcessInput(window, deltaTime);
 
         // clear screen color
         GLCall(glClearColor(0.11f, 0.11f, 0.11f, 1.0f));
@@ -200,4 +193,25 @@ void processInput(GLFWwindow *window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+
+    //----------------- CAMERA MOVE (TRANSLATION) -------------------//
+
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        cameraController.ProcessKeyboardInput(CAMERA_MOVEMENT::FORWARD, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        cameraController.ProcessKeyboardInput(CAMERA_MOVEMENT::BACKWARD, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        cameraController.ProcessKeyboardInput(CAMERA_MOVEMENT::LEFT, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        cameraController.ProcessKeyboardInput(CAMERA_MOVEMENT::RIGHT, deltaTime);
+
+    //----------------- CAMERA MOVE (ROTATION) -------------------//
+    if (glfwGetKey(window, GLFW_KEY_KP_8) == GLFW_PRESS)
+        cameraController.ProcessKeyboardInput(CAMERA_MOVEMENT::UP_ROTATION, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_KP_2) == GLFW_PRESS)
+        cameraController.ProcessKeyboardInput(CAMERA_MOVEMENT::DOWN_ROTATION, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_KP_4) == GLFW_PRESS)
+        cameraController.ProcessKeyboardInput(CAMERA_MOVEMENT::LEFT_ROTATION, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_KP_6) == GLFW_PRESS)
+        cameraController.ProcessKeyboardInput(CAMERA_MOVEMENT::RIGHT_ROTATION, deltaTime);
 }

@@ -12,6 +12,18 @@ enum CAMERA_PROJECTION : unsigned short
     ORTHOGRAPHIC,
 };
 
+enum CAMERA_MOVEMENT : unsigned short
+{
+    BACKWARD,
+    FORWARD,
+    LEFT,
+    RIGHT,
+    LEFT_ROTATION,  // Euler Angles
+    RIGHT_ROTATION, // Euler Angles
+    UP_ROTATION,    // Euler Angles
+    DOWN_ROTATION,  // Euler Angles
+};
+
 class Camera
 {
 private:
@@ -57,8 +69,8 @@ public:
     inline float GetFarPlane() { return m_FarPlane; }
 
 private:
-    void RecalculateView();
-    void RecalculateProjection();
+    void UpdateView();
+    void UpdateProjection();
 };
 
 class FreeCameraController
@@ -76,12 +88,11 @@ private:
 
 public:
     FreeCameraController(Camera *camera);
+    ~FreeCameraController(){};
 
-    Camera *GetCamera() { return m_MainCamera; }
+    //    Camera *GetCamera() { return m_MainCamera; }
 
-    void ProcessInput(GLFWwindow *window, float deltaTime);
-
-    void RecalculateFront();
+    void ProcessKeyboardInput(CAMERA_MOVEMENT direction, float deltaTime);
 
     // camera vectors setters/getter
     void SetCameraPos(glm::vec3 position);
@@ -99,7 +110,8 @@ public:
     float GetYaw() { return m_Yaw; }
     float GetPitch() { return m_Pitch; }
 
-    ~FreeCameraController(){};
+private:
+    void UpdateFront();
 };
 
 #endif

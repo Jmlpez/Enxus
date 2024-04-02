@@ -23,21 +23,21 @@ Camera::Camera(unsigned int vpWidth,
     m_Front = glm::vec3(0.0f, 0.0f, -1.0f);
 
     // in this case is the first calculation
-    RecalculateProjection();
-    RecalculateView();
+    UpdateProjection();
+    UpdateView();
 }
 
 Camera::~Camera()
 {
 }
 
-void Camera::RecalculateView()
+void Camera::UpdateView()
 {
     m_View = glm::lookAt(m_Pos, m_Pos + m_Front, m_Up);
     cameraChanged = false;
 }
 
-void Camera::RecalculateProjection()
+void Camera::UpdateProjection()
 {
     switch (m_Type)
     {
@@ -60,13 +60,13 @@ void Camera::SetViewport(unsigned int vpWidth, unsigned int vpHeight)
 
     m_VpWidth = vpWidth;
     m_VpHeight = vpHeight;
-    RecalculateProjection();
+    UpdateProjection();
 }
 
 void Camera::SetCameraAttr(Shader &shader)
 {
     if (cameraChanged)
-        RecalculateView();
+        UpdateView();
 
     shader.SetMat4("u_Proj", m_Proj);
     shader.SetMat4("u_View", m_View);
@@ -76,7 +76,7 @@ void Camera::SetCameraAttr(Shader &shader)
 void Camera::SetViewProjMatrix(Shader &shader)
 {
     if (cameraChanged)
-        RecalculateView();
+        UpdateView();
 
     shader.SetMat4("u_Proj", m_Proj);
     shader.SetMat4("u_View", m_View);
@@ -108,7 +108,7 @@ FreeCameraController::FreeCameraController(Camera *camera)
     m_MainCamera->SetFront(m_CameraFront);
 };
 
-void FreeCameraController::RecalculateFront()
+void FreeCameraController::UpdateFront()
 {
     glm::vec3 frontAux;
     frontAux.x = cos(glm::radians(m_Yaw)) * cos(glm::radians(m_Pitch));
@@ -119,7 +119,7 @@ void FreeCameraController::RecalculateFront()
     m_MainCamera->SetFront(m_CameraFront);
 }
 
-void FreeCameraController::ProcessInput(GLFWwindow *window, float deltaTime)
+void FreeCameraController::ProcessKeyboardInput(CAMERA_MOVEMENT direction, float deltaTime)
 {
 
     const float cameraSpeed = m_CameraSpeed * deltaTime;
@@ -130,43 +130,42 @@ void FreeCameraController::ProcessInput(GLFWwindow *window, float deltaTime)
     bool cameraMove = false;
 
     // camera locations
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+    if (direction == FORWARD)
     {
         m_CameraPos += m_CameraFront * cameraSpeed;
         cameraMove = true;
     }
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+    if (direction == BACKWARD)
     {
         m_CameraPos -= m_CameraFront * cameraSpeed;
         cameraMove = true;
     }
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+    if (direction == LEFT)
     {
         m_CameraPos -= glm::normalize(glm::cross(m_CameraFront, m_CameraUp)) * cameraSpeed;
         cameraMove = true;
     }
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+    if (direction == RIGHT)
     {
         m_CameraPos += glm::normalize(glm::cross(m_CameraFront, m_CameraUp)) * cameraSpeed;
         cameraMove = true;
     }
+
     if (cameraMove)
-    {
         m_MainCamera->SetPos(m_CameraPos);
-    }
 
     // camera rotations
 
     //----------------- YAW ROTATIONS (around Y-axis) -------------------//
     bool cameraRotationKeyPress = false;
-    if (glfwGetKey(window, GLFW_KEY_KP_4) == GLFW_PRESS)
+    if (direction == LEFT_ROTATION)
     {
         m_Yaw -= cameraRotationSpeed;
         if (m_Yaw <= -360.0f)
             m_Yaw += 360.0f;
         cameraRotationKeyPress = true;
     }
-    if (glfwGetKey(window, GLFW_KEY_KP_6) == GLFW_PRESS)
+    if (direction == RIGHT_ROTATION)
     {
         m_Yaw += cameraRotationSpeed;
         if (m_Yaw >= 360.0f)
@@ -174,12 +173,12 @@ void FreeCameraController::ProcessInput(GLFWwindow *window, float deltaTime)
         cameraRotationKeyPress = true;
     }
     //----------------- PITCH ROTATIONS (around X-axis) -------------------//
-    if (glfwGetKey(window, GLFW_KEY_KP_2) == GLFW_PRESS)
+    if (direction == UP_ROTATION)
     {
         m_Pitch -= cameraRotationSpeed;
         cameraRotationKeyPress = true;
     }
-    if (glfwGetKey(window, GLFW_KEY_KP_8) == GLFW_PRESS)
+    if (direction == DOWN_ROTATION)
     {
         m_Pitch += cameraRotationSpeed;
         cameraRotationKeyPress = true;
@@ -192,7 +191,8 @@ void FreeCameraController::ProcessInput(GLFWwindow *window, float deltaTime)
 
     if (!cameraRotationKeyPress)
         return;
-    RecalculateFront();
+
+    UpdateFront();
 }
 
 void FreeCameraController::SetCameraPos(glm::vec3 position)
@@ -214,10 +214,10 @@ void FreeCameraController::SetCameraFront(glm::vec3 front)
 void FreeCameraController::SetYaw(float degree)
 {
     m_Yaw = degree;
-    RecalculateFront();
+    UpdateFront();
 }
 void FreeCameraController::SetPitch(float degree)
 {
     m_Pitch = degree;
-    RecalculateFront();
+    UpdateFront();
 }
