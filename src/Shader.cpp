@@ -65,12 +65,12 @@ void Shader::SetFloat4(const std::string &uName, float v0, float v1, float v2, f
 void Shader::SetVec2(const std::string &uName, const glm::vec2 &vec)
 {
     int location = GetUniformLocation(uName);
-    GLCall(glUniform2fv(location, 2, glm::value_ptr(vec)));
+    GLCall(glUniform2fv(location, 1, glm::value_ptr(vec)));
 }
 void Shader::SetVec3(const std::string &uName, const glm::vec3 &vec)
 {
     int location = GetUniformLocation(uName);
-    GLCall(glUniform3fv(location, 2, glm::value_ptr(vec)));
+    GLCall(glUniform3fv(location, 1, glm::value_ptr(vec)));
 }
 void Shader::SetMat3(const std::string &uName, const glm::mat3 &mat)
 {
