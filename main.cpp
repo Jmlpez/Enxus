@@ -63,41 +63,66 @@ int main()
     // for resize window event
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-    VertexArray VAO;
+    VertexArray objVAO, lightVAO;
+
     // cube vertices is being imported from cube.h
-    VertexBuffer VBO(cubeVertices, sizeof(cubeVertices));
+    VertexBuffer objVBO(cubeVertices, sizeof(cubeVertices));
+    // lightVBO is not needed because we already have it from the current object (is also a cube)
 
-    VertexBufferLayout layout;
-    layout.Push(3, GL_FLOAT); // position
-    layout.Push(2, GL_FLOAT); // texture coordinates
-    VAO.AddBuffer(VBO, layout);
+    VertexBufferLayout objLayout, lightLayout;
+    objLayout.Push(3, GL_FLOAT); // position
+    objLayout.Push(2, GL_FLOAT); // texture coordinates
+    objLayout.Push(3, GL_FLOAT); // normal vector
+    objVAO.AddBuffer(objVBO, objLayout);
 
-    // IndexBuffer IBO(indices, sizeof(indices) / sizeof(unsigned int));
-
-    Texture2D textureWood("res/images/container.jpg"), textureFace("res/images/awesomeface.png");
-    textureWood.Bind(0);
-    textureFace.Bind(1);
+    lightLayout.Push(3, GL_FLOAT);
+    lightVAO.AddBuffer(objVBO, objLayout);
 
     //----------------- SHADERS -------------------//
-    Shader shader("res/shaders/basic.vert", "res/shaders/basic.frag");
+    Shader objShader("res/shaders/basic-lighting/obj.vert", "res/shaders/basic-lighting/obj.frag");
+    Shader lightShader("res/shaders/basic-lighting/light.vert", "res/shaders/basic-lighting/light.frag");
 
     // bind shader program first
-    shader.Bind();
-    shader.SetInt("u_TextureWood", 0);
-    shader.SetInt("u_TextureFace", 1);
 
-    //----------------- Matrices Transformations -------------------//
-    glm::mat4 model = glm::mat4(1.0f);
-    model = glm::scale(model, glm::vec3(0.5f));
+    //----------------- Light Source Matrices Transformations -------------------//
 
-    shader.SetMat4("u_Model", model);
-    mainCamera.SetViewProjMatrix(shader);
+    glm::mat4 lightModel = glm::mat4(1.0f);
+    glm::vec3 lightPos = glm::vec3(1.2f, 1.0f, 2.0f);
+    glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
+
+    lightModel = glm::translate(lightModel, lightPos);
+    lightModel = glm::scale(lightModel, glm::vec3(0.2f));
+
+    // Basic shader uniforms: MVP matrix
+    lightShader.Bind();
+    // send camera uniforms to the light  shader
+    lightShader.SetMat4("u_Model", lightModel);
+    mainCamera.SetViewProjMatrix(lightShader);
+
+    //----------------- Object Matrices Transformations -------------------//
+
+    glm::mat4 objModel = glm::mat4(1.0f);
+    glm::vec3 objectColor = glm::vec3(1.0f, 0.5f, 0.31f);
+
+    objShader.Bind();
+    // Vectors needed for light calculations
+    objShader.SetVec3("u_ObjectColor", objectColor);
+    objShader.SetVec3("u_LightColor", lightColor);
+    objShader.SetVec3("u_LightPos", lightPos);
+
+    objShader.SetVec3("u_CameraPos", cameraController.GetCameraPos());
+
+    // send camera uniforms to the object shader
+    objShader.SetMat4("u_Model", objModel);
+    mainCamera.SetViewProjMatrix(objShader);
 
     //----------------- UNBIND EVERYTHING -------------------//
-    shader.UnBind();
-    VAO.UnBind();
-    VBO.Unbind();
-    // IBO.Unbind();
+    objShader.UnBind();
+    objVAO.UnBind();
+    objVBO.Unbind();
+
+    lightShader.UnBind();
+    lightVAO.UnBind();
 
     //----------------- IMGUI -------------------//
     IMGUI_CHECKVERSION();
@@ -131,18 +156,25 @@ int main()
 
         //----------------- BIND EVERYTHING BEFORE A DRAW CALL -------------------//
 
-        shader.Bind();       // bind shaders
-        textureWood.Bind(0); // activate and bind texture unit (0)
-        textureFace.Bind(1); // activate and bind texture unit (1)
-        shader.SetMat4("u_Model", model);
-        mainCamera.SetViewProjMatrix(shader);
-        VAO.Bind(); // bind VAO
-
-        // GLCall(glDrawElements(GL_TRIANGLES, IBO.GetCount(), GL_UNSIGNED_INT, nullptr));
-
+        //----------------- RENDER OBJECT -------------------//
+        objShader.Bind(); // bind shaders
+        // send camera pos to specular light calculation
+        objShader.SetVec3("u_CameraPos", cameraController.GetCameraPos());
+        // objShader.SetVec3("u_LightPos", lightPos);
+        mainCamera.SetViewProjMatrix(objShader);
+        objVAO.Bind(); // bind VAO
         GLCall(glDrawArrays(GL_TRIANGLES, 0, 36));
+        objVAO.UnBind(); // unbind VAO
 
-        VAO.UnBind(); // unbind VAO
+        //----------------- RENDER LIGHT SOURCE -------------------//
+        lightShader.Bind();
+        //  lightModel = glm::rotate(lightModel, );
+        lightShader.SetMat4("u_Model", lightModel);
+        mainCamera.SetViewProjMatrix(lightShader);
+        lightVAO.Bind();
+        GLCall(glDrawArrays(GL_TRIANGLES, 0, 36));
+        lightVAO.UnBind();
+        //----------------- RENDER LIGHT SOURCE -------------------//
 
         {
             ImGui::Begin("Camera");
@@ -152,6 +184,11 @@ int main()
             ImGui::Text("Direction x: %.1f  y: %.1f  z: %.1f", cameraFront.x, cameraFront.y, cameraFront.z);
             ImGui::Text("Yaw %.1fº", cameraController.GetYaw());
             ImGui::Text("Pitch %.1fº", cameraController.GetPitch());
+
+            if (ImGui::Button("Reset Camera Location"))
+            {
+                cameraController.ResetCameraLocation();
+            }
             ImGui::End();
 
             ImGui::Begin("FPS");
@@ -204,6 +241,11 @@ void processInput(GLFWwindow *window)
         cameraController.ProcessKeyboardInput(CAMERA_MOVEMENT::LEFT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         cameraController.ProcessKeyboardInput(CAMERA_MOVEMENT::RIGHT, deltaTime);
+
+    if (glfwGetKey(window, GLFW_KEY_PAGE_UP) == GLFW_PRESS)
+        cameraController.ProcessKeyboardInput(CAMERA_MOVEMENT::UP, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_PAGE_DOWN) == GLFW_PRESS)
+        cameraController.ProcessKeyboardInput(CAMERA_MOVEMENT::DOWN, deltaTime);
 
     //----------------- CAMERA MOVE (ROTATION) -------------------//
     if (glfwGetKey(window, GLFW_KEY_KP_8) == GLFW_PRESS)
