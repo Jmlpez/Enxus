@@ -68,8 +68,8 @@ void Camera::SetCameraAttr(Shader &shader)
     if (cameraChanged)
         UpdateView();
 
-    shader.SetMat4("u_Proj", m_Proj);
-    shader.SetMat4("u_View", m_View);
+    shader.SetMat4("uProj", m_Proj);
+    shader.SetMat4("uView", m_View);
     // set other attributes uniforms (e.g position, direction, etc)
 }
 
@@ -78,8 +78,8 @@ void Camera::SetViewProjMatrix(Shader &shader)
     if (cameraChanged)
         UpdateView();
 
-    shader.SetMat4("u_Proj", m_Proj);
-    shader.SetMat4("u_View", m_View);
+    shader.SetMat4("uProj", m_Proj);
+    shader.SetMat4("uView", m_View);
 }
 
 void Camera::SetPos(glm::vec3 position)

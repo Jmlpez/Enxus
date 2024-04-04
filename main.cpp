@@ -63,57 +63,66 @@ int main()
     // for resize window event
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-    VertexArray objVAO, lightVAO;
+    VertexArray objVAO, lightSourceVAO;
 
     // cube vertices is being imported from cube.h
     VertexBuffer objVBO(cubeVertices, sizeof(cubeVertices));
     // lightVBO is not needed because we already have it from the current object (is also a cube)
 
-    VertexBufferLayout objLayout, lightLayout;
+    VertexBufferLayout objLayout, lightSourceLayout;
     objLayout.Push(3, GL_FLOAT); // position
     objLayout.Push(2, GL_FLOAT); // texture coordinates
     objLayout.Push(3, GL_FLOAT); // normal vector
     objVAO.AddBuffer(objVBO, objLayout);
 
-    lightLayout.Push(3, GL_FLOAT);
-    lightVAO.AddBuffer(objVBO, objLayout);
+    lightSourceLayout.Push(3, GL_FLOAT);
+    lightSourceVAO.AddBuffer(objVBO, objLayout);
 
     //----------------- SHADERS -------------------//
     Shader objShader("res/shaders/basic-lighting/obj.vert", "res/shaders/basic-lighting/obj.frag");
-    Shader lightShader("res/shaders/basic-lighting/light.vert", "res/shaders/basic-lighting/light.frag");
+    Shader lightSourceShader("res/shaders/basic-lighting/light.vert", "res/shaders/basic-lighting/light.frag");
 
     // bind shader program first
 
     //----------------- Light Source Matrices Transformations -------------------//
 
-    glm::mat4 lightModel = glm::mat4(1.0f);
-    glm::vec3 lightPos = glm::vec3(1.2f, 1.0f, 2.0f);
-    glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
+    glm::mat4 lightSourceModel = glm::mat4(1.0f);
+    glm::vec3 lightSourcePos = glm::vec3(1.2f, 1.0f, 2.0f);
 
-    lightModel = glm::translate(lightModel, lightPos);
-    lightModel = glm::scale(lightModel, glm::vec3(0.2f));
+    lightSourceModel = glm::translate(lightSourceModel, lightSourcePos);
+    lightSourceModel = glm::scale(lightSourceModel, glm::vec3(0.2f));
 
     // Basic shader uniforms: MVP matrix
-    lightShader.Bind();
+    lightSourceShader.Bind();
     // send camera uniforms to the light  shader
-    lightShader.SetMat4("u_Model", lightModel);
-    mainCamera.SetViewProjMatrix(lightShader);
+    lightSourceShader.SetMat4("uModel", lightSourceModel);
+    mainCamera.SetViewProjMatrix(lightSourceShader);
 
     //----------------- Object Matrices Transformations -------------------//
 
     glm::mat4 objModel = glm::mat4(1.0f);
-    glm::vec3 objectColor = glm::vec3(1.0f, 0.5f, 0.31f);
+    // glm::vec3 objectColor = glm::vec3(1.0f, 0.5f, 0.31f);
 
     objShader.Bind();
     // Vectors needed for light calculations
-    objShader.SetVec3("u_ObjectColor", objectColor);
-    objShader.SetVec3("u_LightColor", lightColor);
-    objShader.SetVec3("u_LightPos", lightPos);
+    // objShader.SetVec3("uObjectColor", objectColor);
 
-    objShader.SetVec3("u_CameraPos", cameraController.GetCameraPos());
+    //----------------- OBJECT MATERIAL -------------------//
+    objShader.SetFloat3("uObjectMaterial.ambient", 1.0f, 0.5f, 0.31f);
+    objShader.SetFloat3("uObjectMaterial.diffuse", 1.0f, 0.5f, 0.31f);
+    objShader.SetFloat3("uObjectMaterial.specular", 0.5f, 0.5f, 0.5f);
+    objShader.SetFloat("uObjectMaterial.shininess", 32.0f);
+
+    //----------------- LIGHT MATERIAL (Affecting the object, not the material of the light source) -------------------//
+    objShader.SetVec3("uLight.position", lightSourcePos);
+    objShader.SetFloat3("uLight.ambient", 0.1f, 0.1f, 0.1f);
+    objShader.SetFloat3("uLight.diffuse", 0.5f, 0.5f, 0.5f);
+    objShader.SetFloat3("uLight.specular", 1.0f, 1.0f, 1.0f);
+
+    objShader.SetVec3("uCameraPos", cameraController.GetCameraPos());
 
     // send camera uniforms to the object shader
-    objShader.SetMat4("u_Model", objModel);
+    objShader.SetMat4("uModel", objModel);
     mainCamera.SetViewProjMatrix(objShader);
 
     //----------------- UNBIND EVERYTHING -------------------//
@@ -121,8 +130,8 @@ int main()
     objVAO.UnBind();
     objVBO.Unbind();
 
-    lightShader.UnBind();
-    lightVAO.UnBind();
+    lightSourceShader.UnBind();
+    lightSourceVAO.UnBind();
 
     //----------------- IMGUI -------------------//
     IMGUI_CHECKVERSION();
@@ -159,21 +168,21 @@ int main()
         //----------------- RENDER OBJECT -------------------//
         objShader.Bind(); // bind shaders
         // send camera pos to specular light calculation
-        objShader.SetVec3("u_CameraPos", cameraController.GetCameraPos());
-        // objShader.SetVec3("u_LightPos", lightPos);
+        objShader.SetVec3("uCameraPos", cameraController.GetCameraPos());
+        // objShader.SetVec3("uLightPos", lightSourcePos);
         mainCamera.SetViewProjMatrix(objShader);
         objVAO.Bind(); // bind VAO
         GLCall(glDrawArrays(GL_TRIANGLES, 0, 36));
         objVAO.UnBind(); // unbind VAO
 
         //----------------- RENDER LIGHT SOURCE -------------------//
-        lightShader.Bind();
+        lightSourceShader.Bind();
         //  lightModel = glm::rotate(lightModel, );
-        lightShader.SetMat4("u_Model", lightModel);
-        mainCamera.SetViewProjMatrix(lightShader);
-        lightVAO.Bind();
+        lightSourceShader.SetMat4("uModel", lightSourceModel);
+        mainCamera.SetViewProjMatrix(lightSourceShader);
+        lightSourceVAO.Bind();
         GLCall(glDrawArrays(GL_TRIANGLES, 0, 36));
-        lightVAO.UnBind();
+        lightSourceVAO.UnBind();
         //----------------- RENDER LIGHT SOURCE -------------------//
 
         {
