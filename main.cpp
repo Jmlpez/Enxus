@@ -78,6 +78,12 @@ int main()
     lightSourceLayout.Push(3, GL_FLOAT);
     lightSourceVAO.AddBuffer(objVBO, objLayout);
 
+    //----------------- TEXTURES -------------------//
+
+    Texture2D containerDiffuse("res/images/container2.png");
+    Texture2D containerSpecular("res/images/container2_specular.png");
+    Texture2D containerEmission("res/images/matrix.jpg");
+
     //----------------- SHADERS -------------------//
     Shader objShader("res/shaders/basic-lighting/obj.vert", "res/shaders/basic-lighting/obj.frag");
     Shader lightSourceShader("res/shaders/basic-lighting/light.vert", "res/shaders/basic-lighting/light.frag");
@@ -88,6 +94,8 @@ int main()
 
     glm::mat4 lightSourceModel = glm::mat4(1.0f);
     glm::vec3 lightSourcePos = glm::vec3(1.2f, 1.0f, 2.0f);
+    //  for directional light
+    // glm::vec3 lightSourceDir = glm::vec3(-0.2f, -1.0f, -0.3f);
 
     lightSourceModel = glm::translate(lightSourceModel, lightSourcePos);
     lightSourceModel = glm::scale(lightSourceModel, glm::vec3(0.2f));
@@ -108,16 +116,27 @@ int main()
     // objShader.SetVec3("uObjectColor", objectColor);
 
     //----------------- OBJECT MATERIAL -------------------//
-    objShader.SetFloat3("uObjectMaterial.ambient", 1.0f, 0.5f, 0.31f);
-    objShader.SetFloat3("uObjectMaterial.diffuse", 1.0f, 0.5f, 0.31f);
-    objShader.SetFloat3("uObjectMaterial.specular", 0.5f, 0.5f, 0.5f);
     objShader.SetFloat("uObjectMaterial.shininess", 32.0f);
+    objShader.SetInt("uObjectMaterial.diffuse", 0);
+    objShader.SetInt("uObjectMaterial.specular", 1);
+
+    containerDiffuse.Bind(0);
+    containerSpecular.Bind(1);
 
     //----------------- LIGHT MATERIAL (Affecting the object, not the material of the light source) -------------------//
-    objShader.SetVec3("uLight.position", lightSourcePos);
+    objShader.SetVec3("uLight.position", cameraController.GetCameraPos()); // to spotlight
+    objShader.SetVec3("uLight.direction", cameraController.GetCameraFront());
+    objShader.SetFloat("uLight.innerCutOffAngle", glm::cos(glm::radians(12.5f)));
+    objShader.SetFloat("uLight.outerCutOffAngle", glm::cos(glm::radians(17.5f)));
+    // objShader.SetVec3("uLight.direction", lightSourceDir);
     objShader.SetFloat3("uLight.ambient", 0.1f, 0.1f, 0.1f);
-    objShader.SetFloat3("uLight.diffuse", 0.5f, 0.5f, 0.5f);
+    objShader.SetFloat3("uLight.diffuse", 1.0f, 1.0f, 1.0f);
     objShader.SetFloat3("uLight.specular", 1.0f, 1.0f, 1.0f);
+
+    // attenuation values
+    objShader.SetFloat("uLight.constant", 1.0f);
+    objShader.SetFloat("uLight.linear", 0.09f);
+    objShader.SetFloat("uLight.quadratic", 0.032f);
 
     objShader.SetVec3("uCameraPos", cameraController.GetCameraPos());
 
@@ -141,6 +160,25 @@ int main()
     ImGui::StyleColorsDark();
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 330");
+
+    //----------------- Emission Color Exercise -------------------//
+
+    // glm::vec3 emissionColor = glm::vec3(0.0f, 1.0f, 0.0f);
+    // float emissionStrength = 1.0f;
+    // emission;
+
+    //----------------- OBJECT POSITIONS IN THE WORLD -------------------//
+    glm::vec3 cubePositions[] = {
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(2.0f, 5.0f, -15.0f),
+        glm::vec3(-1.5f, -2.2f, -2.5f),
+        glm::vec3(-3.8f, -2.0f, -12.3f),
+        glm::vec3(2.4f, -0.4f, -3.5f),
+        glm::vec3(-1.7f, 3.0f, -7.5f),
+        glm::vec3(1.3f, -2.0f, -2.5f),
+        glm::vec3(1.5f, 2.0f, -2.5f),
+        glm::vec3(1.5f, 0.2f, -1.5f),
+        glm::vec3(-1.3f, 1.0f, -1.5f)};
 
     float lastFrame = 0.0f;
 
@@ -167,12 +205,25 @@ int main()
 
         //----------------- RENDER OBJECT -------------------//
         objShader.Bind(); // bind shaders
+        // to spotlight calculation
+        objShader.SetVec3("uLight.position", cameraController.GetCameraPos()); // to spotlight
+        objShader.SetVec3("uLight.direction", cameraController.GetCameraFront());
         // send camera pos to specular light calculation
         objShader.SetVec3("uCameraPos", cameraController.GetCameraPos());
-        // objShader.SetVec3("uLightPos", lightSourcePos);
         mainCamera.SetViewProjMatrix(objShader);
         objVAO.Bind(); // bind VAO
-        GLCall(glDrawArrays(GL_TRIANGLES, 0, 36));
+
+        for (int i = 0; i < 10; i++)
+        {
+            glm::mat4 cubeModel = glm::mat4(1.0f);
+            cubeModel = glm::translate(cubeModel, cubePositions[i]);
+            float angle = 20.0f * i;
+            cubeModel = glm::rotate(cubeModel, glm::radians(angle),
+                                    glm::vec3(1.0f, 0.3f, 0.5f));
+            objShader.SetMat4("uModel", cubeModel);
+            GLCall(glDrawArrays(GL_TRIANGLES, 0, 36));
+        }
+
         objVAO.UnBind(); // unbind VAO
 
         //----------------- RENDER LIGHT SOURCE -------------------//
@@ -204,6 +255,12 @@ int main()
             ImGui::Text("App average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
             ImGui::End();
         }
+
+        //----------------- EMISSION -------------------//
+        // ImGui::Begin("Emission");
+        // ImGui::DragFloat("Emission Strength", &emissionStrength, 0.1f, 1.0f, 30.0f);
+        // ImGui::ColorEdit3("Emission Color", glm::value_ptr(emissionColor));
+        // ImGui::End();
 
         //----------------- IMGUI RENDER -------------------//
 

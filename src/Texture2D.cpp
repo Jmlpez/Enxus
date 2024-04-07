@@ -34,7 +34,7 @@ void Texture2D::LoadImage()
     m_LocalBuffer = stbi_load(m_TexturePath.c_str(), &m_Width, &m_Height, &m_NrChannels, 0);
     if (!m_LocalBuffer)
     {
-        std::cout << "ERROR: Failed to load texture" << std::endl;
+        std::cout << "ERROR: Failed to load texture: " << m_TexturePath << std::endl;
         return;
     }
     // specify textures attributes
