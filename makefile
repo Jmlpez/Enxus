@@ -4,6 +4,7 @@ TARGET = $(BIN_DIR)/main
 INCLUDE_DIR = include
 IMGUI_DIR = imgui
 SRC_DIR = src
+TEST_DIR = $(SRC_DIR)/tests
 
 # OpenGL & Include Flags
 INCLUDE_FLAGS = -Iinclude
@@ -17,6 +18,7 @@ CXXFLAGS = -std=gnu++17 -Wall -Wextra
 # CPP Files 
 SOURCES = $(wildcard $(SRC_DIR)/*.cpp)
 SOURCES += $(wildcard $(IMGUI_DIR)/*.cpp)
+SOURCES += $(wildcard $(TEST_DIR)/*.cpp)
 
 
 # OBJ Files
@@ -33,6 +35,9 @@ $(BIN_DIR)/%.o: $(SRC_DIR)/%.cpp $(INCLUDE_DIR)/%.h
 
 $(BIN_DIR)/%.o: $(IMGUI_DIR)/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@ $(IMGUI_FLAGS)
+
+$(BIN_DIR)/%.o: $(TEST_DIR)/%.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@ $(INCLUDE_FLAGS) $(IMGUI_FLAGS) $(OPENGL_FLAGS)
 
 $(TARGET): $(OBJS) main.cpp
 	$(CXX) $(CXXFLAGS) $^ -o $@ $(INCLUDE_FLAGS) $(IMGUI_FLAGS)  $(OPENGL_FLAGS)
