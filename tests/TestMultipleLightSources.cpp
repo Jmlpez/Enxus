@@ -1,7 +1,4 @@
 #include "TestMultipleLightSources.h"
-// #include "glm/gtc/matrix_transform.hpp"
-// #include "../../include/glm/gtc/matrix_transform.hpp"
-// #include "cube.h"
 
 namespace Test
 {

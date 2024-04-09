@@ -11,9 +11,9 @@
 #include "imgui/imgui_impl_opengl3.h"
 
 // Test
-#include "src/tests/TestMenu.h"
-#include "src/tests/TestClearColor.h"
-#include "src/tests/TestMultipleLightSources.h"
+#include "tests/TestMenu.h"
+#include "tests/TestClearColor.h"
+#include "tests/TestMultipleLightSources.h"
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void processInput(GLFWwindow *window);

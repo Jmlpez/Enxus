@@ -2,14 +2,16 @@
 BIN_DIR = bin
 TARGET = $(BIN_DIR)/main
 INCLUDE_DIR = include
-IMGUI_DIR = imgui
+VENDOR_DIR = vendor
+IMGUI_DIR = $(VENDOR_DIR)/imgui
+TEST_DIR = tests
 SRC_DIR = src
-TEST_DIR = $(SRC_DIR)/tests
 
 # OpenGL & Include Flags
-INCLUDE_FLAGS = -Iinclude
-IMGUI_FLAGS = -Iimgui
-OPENGL_FLAGS = -lglfw -lGL -lGLEW -lX11 -lpthread -lXrandr -lXi -ldl
+INCLUDE_FLAGS = -I$(INCLUDE_DIR)
+VENDOR_FLAGS = -I$(VENDOR_DIR)
+IMGUI_FLAGS = -I$(IMGUI_DIR)
+OPENGL_FLAGS = -lglfw -lGL -lGLEW -lX11 -lpthread -lassimp -lXrandr -lXi -ldl
 
 # Compiler
 CXX = g++
@@ -18,6 +20,7 @@ CXXFLAGS = -std=gnu++17 -Wall -Wextra
 # CPP Files 
 SOURCES = $(wildcard $(SRC_DIR)/*.cpp)
 SOURCES += $(wildcard $(IMGUI_DIR)/*.cpp)
+SOURCES += $(wildcard $(VENDOR_DIR)/*.cpp)
 SOURCES += $(wildcard $(TEST_DIR)/*.cpp)
 
 
@@ -30,17 +33,22 @@ all: $(TARGET)
 # Build all the cpp files into .o files
 # %.o match %.cpp and match %.h (e.g: utils.o utils.cpp utils.h)
 # headers files are added as prerequisites to watch changes in those files too
-$(BIN_DIR)/%.o: $(SRC_DIR)/%.cpp $(INCLUDE_DIR)/%.h
-	$(CXX) $(CXXFLAGS) -c $< -o $@ $(INCLUDE_FLAGS) $(IMGUI_FLAGS) $(OPENGL_FLAGS)
 
+# Build all cpp files inside src
+$(BIN_DIR)/%.o: $(SRC_DIR)/%.cpp $(INCLUDE_DIR)/%.h
+	$(CXX) $(CXXFLAGS) -c $< -o $@ $(INCLUDE_FLAGS) $(VENDOR_FLAGS) $(OPENGL_FLAGS)
+
+# Build imgui
 $(BIN_DIR)/%.o: $(IMGUI_DIR)/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@ $(IMGUI_FLAGS)
 
+# Build tests
 $(BIN_DIR)/%.o: $(TEST_DIR)/%.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@ $(INCLUDE_FLAGS) $(IMGUI_FLAGS) $(OPENGL_FLAGS)
+	$(CXX) $(CXXFLAGS) -c $< -o $@ $(INCLUDE_FLAGS) $(IMGUI_FLAGS) $(VENDOR_FLAGS) $(OPENGL_FLAGS)
 
+# Build main
 $(TARGET): $(OBJS) main.cpp
-	$(CXX) $(CXXFLAGS) $^ -o $@ $(INCLUDE_FLAGS) $(IMGUI_FLAGS)  $(OPENGL_FLAGS)
+	$(CXX) $(CXXFLAGS) $^ -o $@ $(INCLUDE_FLAGS) $(IMGUI_FLAGS) $(VENDOR_FLAGS) $(OPENGL_FLAGS)
 	
 
 run: all
