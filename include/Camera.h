@@ -44,7 +44,7 @@ public:
     ~Camera();
 
     // update viewport
-    void SetViewport(unsigned int vpWidth, unsigned int vpHeight);
+    void OnResize(unsigned int vpWidth, unsigned int vpHeight);
 
     // set Camera Uniforms
     void SetCameraAttr(Shader &shader);

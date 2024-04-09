@@ -52,7 +52,7 @@ void Camera::UpdateProjection()
     }
 }
 
-void Camera::SetViewport(unsigned int vpWidth, unsigned int vpHeight)
+void Camera::OnResize(unsigned int vpWidth, unsigned int vpHeight)
 {
     // if nothing change just return
     if (m_VpWidth == vpWidth && m_VpHeight == vpHeight)
