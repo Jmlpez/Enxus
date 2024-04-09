@@ -1,6 +1,8 @@
 #ifndef TEST_H
 #define TEST_H
 
+#include "Camera.h"
+
 namespace Test
 {
 
@@ -10,7 +12,11 @@ namespace Test
         Test(){};
         virtual ~Test(){};
 
-        virtual void OnUpdate(){};
+        virtual void OnUpdate(float deltaTime, FreeCameraController *cameraController)
+        {
+            (void)deltaTime;
+            (void)cameraController;
+        };
         virtual void OnRender(){};
         virtual void OnImGuiRender(){};
     };

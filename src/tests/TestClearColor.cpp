@@ -11,9 +11,9 @@ namespace Test
     {
     }
 
-    void TestClearColor::OnUpdate()
-    {
-    }
+    // void TestClearColor::OnUpdate(float deltaTime, FreeCameraController *cameraController)
+    // {
+    // }
 
     void TestClearColor::OnRender()
     {

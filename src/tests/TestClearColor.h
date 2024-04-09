@@ -13,7 +13,8 @@ namespace Test
         TestClearColor();
         ~TestClearColor();
 
-        void OnUpdate() override;
+        // Not used
+        // void OnUpdate(float deltaTime, FreeCameraController *cameraController) override;
         void OnRender() override;
         void OnImGuiRender() override;
 

@@ -37,11 +37,15 @@ bool GLLogCall(const char *function, const char *file, int line)
             error = "INVALID_FRAMEBUFFER_OPERATION";
             break;
         }
-        std::cout << "[OPENGL ERROR] : " << error << "\n";
-        std::cout << "FUNCTION: " << function << "\n";
-        std::cout << "FILE: " << file << "\n";
-        std::cout << "LINE: " << line << "\n";
+        std::cout << "[OPENGL ERROR] : " << error << std::endl;
+        std::cout << "FUNCTION: " << function << std::endl;
+        std::cout << "FILE: " << file << std::endl;
+        std::cout << "LINE: " << line << std::endl;
         return false;
     }
     return true;
+}
+void debugLine(int line, const char *file)
+{
+    std::cout << "LINE: (" << line << ") FILE: " << file << std::endl;
 }

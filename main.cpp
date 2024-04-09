@@ -13,7 +13,7 @@
 #include "Shader.h"
 #include "Texture2D.h"
 #include "Camera.h"
-#include "cube.h"
+// #include "cube.h"
 
 // Imgui includes
 #include "imgui/imgui.h"
@@ -23,6 +23,7 @@
 // Test
 #include "src/tests/TestMenu.h"
 #include "src/tests/TestClearColor.h"
+#include "src/tests/TestMultipleLightSources.h"
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void processInput(GLFWwindow *window);
@@ -184,28 +185,6 @@ int main()
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 330");
 
-    // // ImGui::
-    // // ImGui::Dock
-
-    // //----------------- Emission Color Exercise -------------------//
-
-    // // glm::vec3 emissionColor = glm::vec3(0.0f, 1.0f, 0.0f);
-    // // float emissionStrength = 1.0f;
-    // // emission;
-
-    // //----------------- OBJECT POSITIONS IN THE WORLD -------------------//
-    // glm::vec3 cubePositions[] = {
-    //     glm::vec3(0.0f, 0.0f, 0.0f),
-    //     glm::vec3(2.0f, 5.0f, -15.0f),
-    //     glm::vec3(-1.5f, -2.2f, -2.5f),
-    //     glm::vec3(-3.8f, -2.0f, -12.3f),
-    //     glm::vec3(2.4f, -0.4f, -3.5f),
-    //     glm::vec3(-1.7f, 3.0f, -7.5f),
-    //     glm::vec3(1.3f, -2.0f, -2.5f),
-    //     glm::vec3(1.5f, 2.0f, -2.5f),
-    //     glm::vec3(1.5f, 0.2f, -1.5f),
-    //     glm::vec3(-1.3f, 1.0f, -1.5f)};
-
     Test::Test *currentTest = nullptr;
     Test::TestMenu *testMenu = new Test::TestMenu(currentTest);
     currentTest = testMenu;
@@ -213,6 +192,7 @@ int main()
     // Test::TestClearColor test;
 
     testMenu->RegisterTest<Test::TestClearColor>("Clear Color");
+    testMenu->RegisterTest<Test::TestMultipleLightSources>("Lighting Chapter");
 
     float lastFrame = 0.0f;
     while (!glfwWindowShouldClose(window))
@@ -223,7 +203,7 @@ int main()
 
         // process user input
         processInput(window);
-        // mainCamera.SetViewport(viewportWidth, viewportHeight);
+        mainCamera.SetViewport(viewportWidth, viewportHeight);
 
         // clear screen color
         GLCall(glClearColor(0.11f, 0.11f, 0.11f, 1.0f));
@@ -234,10 +214,9 @@ int main()
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        // test.OnImGuiRender();
         if (currentTest)
         {
-            currentTest->OnUpdate();
+            currentTest->OnUpdate(deltaTime, &cameraController);
             currentTest->OnRender();
             ImGui::Begin("Test");
 
@@ -245,81 +224,37 @@ int main()
             {
                 delete currentTest;
                 currentTest = testMenu;
+                cameraController.ResetCameraLocation();
             }
+            ImGui::Separator();
             currentTest->OnImGuiRender();
+            // ImGui::Begin("Camera");
+
+            ImGui::Separator();
+            const glm::vec3 cameraPos = cameraController.GetCameraPos();
+            const glm::vec3 cameraFront = cameraController.GetCameraFront();
+            ImGui::Text("Position x: %.1f  y: %.1f  z: %.1f", cameraPos.x, cameraPos.y, cameraPos.z);
+            ImGui::Text("Direction x: %.1f  y: %.1f  z: %.1f", cameraFront.x, cameraFront.y, cameraFront.z);
+            ImGui::Text("Yaw %.1fº", cameraController.GetYaw());
+            ImGui::Text("Pitch %.1fº", cameraController.GetPitch());
+
+            if (ImGui::Button("Reset Camera Location"))
+            {
+                cameraController.ResetCameraLocation();
+            }
+
+            // ImGui::Begin("FPS");
+            ImGui::Text("App average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+
+            // ImGui::End();
             ImGui::End();
+            // LOG_LINE();
         }
-
-        //----------------- BIND EVERYTHING BEFORE A DRAW CALL -------------------//
-
-        //----------------- RENDER OBJECT -------------------//
-        // objShader.Bind(); // bind shaders
-        // // to spotlight calculation
-        // objShader.SetVec3("uSpotLight.position", cameraController.GetCameraPos()); // to spotlight
-        // objShader.SetVec3("uSpotLight.direction", cameraController.GetCameraFront());
-        // // send camera pos to specular light calculation
-        // objShader.SetVec3("uCameraPos", cameraController.GetCameraPos());
-        // mainCamera.SetViewProjMatrix(objShader);
-        // objVAO.Bind(); // bind VAO
-
-        // for (int i = 0; i < 10; i++)
-        // {
-        //     glm::mat4 cubeModel = glm::mat4(1.0f);
-        //     cubeModel = glm::translate(cubeModel, cubePositions[i]);
-        //     float angle = 20.0f * i;
-        //     cubeModel = glm::rotate(cubeModel, glm::radians(angle),
-        //                             glm::vec3(1.0f, 0.3f, 0.5f));
-        //     objShader.SetMat4("uModel", cubeModel);
-        //     GLCall(glDrawArrays(GL_TRIANGLES, 0, 36));
-        // }
-
-        // objVAO.UnBind(); // unbind VAO
-
-        // //----------------- RENDER LIGHT SOURCE -------------------//
-        // lightSourceShader.Bind();
-        // mainCamera.SetViewProjMatrix(lightSourceShader);
-
-        // lightSourceVAO.Bind();
-        // for (int i = 0; i < 4; i++)
-        // {
-
-        //     glm::mat4 lightSourceModel = glm::mat4(1.0f);
-        //     lightSourceModel = glm::translate(lightSourceModel, pointLightPositions[i]);
-        //     lightSourceModel = glm::scale(lightSourceModel, glm::vec3(0.2f));
-        //     lightSourceShader.SetMat4("uModel", lightSourceModel);
-
-        //     GLCall(glDrawArrays(GL_TRIANGLES, 0, 36));
-        // }
-        // lightSourceVAO.UnBind();
 
         // //----------------- RENDER IMGUI -------------------//
         // {
-        //     ImGui::Begin("Camera");
-        //     const glm::vec3 cameraPos = cameraController.GetCameraPos();
-        //     const glm::vec3 cameraFront = cameraController.GetCameraFront();
-        //     ImGui::Text("Position x: %.1f  y: %.1f  z: %.1f", cameraPos.x, cameraPos.y, cameraPos.z);
-        //     ImGui::Text("Direction x: %.1f  y: %.1f  z: %.1f", cameraFront.x, cameraFront.y, cameraFront.z);
-        //     ImGui::Text("Yaw %.1fº", cameraController.GetYaw());
-        //     ImGui::Text("Pitch %.1fº", cameraController.GetPitch());
 
-        //     if (ImGui::Button("Reset Camera Location"))
-        //     {
-        //         cameraController.ResetCameraLocation();
-        //     }
-        //     ImGui::End();
-
-        //     ImGui::Begin("FPS");
-        //     ImGui::Text("App average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-        //     ImGui::End();
         // }
-
-        //----------------- EMISSION -------------------//
-        // ImGui::Begin("Emission");
-        // ImGui::DragFloat("Emission Strength", &emissionStrength, 0.1f, 1.0f, 30.0f);
-        // ImGui::ColorEdit3("Emission Color", glm::value_ptr(emissionColor));
-        // ImGui::End();
-
-        //----------------- IMGUI RENDER -------------------//
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

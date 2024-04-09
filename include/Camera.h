@@ -1,7 +1,6 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include <GLFW/glfw3.h>
 #include "Shader.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
@@ -92,7 +91,7 @@ public:
     FreeCameraController(Camera *camera);
     ~FreeCameraController(){};
 
-    //    Camera *GetCamera() { return m_MainCamera; }
+    Camera *GetCamera() { return m_MainCamera; }
 
     void ResetCameraLocation();
 
