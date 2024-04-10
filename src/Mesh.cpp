@@ -11,13 +11,12 @@ Mesh::Mesh(
 
 Mesh::~Mesh()
 {
-    // delete all buffers
+    // smart pointers delete it selfs
 }
 
 void Mesh::SetUpMesh()
 {
     m_VertexArrayObject = std::make_shared<VertexArray>();
-
     m_VertexBufferObject = std::make_shared<VertexBuffer>(&m_Vertices[0], (unsigned int)m_Vertices.size() * sizeof(MeshVertex));
     m_IndexBufferObject = std::make_shared<IndexBuffer>(&m_Indices[0], (unsigned int)m_Indices.size());
 
@@ -33,8 +32,8 @@ void Mesh::SetUpMesh()
     layout.Push(2, GL_FLOAT);
 
     m_VertexArrayObject->AddBuffer(*m_VertexBufferObject, layout);
-
     /*
+    IGNORE:
     Assuming a struct call MeshTexture defined as:
     struct MeshTexture{
         std::string path;
