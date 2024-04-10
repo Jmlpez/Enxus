@@ -4,6 +4,7 @@
 #include <GLEW/glew.h>
 
 #include "./debugbreak.h"
+#include <memory> // to handle smart pointers
 
 // Force the program to stop if ASSERT fails
 #define ASSERT(x) \
@@ -21,5 +22,8 @@
 void GLClearError();
 void debugLine(int line, const char *file);
 bool GLLogCall(const char *function, const char *file, int line);
+
+// template <typename T>
+// using Ref = std::shared_ptr<T>;
 
 #endif
