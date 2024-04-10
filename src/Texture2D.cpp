@@ -3,8 +3,8 @@
 #include "stb_image.h"
 #include <iostream>
 
-Texture2D::Texture2D(const std::string &texturePath)
-    : m_RendererId(0), m_TexturePath(texturePath)
+Texture2D::Texture2D(const std::string &texturePath, TEXTURE_TYPE type)
+    : m_RendererId(0), m_TexturePath(texturePath), m_Type(type)
 {
 
     GLCall(glGenTextures(1, &m_RendererId));
@@ -20,6 +20,7 @@ Texture2D::Texture2D(const std::string &texturePath)
 
     LoadImage();
 }
+
 Texture2D::~Texture2D()
 {
     GLCall(glDeleteTextures(1, &m_RendererId));
@@ -52,7 +53,7 @@ void Texture2D::Bind(unsigned int slot) const
     GLCall(glActiveTexture(GL_TEXTURE0 + slot));
     GLCall(glBindTexture(GL_TEXTURE_2D, m_RendererId));
 }
-void Texture2D::UnBind() const
+void Texture2D::Unbind() const
 {
     GLCall(glBindTexture(GL_TEXTURE_2D, 0));
 }
