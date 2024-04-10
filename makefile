@@ -30,6 +30,8 @@ OBJS = $(addprefix $(BIN_DIR)/, $(addsuffix .o, $(basename $(notdir $(SOURCES)))
 
 all: $(TARGET)
 
+#rebuild: 
+
 # Build all the cpp files into .o files
 # %.o match %.cpp and match %.h (e.g: utils.o utils.cpp utils.h)
 # headers files are added as prerequisites to watch changes in those files too
@@ -37,6 +39,11 @@ all: $(TARGET)
 # Build all cpp files inside src
 $(BIN_DIR)/%.o: $(SRC_DIR)/%.cpp $(INCLUDE_DIR)/%.h
 	$(CXX) $(CXXFLAGS) -c $< -o $@ $(INCLUDE_FLAGS) $(VENDOR_FLAGS) $(OPENGL_FLAGS)
+
+# Build stb_image cpp file inside vendor 
+$(BIN_DIR)/%.o: $(VENDOR_DIR)/%.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@ 
+
 
 # Build imgui
 $(BIN_DIR)/%.o: $(IMGUI_DIR)/%.cpp
@@ -58,6 +65,12 @@ run: all
 
 pepe: pepe.cpp
 	g++ -std=gnu++17 -Wall -Wextra pepe.cpp -o pepe && ./pepe
+
+rebuild:
+	@echo "\n---------------------- RE-BUILDING THE ENTIRE PROJECT -----------------------\n"
+	@make clean
+	@make all
+	@echo "\n---------------------- FINISHED THE RE-BUILDING OF THE ENTIRE PROJECT -----------------------\n"
 
 clean:
 	rm -fr $(BIN_DIR)/*
