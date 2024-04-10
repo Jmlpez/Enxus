@@ -145,11 +145,11 @@ namespace Test
         // mainCamera->SetViewProjMatrix(*objShader);
 
         // //----------------- UNBIND EVERYTHING -------------------//
-        objShader->UnBind();
-        objVAO->UnBind();
+        objShader->Unbind();
+        objVAO->Unbind();
         objVBO->Unbind();
-        lightSourceShader->UnBind();
-        lightSourceVAO->UnBind();
+        lightSourceShader->Unbind();
+        lightSourceVAO->Unbind();
     }
 
     TestMultipleLightSources::~TestMultipleLightSources()
@@ -174,7 +174,7 @@ namespace Test
         objShader->SetVec3("uCameraPos", cameraController->GetCameraPos());
         cameraController->GetCamera()->SetViewProjMatrix(*objShader);
 
-        objShader->UnBind();
+        objShader->Unbind();
         lightSourceShader->Bind();
         cameraController->GetCamera()->SetViewProjMatrix(*lightSourceShader);
     }
@@ -196,7 +196,7 @@ namespace Test
                 GLCall(glDrawArrays(GL_TRIANGLES, 0, 36));
             }
 
-            objVAO->UnBind(); // unbind VAO
+            objVAO->Unbind(); // unbind VAO
         }
         //----------------- RENDER LIGHTS SOURCES -------------------//
 
@@ -215,7 +215,7 @@ namespace Test
 
                 GLCall(glDrawArrays(GL_TRIANGLES, 0, 36));
             }
-            lightSourceVAO->UnBind();
+            lightSourceVAO->Unbind();
         }
     }
     void TestMultipleLightSources::OnImGuiRender()

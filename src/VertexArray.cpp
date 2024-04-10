@@ -32,7 +32,7 @@ void VertexArray::Bind() const
 {
     GLCall(glBindVertexArray(m_RendererId));
 }
-void VertexArray::UnBind() const
+void VertexArray::Unbind() const
 {
     GLCall(glBindVertexArray(0));
 }

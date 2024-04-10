@@ -21,7 +21,7 @@ public:
     Shader(const std::string &vertexFilePath, const std::string &fragmentFilePath);
 
     void Bind() const;
-    void UnBind() const;
+    void Unbind() const;
 
     void SetBool(const std::string &uName, bool value);
     void SetInt(const std::string &uName, int value);

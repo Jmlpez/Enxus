@@ -16,7 +16,7 @@ public:
     void AddBuffer(const VertexBuffer &vbo, const VertexBufferLayout &layout);
 
     void Bind() const;
-    void UnBind() const;
+    void Unbind() const;
 };
 
 #endif
