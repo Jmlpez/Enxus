@@ -2,13 +2,14 @@
 
 void Renderer::Draw(Mesh &mesh, Shader &shader)
 {
+
     mesh.GetVAO()->Bind();
     shader.Bind();
 
     /*
-    Currently supported textures types
-    diffuse map
-    specular map
+        Currently supported textures types
+        diffuse map
+        specular map
     */
     unsigned diffuseNr = 1;
     unsigned specularNr = 1;
@@ -23,10 +24,10 @@ void Renderer::Draw(Mesh &mesh, Shader &shader)
         {
             name = "texture_diffuse" + std::to_string(diffuseNr++);
         }
-        // else if (texture.GetType() == TEXTURE_TYPE::SPECULAR)
-        // {
-        //     name = "texture_specular" + std::to_string(specularNr++);
-        // }
+        else if (texture->GetType() == TEXTURE_TYPE::SPECULAR)
+        {
+            name = "texture_specular" + std::to_string(specularNr++);
+        }
         shader.SetInt(("material." + name).c_str(), i);
         texture->Bind(i); // active the current texture slot
     }

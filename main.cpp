@@ -5,6 +5,9 @@
 #include <fstream>
 #include <sstream>
 
+// utility functions
+#include "utils.h"
+
 // Imgui includes
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glfw.h"
@@ -13,7 +16,8 @@
 // Test
 #include "tests/TestMenu.h"
 #include "tests/TestClearColor.h"
-#include "tests/TestMultipleLightSources.h"
+#include "tests/TestMesh.h"
+// #include "tests/TestMultipleLightSources.h"
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void processInput(GLFWwindow *window);
@@ -72,7 +76,7 @@ int main()
     currentTest = testMenu;
 
     testMenu->RegisterTest<Test::TestClearColor>("Clear Color");
-    testMenu->RegisterTest<Test::TestMultipleLightSources>("Lighting Chapter");
+    testMenu->RegisterTest<Test::TestMesh>("Mesh");
 
     float lastFrame = 0.0f;
     while (!glfwWindowShouldClose(window))
@@ -108,7 +112,6 @@ int main()
             }
             ImGui::Separator();
             currentTest->OnImGuiRender();
-            // ImGui::Begin("Camera");
 
             ImGui::Separator();
             const glm::vec3 cameraPos = cameraController.GetCameraPos();
@@ -123,12 +126,9 @@ int main()
                 cameraController.ResetCameraLocation();
             }
 
-            // ImGui::Begin("FPS");
             ImGui::Text("App average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 
-            // ImGui::End();
             ImGui::End();
-            // LOG_LINE();
         }
 
         ImGui::Render();
