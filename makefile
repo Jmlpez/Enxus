@@ -56,5 +56,9 @@ run: all
 	@$(TARGET)
 	@echo "\n------------------- END OF RUNING -------------------\n"	
 
+pepe: pepe.cpp
+	g++ -std=gnu++17 -Wall -Wextra pepe.cpp -o pepe && ./pepe
+
 clean:
 	rm -fr $(BIN_DIR)/*
+
