@@ -13,12 +13,9 @@ namespace Test
         std::vector<unsigned int> indices{0, 1, 3,
                                           1, 2, 3};
 
-        // textureWood = new Texture2D("res/images/container.jpg", TEXTURE_TYPE::DIFFUSE);
-        // textureWood = new Texture2D("res/images/container.jpg", TEXTURE_TYPE::DIFFUSE);
-
-        std::vector<std::shared_ptr<Texture2D>> textures{
-            std::make_shared<Texture2D>("res/images/container.jpg", TEXTURE_TYPE::DIFFUSE),
-            std::make_shared<Texture2D>("res/images/awesomeface.png", TEXTURE_TYPE::DIFFUSE),
+        std::vector<MeshTexture> textures{
+            {"res/images/container.jpg", TEXTURE_TYPE::DIFFUSE},
+            {"res/images/awesomeface.png", TEXTURE_TYPE::DIFFUSE},
         };
 
         m_Plane = std::make_shared<Mesh>(vertices, indices, textures);

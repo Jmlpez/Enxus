@@ -11,6 +11,7 @@ void Renderer::Draw(Mesh &mesh, Shader &shader)
         diffuse map
         specular map
     */
+
     unsigned diffuseNr = 1;
     unsigned specularNr = 1;
 

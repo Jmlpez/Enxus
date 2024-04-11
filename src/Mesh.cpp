@@ -3,8 +3,8 @@
 Mesh::Mesh(
     std::vector<MeshVertex> vertices,
     std::vector<unsigned int> indices,
-    std::vector<std::shared_ptr<Texture2D>> &textures)
-    : m_Vertices(vertices), m_Indices(indices), m_Textures(textures)
+    std::vector<MeshTexture> textures)
+    : m_Vertices(vertices), m_Indices(indices), m_MeshTextures(textures)
 {
     SetUpMesh();
 }
@@ -40,4 +40,8 @@ void Mesh::SetUpMesh()
         TEXTURE_TYPE
     }
     */
+    for (auto &[path, type] : m_MeshTextures)
+    {
+        m_Textures.push_back(std::make_shared<Texture2D>(path, type));
+    }
 }

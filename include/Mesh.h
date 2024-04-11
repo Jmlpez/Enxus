@@ -15,6 +15,12 @@ struct MeshVertex
     glm::vec2 TexCoords;
 };
 
+struct MeshTexture
+{
+    std::string Path;
+    TEXTURE_TYPE Type;
+};
+
 class Mesh
 {
 private:
@@ -24,10 +30,12 @@ private:
 
     std::vector<MeshVertex> m_Vertices;
     std::vector<unsigned int> m_Indices;
+    std::vector<MeshTexture> m_MeshTextures;
+
     std::vector<std::shared_ptr<Texture2D>> m_Textures;
 
 public:
-    Mesh(std::vector<MeshVertex> vertices, std::vector<unsigned int> indices, std::vector<std::shared_ptr<Texture2D>> &textures);
+    Mesh(std::vector<MeshVertex> vertices, std::vector<unsigned int> indices, std::vector<MeshTexture> textures);
     ~Mesh();
 
     void SetUpMesh();
