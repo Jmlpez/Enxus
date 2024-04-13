@@ -41,7 +41,14 @@ void Renderer::Draw(std::shared_ptr<Mesh> mesh, Shader &shader)
     }
 
     mesh->GetVAO()->Bind();
-    GLCall(glDrawElements(GL_TRIANGLES, mesh->GetIBO()->GetCount(), GL_UNSIGNED_INT, nullptr));
+    if (mesh->HasIndices())
+    {
+        GLCall(glDrawElements(GL_TRIANGLES, mesh->GetIBO()->GetCount(), GL_UNSIGNED_INT, nullptr));
+    }
+    else
+    {
+        GLCall(glDrawArrays(GL_TRIANGLES, 0, mesh->GetVertices().size()));
+    }
 
     mesh->GetVAO()->Unbind();
     mesh->GetIBO()->Unbind();

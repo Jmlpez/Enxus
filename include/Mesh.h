@@ -11,8 +11,8 @@
 struct MeshVertex
 {
     glm::vec3 Position;
-    glm::vec3 Normal;
     glm::vec2 TexCoords;
+    glm::vec3 Normal;
 };
 
 struct MeshTexture
@@ -49,6 +49,9 @@ public:
     std::shared_ptr<VertexArray> GetVAO() const { return m_VertexArrayObject; }
     std::shared_ptr<VertexBuffer> GetVBO() const { return m_VertexBufferObject; }
     std::shared_ptr<IndexBuffer> GetIBO() const { return m_IndexBufferObject; }
+
+    // smart pointers has the bool operator overloaded
+    bool HasIndices() { return (bool)m_IndexBufferObject; }
 };
 
 #endif
