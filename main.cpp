@@ -17,6 +17,7 @@
 #include "tests/TestMenu.h"
 #include "tests/TestClearColor.h"
 #include "tests/TestMesh.h"
+#include "tests/TestModel.h"
 // #include "tests/TestMultipleLightSources.h"
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
@@ -77,6 +78,9 @@ int main()
 
     testMenu->RegisterTest<Test::TestClearColor>("Clear Color");
     testMenu->RegisterTest<Test::TestMesh>("Mesh");
+    testMenu->RegisterTest<Test::TestModel>("Model Loading");
+
+    currentTest = new Test::TestModel;
 
     float lastFrame = 0.0f;
     while (!glfwWindowShouldClose(window))
