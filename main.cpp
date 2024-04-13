@@ -98,7 +98,7 @@ int main()
 
         // clear screen color
         GLCall(glClearColor(0.11f, 0.11f, 0.11f, 1.0f));
-        GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+        GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT));
 
         //----------------- IMGUI START NEW FRAME -------------------//
         ImGui_ImplOpenGL3_NewFrame();
