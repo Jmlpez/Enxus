@@ -18,12 +18,13 @@
 #include "tests/TestClearColor.h"
 #include "tests/TestMesh.h"
 #include "tests/TestModel.h"
+#include "tests/TestDepthBuffer.h"
 // #include "tests/TestMultipleLightSources.h"
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void processInput(GLFWwindow *window);
 
-unsigned int viewportWidth = 800, viewportHeight = 600;
+unsigned int viewportWidth = 1366, viewportHeight = 768;
 float deltaTime = 0.0f;
 
 Camera mainCamera(viewportWidth, viewportHeight, CAMERA_PROJECTION::PERSPECTIVE);
@@ -47,6 +48,7 @@ int main()
         glfwTerminate();
         return -1;
     }
+
     glfwMakeContextCurrent(window);
 
     if (glewInit() != GLEW_OK)
@@ -79,8 +81,9 @@ int main()
     testMenu->RegisterTest<Test::TestClearColor>("Clear Color");
     testMenu->RegisterTest<Test::TestMesh>("Mesh");
     testMenu->RegisterTest<Test::TestModel>("Model Loading");
+    testMenu->RegisterTest<Test::TestDepthBuffer>("Depth Testing");
 
-    currentTest = new Test::TestModel;
+    currentTest = new Test::TestDepthBuffer;
 
     float lastFrame = 0.0f;
     while (!glfwWindowShouldClose(window))
