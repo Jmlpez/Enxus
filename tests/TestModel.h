@@ -25,7 +25,9 @@ namespace Test
         std::shared_ptr<Model> m_Backpack;
         std::shared_ptr<Model> m_Box;
         std::shared_ptr<Shader> m_Shader;
+
         glm::vec3 m_LightDirection;
+        bool m_IsUVsFlipped = true;
     };
 }
 #endif

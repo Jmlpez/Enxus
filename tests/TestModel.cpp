@@ -37,6 +37,7 @@ namespace Test
         m_Shader->Bind();
         m_Shader->SetVec3("uCameraPos", cameraController->GetCameraPos());
         m_Shader->SetVec3("uDirLight.direction", m_LightDirection);
+        m_Shader->SetBool("uFlipsUVs", m_IsUVsFlipped);
         cameraController->GetCamera()->SetViewProjMatrix(*m_Shader);
         m_Shader->Unbind();
     }
@@ -47,11 +48,12 @@ namespace Test
 
         m_Shader->Bind();
         glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(glm::mat4(1.0f), glm::vec3(-10.0f, 0.0f, 0.0f));
         m_Shader->SetMat4("uModel", model);
         renderer.DrawModel(m_Backpack, *m_Shader);
         //----------------- Box position -------------------//
 
-        model = glm::translate(glm::mat4(1.0f), glm::vec3(4.0f, 0.0f, -1.0f));
+        model = glm::translate(glm::mat4(1.0f), glm::vec3(10.0f, 0.0f, -1.0f));
         m_Shader->SetMat4("uModel", model);
         renderer.DrawModel(m_Box, *m_Shader);
     };
@@ -59,6 +61,7 @@ namespace Test
     void TestModel::OnImGuiRender()
     {
         ImGui::DragFloat3("Light direction", glm::value_ptr(m_LightDirection), 0.1f, -4.0f, 4.0f);
-    };
+        ImGui::Checkbox("Flip UVs", &m_IsUVsFlipped);
+    }
 
 }

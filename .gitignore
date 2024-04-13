@@ -1,8 +1,7 @@
-back_main.cpp
-todo.md
-pepe*
 .vscode/*
-run.sh
 bin/*
-plane.txt
+res/models/models-ignore/*
+pepe*
+todo.md
 imgui.ini
+plane.txt
