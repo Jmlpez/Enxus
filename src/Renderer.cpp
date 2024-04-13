@@ -1,9 +1,16 @@
 #include "Renderer.h"
+#include <iostream>
 
-void Renderer::Draw(Mesh &mesh, Shader &shader)
+void Renderer::ClearColor(float red, float green, float blue, float alpha)
+{
+    GLCall(glClearColor(red, green, blue, alpha));
+    GLCall(glClear(GL_COLOR_BUFFER_BIT));
+}
+
+void Renderer::Draw(std::shared_ptr<Mesh> mesh, Shader &shader)
 {
 
-    mesh.GetVAO()->Bind();
+    mesh->GetVAO()->Bind();
     shader.Bind();
 
     /*
@@ -15,17 +22,17 @@ void Renderer::Draw(Mesh &mesh, Shader &shader)
     unsigned diffuseNr = 1;
     unsigned specularNr = 1;
 
-    auto textures = mesh.GetTextures();
+    auto textures = mesh->GetTextures();
 
     for (unsigned int i = 0; i < textures.size(); i++)
     {
         auto &texture = textures[i];
         std::string number, name;
-        if (texture->GetType() == TEXTURE_TYPE::DIFFUSE)
+        if (texture->GetType() == Texture_Type::DIFFUSE)
         {
             name = "texture_diffuse" + std::to_string(diffuseNr++);
         }
-        else if (texture->GetType() == TEXTURE_TYPE::SPECULAR)
+        else if (texture->GetType() == Texture_Type::SPECULAR)
         {
             name = "texture_specular" + std::to_string(specularNr++);
         }
@@ -33,9 +40,19 @@ void Renderer::Draw(Mesh &mesh, Shader &shader)
         texture->Bind(i); // active the current texture slot
     }
 
-    mesh.GetVAO()->Bind();
-    GLCall(glDrawElements(GL_TRIANGLES, mesh.GetIBO()->GetCount(), GL_UNSIGNED_INT, nullptr));
+    mesh->GetVAO()->Bind();
+    GLCall(glDrawElements(GL_TRIANGLES, mesh->GetIBO()->GetCount(), GL_UNSIGNED_INT, nullptr));
 
-    mesh.GetVAO()->Unbind();
-    mesh.GetIBO()->Unbind();
+    mesh->GetVAO()->Unbind();
+    mesh->GetIBO()->Unbind();
+}
+
+void Renderer::DrawModel(std::shared_ptr<Model> model, Shader &shader)
+{
+    // Draw(*model.GetMeshes()[1], shader);
+    auto meshes = model->GetMeshes();
+    for (auto mesh : meshes)
+    {
+        Draw(mesh, shader);
+    }
 }
