@@ -1,4 +1,5 @@
 #include "Mesh.h"
+#include <iostream>
 
 Mesh::Mesh(
     std::vector<MeshVertex> vertices,
@@ -6,7 +7,17 @@ Mesh::Mesh(
     std::vector<MeshTexture> textures)
     : m_Vertices(vertices), m_Indices(indices), m_MeshTextures(textures)
 {
-    SetUpMesh();
+    CreateBuffers();
+    CreateTextures();
+}
+
+Mesh::Mesh(
+    std::vector<MeshVertex> vertices,
+    std::vector<unsigned int> indices,
+    std::vector<std::shared_ptr<Texture2D>> texturesRef)
+    : m_Vertices(vertices), m_Indices(indices), m_Textures(texturesRef)
+{
+    CreateBuffers();
 }
 
 Mesh::~Mesh()
@@ -14,7 +25,7 @@ Mesh::~Mesh()
     // smart pointers delete it selfs
 }
 
-void Mesh::SetUpMesh()
+void Mesh::CreateBuffers()
 {
     m_VertexArrayObject = std::make_shared<VertexArray>();
     m_VertexBufferObject = std::make_shared<VertexBuffer>(&m_Vertices[0], (unsigned int)m_Vertices.size() * sizeof(MeshVertex));
@@ -40,6 +51,10 @@ void Mesh::SetUpMesh()
         TEXTURE_TYPE
     }
     */
+}
+
+void Mesh::CreateTextures()
+{
     for (auto &[path, type] : m_MeshTextures)
     {
         m_Textures.push_back(std::make_shared<Texture2D>(path, type));

@@ -18,7 +18,7 @@ struct MeshVertex
 struct MeshTexture
 {
     std::string Path;
-    TEXTURE_TYPE Type;
+    Texture_Type Type;
 };
 
 class Mesh
@@ -36,9 +36,11 @@ private:
 
 public:
     Mesh(std::vector<MeshVertex> vertices, std::vector<unsigned int> indices, std::vector<MeshTexture> textures);
+    Mesh(std::vector<MeshVertex> vertices, std::vector<unsigned int> indices, std::vector<std::shared_ptr<Texture2D>> texturesRef);
     ~Mesh();
 
-    void SetUpMesh();
+    void CreateBuffers();
+    void CreateTextures();
 
     const std::vector<MeshVertex> &GetVertices() const { return m_Vertices; }
     const std::vector<unsigned int> &GetIndices() const { return m_Indices; }
