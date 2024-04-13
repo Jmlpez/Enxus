@@ -3,7 +3,7 @@
 
 #include <string>
 
-enum TEXTURE_TYPE
+enum Texture_Type
 {
     DIFFUSE,
     SPECULAR,
@@ -23,17 +23,18 @@ private:
     std::string m_TexturePath;
 
     // texture map
-    TEXTURE_TYPE m_Type;
+    Texture_Type m_Type;
 
 public:
-    Texture2D(const std::string &texturePath, TEXTURE_TYPE type = TEXTURE_TYPE::DIFFUSE);
+    Texture2D(const std::string &texturePath, Texture_Type type = Texture_Type::DIFFUSE);
     ~Texture2D();
 
     void Bind(unsigned int slot = 0) const;
     void Unbind() const;
 
-    void SetType(TEXTURE_TYPE type) { m_Type = type; }
+    void SetType(Texture_Type type) { m_Type = type; }
     unsigned int GetType() const { return m_Type; }
+    const std::string &GetPath() const { return m_TexturePath; }
 
 private:
     void LoadImage();

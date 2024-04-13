@@ -3,7 +3,7 @@
 #include "stb_image.h"
 #include <iostream>
 
-Texture2D::Texture2D(const std::string &texturePath, TEXTURE_TYPE type)
+Texture2D::Texture2D(const std::string &texturePath, Texture_Type type)
     : m_RendererId(0), m_TexturePath(texturePath), m_Type(type)
 {
 
@@ -39,7 +39,18 @@ void Texture2D::LoadImage()
         return;
     }
     // specify textures attributes
-    GLCall(glTexImage2D(GL_TEXTURE_2D, 0, m_NrChannels > 3 ? GL_RGBA : GL_RGB, m_Width, m_Height, 0, m_NrChannels > 3 ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, m_LocalBuffer));
+    GLenum format;
+    if (m_NrChannels == 1)
+        format = GL_RED;
+    else if (m_NrChannels == 3)
+        format = GL_RGB;
+    else if (m_NrChannels == 4)
+        format = GL_RGBA;
+
+    // GLCall(glTexImage2D(GL_TEXTURE_2D, 0, m_NrChannels > 3 ? GL_RGBA : GL_RGB, m_Width, m_Height, 0, m_NrChannels > 3 ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, m_LocalBuffer));
+    GLCall(glTexImage2D(GL_TEXTURE_2D, 0, format, m_Width, m_Height, 0, format, GL_UNSIGNED_BYTE, m_LocalBuffer));
+
+    // GLCall(glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, m_Width, m_Height));
 
     // generate mipmaps using OpenGL built-in function
     GLCall(glGenerateMipmap(GL_TEXTURE_2D));
