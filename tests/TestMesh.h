@@ -16,7 +16,6 @@ namespace Test
         TestMesh();
         ~TestMesh();
 
-        // Not used
         void OnUpdate(float deltaTime, FreeCameraController *cameraController) override;
         void OnRender() override;
         void OnImGuiRender() override;

@@ -14,8 +14,8 @@ namespace Test
                                           1, 2, 3};
 
         std::vector<MeshTexture> textures{
-            {"res/images/container.jpg", TEXTURE_TYPE::DIFFUSE},
-            {"res/images/awesomeface.png", TEXTURE_TYPE::DIFFUSE},
+            {"res/images/container.jpg", Texture_Type::DIFFUSE},
+            {"res/images/awesomeface.png", Texture_Type::DIFFUSE},
         };
 
         m_Plane = std::make_shared<Mesh>(vertices, indices, textures);
@@ -39,8 +39,7 @@ namespace Test
     void TestMesh::OnRender()
     {
         Renderer renderer;
-
-        renderer.Draw(*m_Plane, *m_Shader);
+        renderer.Draw(m_Plane, *m_Shader);
     };
 
     void TestMesh::OnImGuiRender(){
