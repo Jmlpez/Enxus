@@ -21,8 +21,8 @@ namespace Test
         void OnImGuiRender() override;
 
     private:
-        std::shared_ptr<Mesh> m_Box, m_Floor;
-        std::shared_ptr<Shader> m_NormalShader, m_SingleColorShader;
+        Ref<Mesh> m_Box, m_Floor;
+        Ref<Shader> m_NormalShader, m_SingleColorShader;
 
         bool showDepthValue = false;
         float m_OutlineWidth = 0.1f;

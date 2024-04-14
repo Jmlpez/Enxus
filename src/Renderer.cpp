@@ -7,7 +7,7 @@ void Renderer::ClearColor(float red, float green, float blue, float alpha)
     GLCall(glClear(GL_COLOR_BUFFER_BIT));
 }
 
-void Renderer::Draw(std::shared_ptr<Mesh> mesh, Shader &shader)
+void Renderer::Draw(Ref<Mesh> mesh, Shader &shader)
 {
 
     mesh->GetVAO()->Bind();
@@ -28,11 +28,11 @@ void Renderer::Draw(std::shared_ptr<Mesh> mesh, Shader &shader)
     {
         auto &texture = textures[i];
         std::string number, name;
-        if (texture->GetType() == Texture_Type::DIFFUSE)
+        if (texture->GetType() == TextureType::DIFFUSE)
         {
             name = "texture_diffuse" + std::to_string(diffuseNr++);
         }
-        else if (texture->GetType() == Texture_Type::SPECULAR)
+        else if (texture->GetType() == TextureType::SPECULAR)
         {
             name = "texture_specular" + std::to_string(specularNr++);
         }
@@ -54,7 +54,7 @@ void Renderer::Draw(std::shared_ptr<Mesh> mesh, Shader &shader)
     mesh->GetIBO()->Unbind();
 }
 
-void Renderer::DrawModel(std::shared_ptr<Model> model, Shader &shader)
+void Renderer::DrawModel(Ref<Model> model, Shader &shader)
 {
     // Draw(*model.GetMeshes()[1], shader);
     auto meshes = model->GetMeshes();

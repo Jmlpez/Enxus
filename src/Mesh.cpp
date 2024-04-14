@@ -1,17 +1,17 @@
 #include "Mesh.h"
 #include <iostream>
 
-Mesh::Mesh(std::vector<MeshVertex> vertices,
-           std::vector<MeshTexture> textures) : m_Vertices(vertices), m_MeshTextures(textures)
+Mesh::Mesh(std::vector<VertexData> vertices,
+           std::vector<TextureData2D> textures) : m_Vertices(vertices), m_MeshTextures(textures)
 {
     CreateBuffers();
     CreateTextures();
 }
 
 Mesh::Mesh(
-    std::vector<MeshVertex> vertices,
+    std::vector<VertexData> vertices,
     std::vector<unsigned int> indices,
-    std::vector<MeshTexture> textures)
+    std::vector<TextureData2D> textures)
     : m_Vertices(vertices), m_Indices(indices), m_MeshTextures(textures)
 {
     CreateBuffers();
@@ -19,9 +19,9 @@ Mesh::Mesh(
 }
 
 Mesh::Mesh(
-    std::vector<MeshVertex> vertices,
+    std::vector<VertexData> vertices,
     std::vector<unsigned int> indices,
-    std::vector<std::shared_ptr<Texture2D>> texturesRef)
+    std::vector<Ref<Texture2D>> texturesRef)
     : m_Vertices(vertices), m_Indices(indices), m_Textures(texturesRef)
 {
     CreateBuffers();
@@ -35,7 +35,7 @@ Mesh::~Mesh()
 void Mesh::CreateBuffers()
 {
     m_VertexArrayObject = std::make_shared<VertexArray>();
-    m_VertexBufferObject = std::make_shared<VertexBuffer>(&m_Vertices[0], (unsigned int)m_Vertices.size() * sizeof(MeshVertex));
+    m_VertexBufferObject = std::make_shared<VertexBuffer>(&m_Vertices[0], (unsigned int)m_Vertices.size() * sizeof(VertexData));
 
     if (m_Indices.size() > 0) // if the mesh has indices
         m_IndexBufferObject = std::make_shared<IndexBuffer>(&m_Indices[0], (unsigned int)m_Indices.size());

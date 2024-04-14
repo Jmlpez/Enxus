@@ -7,7 +7,7 @@ namespace Test
     {
         //----------------- BOX -------------------//
 
-        std::vector<MeshVertex> vertices{
+        std::vector<VertexData> vertices{
             {glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 0.0f), glm::vec3(0.0f)},
             {glm::vec3(0.5f, -0.5f, -0.5f), glm::vec2(1.0f, 0.0f), glm::vec3(0.0f)},
             {glm::vec3(0.5f, 0.5f, -0.5f), glm::vec2(1.0f, 1.0f), glm::vec3(0.0f)},
@@ -46,13 +46,13 @@ namespace Test
             {glm::vec3(-0.5f, 0.5f, -0.5f), glm::vec2(0.0f, 1.0), glm::vec3(0.0f)},
         };
 
-        std::vector<MeshTexture> textures{
-            {"res/images/marble.jpg", Texture_Type::DIFFUSE},
+        std::vector<TextureData2D> textures{
+            {"res/images/marble.jpg", TextureType::DIFFUSE},
         };
 
         m_Box = std::make_shared<Mesh>(vertices, textures);
         //----------------- PLANE -------------------//
-        vertices = std::vector<MeshVertex>{
+        vertices = std::vector<VertexData>{
             {glm::vec3(5.0f, -0.5f, 5.0f), glm::vec2(2.0f, 0.0f), glm::vec3(0.0f)},
             {glm::vec3(-5.0f, -0.5f, 5.0f), glm::vec2(0.0f, 0.0f), glm::vec3(0.0f)},
             {glm::vec3(-5.0f, -0.5f, -5.0f), glm::vec2(0.0f, 2.0f), glm::vec3(0.0f)},
@@ -60,8 +60,8 @@ namespace Test
             {glm::vec3(-5.0f, -0.5f, -5.0f), glm::vec2(0.0f, 2.0f), glm::vec3(0.0f)},
             {glm::vec3(5.0f, -0.5f, -5.0f), glm::vec2(2.0f, 2.0), glm::vec3(0.0f)},
         };
-        std::vector<MeshTexture> texturesFloor{
-            {"res/images/metal.png", Texture_Type::DIFFUSE},
+        std::vector<TextureData2D> texturesFloor{
+            {"res/images/metal.png", TextureType::DIFFUSE},
         };
         m_Floor = std::make_shared<Mesh>(vertices, texturesFloor);
 

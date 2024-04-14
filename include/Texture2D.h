@@ -3,13 +3,21 @@
 
 #include <string>
 
-enum Texture_Type
+enum TextureType
 {
     DIFFUSE,
     SPECULAR,
     NORMAL,
     // EMISSION,
     // Albedo, Metallic, Roughness etc
+};
+
+struct TextureData2D
+{
+    std::string path;
+    TextureType type;
+    TextureData2D(const std::string &_path, TextureType _type) : path(_path), type(_type) {}
+    TextureData2D() : path(""), type(TextureType::DIFFUSE) {}
 };
 
 class Texture2D
@@ -19,24 +27,23 @@ private:
     int m_Width, m_Height, m_NrChannels;
     unsigned char *m_LocalBuffer; // texture data
 
-    // debugging purposes
-    std::string m_TexturePath;
-
-    // texture map
-    Texture_Type m_Type;
+    TextureData2D m_TextureData;
 
 public:
-    Texture2D(const std::string &texturePath, Texture_Type type = Texture_Type::DIFFUSE);
+    Texture2D(const TextureData2D &textureData);
+    Texture2D(const std::string &texturePath, TextureType type = TextureType::DIFFUSE);
     ~Texture2D();
 
     void Bind(unsigned int slot = 0) const;
     void Unbind() const;
 
-    void SetType(Texture_Type type) { m_Type = type; }
-    unsigned int GetType() const { return m_Type; }
-    const std::string &GetPath() const { return m_TexturePath; }
+    const std::string &GetPath() const { return m_TextureData.path; }
+    unsigned int GetType() const { return m_TextureData.type; }
+
+    void SetType(TextureType type) { m_TextureData.type = type; }
 
 private:
+    void CreateTexture2D();
     void LoadImage();
 };
 

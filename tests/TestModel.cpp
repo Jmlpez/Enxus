@@ -48,12 +48,12 @@ namespace Test
 
         m_Shader->Bind();
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(glm::mat4(1.0f), glm::vec3(-10.0f, 0.0f, 0.0f));
+        model = glm::translate(glm::mat4(1.0f), glm::vec3(-4.0f, 0.0f, 0.0f));
         m_Shader->SetMat4("uModel", model);
         renderer.DrawModel(m_Backpack, *m_Shader);
         //----------------- Box position -------------------//
 
-        model = glm::translate(glm::mat4(1.0f), glm::vec3(10.0f, 0.0f, -1.0f));
+        model = glm::translate(glm::mat4(1.0f), glm::vec3(4.0f, 0.0f, -1.0f));
         m_Shader->SetMat4("uModel", model);
         renderer.DrawModel(m_Box, *m_Shader);
     };

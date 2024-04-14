@@ -3,10 +3,25 @@
 #include "stb_image.h"
 #include <iostream>
 
-Texture2D::Texture2D(const std::string &texturePath, Texture_Type type)
-    : m_RendererId(0), m_TexturePath(texturePath), m_Type(type)
+Texture2D::Texture2D(const TextureData2D &textureData)
+    : m_RendererId(0), m_TextureData(textureData)
 {
+    CreateTexture2D();
+}
 
+Texture2D::Texture2D(const std::string &texturePath, TextureType type)
+    : m_RendererId(0), m_TextureData(texturePath, type)
+{
+    CreateTexture2D();
+}
+
+Texture2D::~Texture2D()
+{
+    GLCall(glDeleteTextures(1, &m_RendererId));
+}
+
+void Texture2D::CreateTexture2D()
+{
     GLCall(glGenTextures(1, &m_RendererId));
     GLCall(glActiveTexture(GL_TEXTURE0));
     GLCall(glBindTexture(GL_TEXTURE_2D, m_RendererId));
@@ -21,21 +36,16 @@ Texture2D::Texture2D(const std::string &texturePath, Texture_Type type)
     LoadImage();
 }
 
-Texture2D::~Texture2D()
-{
-    GLCall(glDeleteTextures(1, &m_RendererId));
-}
-
 void Texture2D::LoadImage()
 {
     // OpenGL expect the Y coordinate to start at the bottom left
     // instead of the top left, so this flip the Y coordinates of the image
     stbi_set_flip_vertically_on_load(true);
 
-    m_LocalBuffer = stbi_load(m_TexturePath.c_str(), &m_Width, &m_Height, &m_NrChannels, 0);
+    m_LocalBuffer = stbi_load(m_TextureData.path.c_str(), &m_Width, &m_Height, &m_NrChannels, 0);
     if (!m_LocalBuffer)
     {
-        std::cout << "ERROR: Failed to load texture: " << m_TexturePath << std::endl;
+        std::cout << "ERROR: Failed to load texture: " << m_TextureData.path << std::endl;
         return;
     }
     // specify textures attributes

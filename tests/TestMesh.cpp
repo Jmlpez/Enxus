@@ -4,7 +4,7 @@ namespace Test
 {
     TestMesh::TestMesh()
     {
-        std::vector<MeshVertex> vertices{
+        std::vector<VertexData> vertices{
             {glm::vec3(0.5f, 0.0f, 0.5f), glm::vec2(1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f)},   // top right
             {glm::vec3(0.5f, 0.0f, -0.5f), glm::vec2(1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f)},  // bottom right
             {glm::vec3(-0.5f, 0.0f, -0.5f), glm::vec2(0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f)}, // bottom left
@@ -13,9 +13,9 @@ namespace Test
         std::vector<unsigned int> indices{0, 1, 3,
                                           1, 2, 3};
 
-        std::vector<MeshTexture> textures{
-            {"res/images/container.jpg", Texture_Type::DIFFUSE},
-            {"res/images/awesomeface.png", Texture_Type::DIFFUSE},
+        std::vector<TextureData2D> textures{
+            {"res/images/container.jpg", TextureType::DIFFUSE},
+            {"res/images/awesomeface.png", TextureType::DIFFUSE},
         };
 
         m_Plane = std::make_shared<Mesh>(vertices, indices, textures);

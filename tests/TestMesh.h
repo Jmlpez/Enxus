@@ -21,8 +21,8 @@ namespace Test
         void OnImGuiRender() override;
 
     private:
-        std::shared_ptr<Mesh> m_Plane;
-        std::shared_ptr<Shader> m_Shader;
+        Ref<Mesh> m_Plane;
+        Ref<Shader> m_Shader;
     };
 }
 #endif

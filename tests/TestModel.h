@@ -22,9 +22,9 @@ namespace Test
         void OnImGuiRender() override;
 
     private:
-        std::shared_ptr<Model> m_Backpack;
-        std::shared_ptr<Model> m_Box;
-        std::shared_ptr<Shader> m_Shader;
+        Ref<Model> m_Backpack;
+        Ref<Model> m_Box;
+        Ref<Shader> m_Shader;
 
         glm::vec3 m_LightDirection;
         bool m_IsUVsFlipped = true;
