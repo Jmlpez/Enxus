@@ -50,12 +50,12 @@ namespace Test
                 -0.5f, 0.5f, -0.5f, /*V*/ 0.0f, 1.0f, /*Tex*/ 0.0f, 1.0f, 0.0f, /* Normal */
             };
         // cameraController = new FreeCameraController(mainCamera);
-        objVAO = new VertexArray;
-        lightSourceVAO = new VertexArray;
+        objVAO = new Enxus::VertexArray;
+        lightSourceVAO = new Enxus::VertexArray;
         // lightVBO is not needed because we already have it from the current object (is also a cube)
         // std::cout << "Hi in line "
-        objVBO = new VertexBuffer(cubeVertices, sizeof(cubeVertices));
-        VertexBufferLayout objLayout, lightSourceLayout;
+        objVBO = new Enxus::VertexBuffer(cubeVertices, sizeof(cubeVertices));
+        Enxus::VertexBufferLayout objLayout, lightSourceLayout;
         objLayout.Push(3, GL_FLOAT); // position
         objLayout.Push(2, GL_FLOAT); // texture coordinates
         objLayout.Push(3, GL_FLOAT); // normal vector
@@ -67,13 +67,13 @@ namespace Test
 
         // //----------------- TEXTURES -------------------//
 
-        containerDiffuse = new Texture2D("res/images/container2.png");
-        containerSpecular = new Texture2D("res/images/container2_specular.png");
+        containerDiffuse = new Enxus::Texture2D("res/images/container2.png");
+        containerSpecular = new Enxus::Texture2D("res/images/container2_specular.png");
 
         // //----------------- SHADERS -------------------//
 
-        objShader = new Shader("res/shaders/basic-lighting/obj.vert", "res/shaders/basic-lighting/obj.frag");
-        lightSourceShader = new Shader("res/shaders/basic-lighting/light.vert", "res/shaders/basic-lighting/light.frag");
+        objShader = new Enxus::Shader("res/shaders/basic-lighting/obj.vert", "res/shaders/basic-lighting/obj.frag");
+        lightSourceShader = new Enxus::Shader("res/shaders/basic-lighting/light.vert", "res/shaders/basic-lighting/light.frag");
 
         // // bind shader program first
 
@@ -163,7 +163,7 @@ namespace Test
         delete containerSpecular;
     }
 
-    void TestMultipleLightSources::OnUpdate(float deltaTime, FreeCameraController *cameraController)
+    void TestMultipleLightSources::OnUpdate(float deltaTime, Enxus::FreeCameraController *cameraController)
     {
         (void)deltaTime;
         objShader->Bind();

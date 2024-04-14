@@ -4,19 +4,23 @@
 #include "VertexBuffer.h"
 #include "VertexBufferLayout.h"
 
-class VertexArray
+namespace Enxus
 {
-private:
-    unsigned int m_RendererId;
 
-public:
-    VertexArray();
-    ~VertexArray();
+    class VertexArray
+    {
+    private:
+        unsigned int m_RendererId;
 
-    void AddBuffer(const VertexBuffer &vbo, const VertexBufferLayout &layout);
+    public:
+        VertexArray();
+        ~VertexArray();
 
-    void Bind() const;
-    void Unbind() const;
-};
+        void AddBuffer(const VertexBuffer &vbo, const VertexBufferLayout &layout);
+
+        void Bind() const;
+        void Unbind() const;
+    };
+}
 
 #endif

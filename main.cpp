@@ -27,8 +27,8 @@ void processInput(GLFWwindow *window);
 unsigned int viewportWidth = 1366, viewportHeight = 768;
 float deltaTime = 0.0f;
 
-Camera mainCamera(viewportWidth, viewportHeight, CAMERA_PROJECTION::PERSPECTIVE);
-FreeCameraController cameraController(&mainCamera);
+Enxus::Camera mainCamera(viewportWidth, viewportHeight, Enxus::CAMERA_PROJECTION::PERSPECTIVE);
+Enxus::FreeCameraController cameraController(&mainCamera);
 
 int main()
 {
@@ -176,26 +176,26 @@ void processInput(GLFWwindow *window)
     //----------------- CAMERA MOVE (TRANSLATION) -------------------//
 
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        cameraController.ProcessKeyboardInput(CAMERA_MOVEMENT::FORWARD, deltaTime);
+        cameraController.ProcessKeyboardInput(Enxus::CAMERA_MOVEMENT::FORWARD, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        cameraController.ProcessKeyboardInput(CAMERA_MOVEMENT::BACKWARD, deltaTime);
+        cameraController.ProcessKeyboardInput(Enxus::CAMERA_MOVEMENT::BACKWARD, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        cameraController.ProcessKeyboardInput(CAMERA_MOVEMENT::LEFT, deltaTime);
+        cameraController.ProcessKeyboardInput(Enxus::CAMERA_MOVEMENT::LEFT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        cameraController.ProcessKeyboardInput(CAMERA_MOVEMENT::RIGHT, deltaTime);
+        cameraController.ProcessKeyboardInput(Enxus::CAMERA_MOVEMENT::RIGHT, deltaTime);
 
     if (glfwGetKey(window, GLFW_KEY_PAGE_UP) == GLFW_PRESS)
-        cameraController.ProcessKeyboardInput(CAMERA_MOVEMENT::UP, deltaTime);
+        cameraController.ProcessKeyboardInput(Enxus::CAMERA_MOVEMENT::UP, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_PAGE_DOWN) == GLFW_PRESS)
-        cameraController.ProcessKeyboardInput(CAMERA_MOVEMENT::DOWN, deltaTime);
+        cameraController.ProcessKeyboardInput(Enxus::CAMERA_MOVEMENT::DOWN, deltaTime);
 
     //----------------- CAMERA MOVE (ROTATION) -------------------//
     if (glfwGetKey(window, GLFW_KEY_KP_8) == GLFW_PRESS)
-        cameraController.ProcessKeyboardInput(CAMERA_MOVEMENT::UP_ROTATION, deltaTime);
+        cameraController.ProcessKeyboardInput(Enxus::CAMERA_MOVEMENT::UP_ROTATION, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_KP_2) == GLFW_PRESS)
-        cameraController.ProcessKeyboardInput(CAMERA_MOVEMENT::DOWN_ROTATION, deltaTime);
+        cameraController.ProcessKeyboardInput(Enxus::CAMERA_MOVEMENT::DOWN_ROTATION, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_KP_4) == GLFW_PRESS)
-        cameraController.ProcessKeyboardInput(CAMERA_MOVEMENT::LEFT_ROTATION, deltaTime);
+        cameraController.ProcessKeyboardInput(Enxus::CAMERA_MOVEMENT::LEFT_ROTATION, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_KP_6) == GLFW_PRESS)
-        cameraController.ProcessKeyboardInput(CAMERA_MOVEMENT::RIGHT_ROTATION, deltaTime);
+        cameraController.ProcessKeyboardInput(Enxus::CAMERA_MOVEMENT::RIGHT_ROTATION, deltaTime);
 }

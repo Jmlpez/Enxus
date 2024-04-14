@@ -12,7 +12,7 @@ namespace Test
         Test(){};
         virtual ~Test(){};
 
-        virtual void OnUpdate(float deltaTime, FreeCameraController *cameraController)
+        virtual void OnUpdate(float deltaTime, Enxus::FreeCameraController *cameraController)
         {
             (void)deltaTime;
             (void)cameraController;

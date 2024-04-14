@@ -14,7 +14,7 @@ namespace Test
         ~TestClearColor();
 
         // Not used
-        // void OnUpdate(float deltaTime, FreeCameraController *cameraController) override;
+        // void OnUpdate(float deltaTime, Enxus::FreeCameraController *cameraController) override;
         void OnRender() override;
         void OnImGuiRender() override;
 

@@ -3,48 +3,52 @@
 
 #include <string>
 
-enum TextureType
+namespace Enxus
 {
-    DIFFUSE,
-    SPECULAR,
-    NORMAL,
-    // EMISSION,
-    // Albedo, Metallic, Roughness etc
-};
 
-struct TextureData2D
-{
-    std::string path;
-    TextureType type;
-    TextureData2D(const std::string &_path, TextureType _type) : path(_path), type(_type) {}
-    TextureData2D() : path(""), type(TextureType::DIFFUSE) {}
-};
+    enum TextureType
+    {
+        DIFFUSE,
+        SPECULAR,
+        NORMAL,
+        // EMISSION,
+        // Albedo, Metallic, Roughness etc
+    };
 
-class Texture2D
-{
-private:
-    unsigned int m_RendererId;
-    int m_Width, m_Height, m_NrChannels;
-    unsigned char *m_LocalBuffer; // texture data
+    struct TextureData2D
+    {
+        std::string path;
+        TextureType type;
+        TextureData2D(const std::string &_path, TextureType _type) : path(_path), type(_type) {}
+        TextureData2D() : path(""), type(TextureType::DIFFUSE) {}
+    };
 
-    TextureData2D m_TextureData;
+    class Texture2D
+    {
+    private:
+        unsigned int m_RendererId;
+        int m_Width, m_Height, m_NrChannels;
+        unsigned char *m_LocalBuffer; // texture data
 
-public:
-    Texture2D(const TextureData2D &textureData);
-    Texture2D(const std::string &texturePath, TextureType type = TextureType::DIFFUSE);
-    ~Texture2D();
+        TextureData2D m_TextureData;
 
-    void Bind(unsigned int slot = 0) const;
-    void Unbind() const;
+    public:
+        Texture2D(const TextureData2D &textureData);
+        Texture2D(const std::string &texturePath, TextureType type = TextureType::DIFFUSE);
+        ~Texture2D();
 
-    const std::string &GetPath() const { return m_TextureData.path; }
-    unsigned int GetType() const { return m_TextureData.type; }
+        void Bind(unsigned int slot = 0) const;
+        void Unbind() const;
 
-    void SetType(TextureType type) { m_TextureData.type = type; }
+        const std::string &GetPath() const { return m_TextureData.path; }
+        unsigned int GetType() const { return m_TextureData.type; }
 
-private:
-    void CreateTexture2D();
-    void LoadImage();
-};
+        void SetType(TextureType type) { m_TextureData.type = type; }
+
+    private:
+        void CreateTexture2D();
+        void LoadImage();
+    };
+}
 
 #endif

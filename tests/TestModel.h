@@ -17,14 +17,14 @@ namespace Test
         ~TestModel();
 
         // Not used
-        void OnUpdate(float deltaTime, FreeCameraController *cameraController) override;
+        void OnUpdate(float deltaTime, Enxus::FreeCameraController *cameraController) override;
         void OnRender() override;
         void OnImGuiRender() override;
 
     private:
-        Ref<Model> m_Backpack;
-        Ref<Model> m_Box;
-        Ref<Shader> m_Shader;
+        Enxus::Ref<Enxus::Model> m_Backpack;
+        Enxus::Ref<Enxus::Model> m_Box;
+        Enxus::Ref<Enxus::Shader> m_Shader;
 
         glm::vec3 m_LightDirection;
         bool m_IsUVsFlipped = true;

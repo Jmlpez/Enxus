@@ -6,10 +6,10 @@ namespace Test
 {
     TestModel::TestModel() : m_LightDirection(-0.2f, -1.0f, -0.3f)
     {
-        m_Backpack = std::make_shared<Model>("res/models/backpack/backpack.obj");
-        m_Box = std::make_shared<Model>("res/models/box/box.obj");
+        m_Backpack = std::make_shared<Enxus::Model>("res/models/backpack/backpack.obj");
+        m_Box = std::make_shared<Enxus::Model>("res/models/box/box.obj");
 
-        m_Shader = std::make_shared<Shader>("res/shaders/model/backpack.vert", "res/shaders/model/backpack.frag");
+        m_Shader = std::make_shared<Enxus::Shader>("res/shaders/model/backpack.vert", "res/shaders/model/backpack.frag");
 
         m_Shader->Bind();
         //----------------- Backpack position -------------------//
@@ -31,7 +31,7 @@ namespace Test
     {
     }
 
-    void TestModel::OnUpdate(float deltaTime, FreeCameraController *cameraController)
+    void TestModel::OnUpdate(float deltaTime, Enxus::FreeCameraController *cameraController)
     {
         (void)deltaTime;
         m_Shader->Bind();
@@ -43,7 +43,7 @@ namespace Test
     }
     void TestModel::OnRender()
     {
-        Renderer renderer;
+        Enxus::Renderer renderer;
         renderer.ClearColor(0.13f, 0.14f, 0.16f, 1.0f);
 
         m_Shader->Bind();

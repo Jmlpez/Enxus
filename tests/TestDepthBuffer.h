@@ -16,13 +16,13 @@ namespace Test
         ~TestDepthBuffer();
 
         // Not used
-        void OnUpdate(float deltaTime, FreeCameraController *cameraController) override;
+        void OnUpdate(float deltaTime, Enxus::FreeCameraController *cameraController) override;
         void OnRender() override;
         void OnImGuiRender() override;
 
     private:
-        Ref<Mesh> m_Box, m_Floor;
-        Ref<Shader> m_NormalShader, m_SingleColorShader;
+        Enxus::Ref<Enxus::Mesh> m_Box, m_Floor;
+        Enxus::Ref<Enxus::Shader> m_NormalShader, m_SingleColorShader;
 
         bool showDepthValue = false;
         float m_OutlineWidth = 0.1f;

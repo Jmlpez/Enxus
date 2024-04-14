@@ -16,13 +16,13 @@ namespace Test
         TestMesh();
         ~TestMesh();
 
-        void OnUpdate(float deltaTime, FreeCameraController *cameraController) override;
+        void OnUpdate(float deltaTime, Enxus::FreeCameraController *cameraController) override;
         void OnRender() override;
         void OnImGuiRender() override;
 
     private:
-        Ref<Mesh> m_Plane;
-        Ref<Shader> m_Shader;
+        Enxus::Ref<Enxus::Mesh> m_Plane;
+        Enxus::Ref<Enxus::Shader> m_Shader;
     };
 }
 #endif

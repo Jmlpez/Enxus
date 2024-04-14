@@ -1,196 +1,200 @@
 #include "Model.h"
 #include <iostream>
 
-Model::Model(const std::string &path) : m_ModelPath(path)
+namespace Enxus
 {
-    LoadModel(path);
-}
 
-Model::~Model()
-{
-}
-
-void Model::LoadModel(const std::string &path)
-{
-    Assimp::Importer importer;
-
-    auto importerStepsFlags = aiProcess_Triangulate | aiProcess_FlipUVs;
-    // (check about flips uvs later)
-    // auto importerStepsFlags = aiProcess_Triangulate;
-    /*
-    Other usefull options
-    aiProcess_GenNormals:
-    creates normal vectors for each vertex if the model doesn’tcontain normal vectors.
-
-    aiProcess_SplitLargeMeshes:
-    splits large meshes into smaller sub-meshes which
-    is useful if your rendering has a maximum number of vertices allowed
-    and can only process smaller meshes.
-
-    aiProcess_OptimizeMeshes:
-    does the reverse by trying to join several meshes into
-    one larger mesh, reducing drawing calls for optimization.
-    */
-
-    const aiScene *scene = importer.ReadFile(path, importerStepsFlags);
-
-    // If there is a problem loading the scene or the model
-    if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+    Model::Model(const std::string &path) : m_ModelPath(path)
     {
-        std::cout << "[ASSIMP ERROR] :" << importer.GetErrorString() << std::endl;
-        return;
+        LoadModel(path);
     }
-    m_ModelDirPath = m_ModelPath.substr(0, m_ModelPath.find_last_of('/'));
 
-    ProcessNode(scene->mRootNode, scene);
-}
-
-void Model::ProcessNode(aiNode *node, const aiScene *scene)
-{
-    // load all meshes of the given node (if any)
-    for (unsigned int i = 0; i < node->mNumMeshes; i++)
+    Model::~Model()
     {
-        aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
-        m_Meshes.push_back(ProcessMesh(mesh, scene));
     }
-    // recursively process the node childrens in a DFS-fashion (if any)
-    for (unsigned int i = 0; i < node->mNumChildren; i++)
+
+    void Model::LoadModel(const std::string &path)
     {
-        ProcessNode(node->mChildren[i], scene);
-    }
-}
-Ref<Mesh> Model::ProcessMesh(aiMesh *mesh, const aiScene *scene)
-{
-    std::vector<VertexData> vertices = ProcessVertices(mesh);
-    std::vector<unsigned int> indices = ProcessIndices(mesh);
-    std::vector<Ref<Texture2D>> texturesRef = ProcessTextures(mesh, scene);
+        Assimp::Importer importer;
 
-    return std::make_shared<Mesh>(vertices, indices, texturesRef);
-}
+        auto importerStepsFlags = aiProcess_Triangulate | aiProcess_FlipUVs;
+        // (check about flips uvs later)
+        // auto importerStepsFlags = aiProcess_Triangulate;
+        /*
+        Other usefull options
+        aiProcess_GenNormals:
+        creates normal vectors for each vertex if the model doesn’tcontain normal vectors.
 
-std::vector<VertexData> Model::ProcessVertices(aiMesh *mesh)
-{
-    std::vector<VertexData> vertices;
-    for (unsigned int i = 0; i < mesh->mNumVertices; i++)
-    {
-        VertexData vertex;
-        glm::vec3 tempVec;
+        aiProcess_SplitLargeMeshes:
+        splits large meshes into smaller sub-meshes which
+        is useful if your rendering has a maximum number of vertices allowed
+        and can only process smaller meshes.
 
-        //----------------- POSITION -------------------//
-        tempVec.x = mesh->mVertices[i].x;
-        tempVec.y = mesh->mVertices[i].y;
-        tempVec.z = mesh->mVertices[i].z;
-        vertex.position = tempVec;
-        //----------------- NORMALS -------------------//
-        if (mesh->HasNormals())
+        aiProcess_OptimizeMeshes:
+        does the reverse by trying to join several meshes into
+        one larger mesh, reducing drawing calls for optimization.
+        */
+
+        const aiScene *scene = importer.ReadFile(path, importerStepsFlags);
+
+        // If there is a problem loading the scene or the model
+        if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
         {
-            tempVec.x = mesh->mNormals[i].x;
-            tempVec.y = mesh->mNormals[i].y;
-            tempVec.z = mesh->mNormals[i].z;
-            vertex.normal = tempVec;
+            std::cout << "[ASSIMP ERROR] :" << importer.GetErrorString() << std::endl;
+            return;
         }
-        //----------------- TEXTURE COORDINATES -------------------//
-        // the first set of textures (assimp hold up to 8)
-        if (mesh->mTextureCoords[0])
-        {
-            glm::vec2 coords;
-            coords.x = mesh->mTextureCoords[0][i].x;
-            coords.y = mesh->mTextureCoords[0][i].y;
-            vertex.texCoords = coords;
-        }
-        else
-        { // does not has textures...
-            vertex.texCoords = glm::vec2(0.0f, 0.0f);
-        }
-        vertices.push_back(vertex);
+        m_ModelDirPath = m_ModelPath.substr(0, m_ModelPath.find_last_of('/'));
+
+        ProcessNode(scene->mRootNode, scene);
     }
-    return vertices;
-}
 
-std::vector<unsigned int> Model::ProcessIndices(aiMesh *mesh)
-{
-
-    std::vector<unsigned int> indices;
-    for (unsigned int i = 0; i < mesh->mNumFaces; i++)
+    void Model::ProcessNode(aiNode *node, const aiScene *scene)
     {
-        aiFace &face = mesh->mFaces[i];
-        for (unsigned int j = 0; j < face.mNumIndices; j++)
+        // load all meshes of the given node (if any)
+        for (unsigned int i = 0; i < node->mNumMeshes; i++)
         {
-            indices.push_back(face.mIndices[j]);
+            aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
+            m_Meshes.push_back(ProcessMesh(mesh, scene));
+        }
+        // recursively process the node childrens in a DFS-fashion (if any)
+        for (unsigned int i = 0; i < node->mNumChildren; i++)
+        {
+            ProcessNode(node->mChildren[i], scene);
         }
     }
-    return indices;
-}
-
-std::vector<Ref<Texture2D>> Model::ProcessTextures(aiMesh *mesh, const aiScene *scene)
-{
-    std::vector<Ref<Texture2D>> textures;
-    // unnecessary :
-    // the check of the flag AI_SCENE_FLAGS_INCOMPLETE ensure that the object has at least one material
-    // if (!(mesh->mMaterialIndex >= 0))
-    //     return textures;
-
-    aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
-
-    std::vector<Ref<Texture2D>> diffuseMaps = LoadMaterialTextures(material, aiTextureType_DIFFUSE);
-    textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
-
-    std::vector<Ref<Texture2D>> specularMaps = LoadMaterialTextures(material, aiTextureType_SPECULAR);
-    textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
-
-    return textures;
-}
-
-std::vector<Ref<Texture2D>> Model::LoadMaterialTextures(aiMaterial *mat, aiTextureType type)
-{
-    std::vector<Ref<Texture2D>> textures;
-    for (unsigned int i = 0; i < mat->GetTextureCount(type); i++)
+    Ref<Mesh> Model::ProcessMesh(aiMesh *mesh, const aiScene *scene)
     {
-        aiString texPath;
-        mat->GetTexture(type, i, &texPath);
-        std::string fullTexturePath = m_ModelDirPath + "/" + std::string(texPath.C_Str());
+        std::vector<VertexData> vertices = ProcessVertices(mesh);
+        std::vector<unsigned int> indices = ProcessIndices(mesh);
+        std::vector<Ref<Texture2D>> texturesRef = ProcessTextures(mesh, scene);
 
-        bool isTextureLoaded = false;
-        for (const auto &tex : m_LoadedTextures)
+        return std::make_shared<Mesh>(vertices, indices, texturesRef);
+    }
+
+    std::vector<VertexData> Model::ProcessVertices(aiMesh *mesh)
+    {
+        std::vector<VertexData> vertices;
+        for (unsigned int i = 0; i < mesh->mNumVertices; i++)
         {
+            VertexData vertex;
+            glm::vec3 tempVec;
 
-            if (tex->GetPath() == fullTexturePath)
+            //----------------- POSITION -------------------//
+            tempVec.x = mesh->mVertices[i].x;
+            tempVec.y = mesh->mVertices[i].y;
+            tempVec.z = mesh->mVertices[i].z;
+            vertex.position = tempVec;
+            //----------------- NORMALS -------------------//
+            if (mesh->HasNormals())
             {
-                textures.push_back(tex);
-                isTextureLoaded = true;
-                break;
+                tempVec.x = mesh->mNormals[i].x;
+                tempVec.y = mesh->mNormals[i].y;
+                tempVec.z = mesh->mNormals[i].z;
+                vertex.normal = tempVec;
+            }
+            //----------------- TEXTURE COORDINATES -------------------//
+            // the first set of textures (assimp hold up to 8)
+            if (mesh->mTextureCoords[0])
+            {
+                glm::vec2 coords;
+                coords.x = mesh->mTextureCoords[0][i].x;
+                coords.y = mesh->mTextureCoords[0][i].y;
+                vertex.texCoords = coords;
+            }
+            else
+            { // does not has textures...
+                vertex.texCoords = glm::vec2(0.0f, 0.0f);
+            }
+            vertices.push_back(vertex);
+        }
+        return vertices;
+    }
+
+    std::vector<unsigned int> Model::ProcessIndices(aiMesh *mesh)
+    {
+
+        std::vector<unsigned int> indices;
+        for (unsigned int i = 0; i < mesh->mNumFaces; i++)
+        {
+            aiFace &face = mesh->mFaces[i];
+            for (unsigned int j = 0; j < face.mNumIndices; j++)
+            {
+                indices.push_back(face.mIndices[j]);
             }
         }
-        if (isTextureLoaded)
-            continue;
-
-        TextureData2D textureData;
-        textureData.path = fullTexturePath;
-        textureData.type = GetTextureType(type);
-
-        Ref<Texture2D>
-            texture = std::make_shared<Texture2D>(textureData);
-        textures.push_back(texture);
-        m_LoadedTextures.push_back(texture);
+        return indices;
     }
-    return textures;
-}
 
-TextureType Model::GetTextureType(aiTextureType type)
-{
-    switch (type)
+    std::vector<Ref<Texture2D>> Model::ProcessTextures(aiMesh *mesh, const aiScene *scene)
     {
-    case aiTextureType_DIFFUSE:
-        return TextureType::DIFFUSE;
-    case aiTextureType_SPECULAR:
-        return TextureType::SPECULAR;
-    case aiTextureType_NORMALS:
-        return TextureType::NORMAL;
-    default:
-        break;
-    }
-    std::cout << "[ASSIMP ERROR]: Unknow texture type" << std::endl;
-    ASSERT(false);
+        std::vector<Ref<Texture2D>> textures;
+        // unnecessary :
+        // the check of the flag AI_SCENE_FLAGS_INCOMPLETE ensure that the object has at least one material
+        // if (!(mesh->mMaterialIndex >= 0))
+        //     return textures;
 
-    return TextureType(0); // to remove warning
+        aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
+
+        std::vector<Ref<Texture2D>> diffuseMaps = LoadMaterialTextures(material, aiTextureType_DIFFUSE);
+        textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
+
+        std::vector<Ref<Texture2D>> specularMaps = LoadMaterialTextures(material, aiTextureType_SPECULAR);
+        textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
+
+        return textures;
+    }
+
+    std::vector<Ref<Texture2D>> Model::LoadMaterialTextures(aiMaterial *mat, aiTextureType type)
+    {
+        std::vector<Ref<Texture2D>> textures;
+        for (unsigned int i = 0; i < mat->GetTextureCount(type); i++)
+        {
+            aiString texPath;
+            mat->GetTexture(type, i, &texPath);
+            std::string fullTexturePath = m_ModelDirPath + "/" + std::string(texPath.C_Str());
+
+            bool isTextureLoaded = false;
+            for (const auto &tex : m_LoadedTextures)
+            {
+
+                if (tex->GetPath() == fullTexturePath)
+                {
+                    textures.push_back(tex);
+                    isTextureLoaded = true;
+                    break;
+                }
+            }
+            if (isTextureLoaded)
+                continue;
+
+            TextureData2D textureData;
+            textureData.path = fullTexturePath;
+            textureData.type = GetTextureType(type);
+
+            Ref<Texture2D>
+                texture = std::make_shared<Texture2D>(textureData);
+            textures.push_back(texture);
+            m_LoadedTextures.push_back(texture);
+        }
+        return textures;
+    }
+
+    TextureType Model::GetTextureType(aiTextureType type)
+    {
+        switch (type)
+        {
+        case aiTextureType_DIFFUSE:
+            return TextureType::DIFFUSE;
+        case aiTextureType_SPECULAR:
+            return TextureType::SPECULAR;
+        case aiTextureType_NORMALS:
+            return TextureType::NORMAL;
+        default:
+            break;
+        }
+        std::cout << "[ASSIMP ERROR]: Unknow texture type" << std::endl;
+        ASSERT(false);
+
+        return TextureType(0); // to remove warning
+    }
 }

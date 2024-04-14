@@ -11,7 +11,7 @@ namespace Test
     {
     }
 
-    // void TestClearColor::OnUpdate(float deltaTime, FreeCameraController *cameraController)
+    // void TestClearColor::OnUpdate(float deltaTime, Enxus::FreeCameraController *cameraController)
     // {
     // }
 

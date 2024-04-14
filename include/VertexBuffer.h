@@ -3,17 +3,19 @@
 
 #include "utils.h"
 
-class VertexBuffer
+namespace Enxus
 {
-private:
-    unsigned int m_RendererId;
+    class VertexBuffer
+    {
+    private:
+        unsigned int m_RendererId;
 
-public:
-    VertexBuffer(const void *data, unsigned int size);
-    ~VertexBuffer();
+    public:
+        VertexBuffer(const void *data, unsigned int size);
+        ~VertexBuffer();
 
-    void Bind() const;
-    void Unbind() const;
-};
-
+        void Bind() const;
+        void Unbind() const;
+    };
+}
 #endif

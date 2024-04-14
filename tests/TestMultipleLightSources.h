@@ -18,15 +18,15 @@ namespace Test
         TestMultipleLightSources();
         ~TestMultipleLightSources() override;
 
-        void OnUpdate(float deltaTime, FreeCameraController *cameraController) override;
+        void OnUpdate(float deltaTime, Enxus::FreeCameraController *cameraController) override;
         void OnRender() override;
         void OnImGuiRender() override;
 
     private:
-        Shader *objShader, *lightSourceShader;
-        VertexArray *lightSourceVAO, *objVAO;
-        Texture2D *containerDiffuse, *containerSpecular;
-        VertexBuffer *objVBO;
+        Enxus::Shader *objShader, *lightSourceShader;
+        Enxus::VertexArray *lightSourceVAO, *objVAO;
+        Enxus::Texture2D *containerDiffuse, *containerSpecular;
+        Enxus::VertexBuffer *objVBO;
 
         glm::vec3 cubePositions[10] = {
             glm::vec3(0.0f, 0.0f, 0.0f),
