@@ -19,6 +19,7 @@
 #include "tests/TestMesh.h"
 #include "tests/TestModel.h"
 #include "tests/TestDepthBuffer.h"
+#include "tests/TestBlending.h"
 // #include "tests/TestMultipleLightSources.h"
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
@@ -82,8 +83,9 @@ int main()
     testMenu->RegisterTest<Test::TestMesh>("Mesh");
     testMenu->RegisterTest<Test::TestModel>("Model Loading");
     testMenu->RegisterTest<Test::TestDepthBuffer>("Depth Testing");
+    testMenu->RegisterTest<Test::TestBlending>("Blending");
 
-    currentTest = new Test::TestDepthBuffer;
+    currentTest = new Test::TestBlending;
 
     float lastFrame = 0.0f;
     while (!glfwWindowShouldClose(window))
