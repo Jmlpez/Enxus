@@ -1,6 +1,13 @@
 #include "Mesh.h"
 #include <iostream>
 
+Mesh::Mesh(std::vector<MeshVertex> vertices,
+           std::vector<MeshTexture> textures) : m_Vertices(vertices), m_MeshTextures(textures)
+{
+    CreateBuffers();
+    CreateTextures();
+}
+
 Mesh::Mesh(
     std::vector<MeshVertex> vertices,
     std::vector<unsigned int> indices,

@@ -35,6 +35,7 @@ private:
     std::vector<std::shared_ptr<Texture2D>> m_Textures;
 
 public:
+    Mesh(std::vector<MeshVertex> vertices, std::vector<MeshTexture> textures);
     Mesh(std::vector<MeshVertex> vertices, std::vector<unsigned int> indices, std::vector<MeshTexture> textures);
     Mesh(std::vector<MeshVertex> vertices, std::vector<unsigned int> indices, std::vector<std::shared_ptr<Texture2D>> texturesRef);
     ~Mesh();

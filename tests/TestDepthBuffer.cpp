@@ -49,9 +49,8 @@ namespace Test
         std::vector<MeshTexture> textures{
             {"res/images/marble.jpg", Texture_Type::DIFFUSE},
         };
-        std::vector<unsigned int> indices;
 
-        m_Box = std::make_shared<Mesh>(vertices, indices, textures);
+        m_Box = std::make_shared<Mesh>(vertices, textures);
         //----------------- PLANE -------------------//
         vertices = std::vector<MeshVertex>{
             {glm::vec3(5.0f, -0.5f, 5.0f), glm::vec2(2.0f, 0.0f), glm::vec3(0.0f)},
@@ -64,7 +63,7 @@ namespace Test
         std::vector<MeshTexture> texturesFloor{
             {"res/images/metal.png", Texture_Type::DIFFUSE},
         };
-        m_Floor = std::make_shared<Mesh>(vertices, indices, texturesFloor);
+        m_Floor = std::make_shared<Mesh>(vertices, texturesFloor);
 
         m_NormalShader = std::make_shared<Shader>("res/shaders/advanced-opengl/depth-test/basic.vert", "res/shaders/advanced-opengl/depth-test/basic.frag");
         m_SingleColorShader = std::make_shared<Shader>("res/shaders/advanced-opengl/depth-test/basic.vert", "res/shaders/advanced-opengl/depth-test/single-color.frag");
