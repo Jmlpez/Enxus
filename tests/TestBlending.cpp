@@ -1,11 +1,12 @@
 #include "TestBlending.h"
 #include "imgui/imgui.h"
 #include "Renderer.h"
+#include <algorithm>
 
 namespace Test
 {
     TestBlending::TestBlending()
-        : m_GrassPositions{
+        : m_TransparentObjsPositions{
               glm::vec3(-1.5f, 0.0f, -0.48f),
               glm::vec3(1.5f, 0.0f, 0.51f),
               glm::vec3(0.0f, 0.0f, 0.7f),
@@ -83,10 +84,10 @@ namespace Test
         };
 
         std::vector<Enxus::TextureData2D> grassTextures{{
-            "res/images/grass.png",
+            "res/images/window.png",
             Enxus::TextureType::DIFFUSE,
         }};
-        m_Grass = std::make_shared<Enxus::Mesh>(grassVertices, grassTextures);
+        m_TransparentObj = std::make_shared<Enxus::Mesh>(grassVertices, grassTextures);
         // Create an API to set TexParameter
         // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -95,6 +96,10 @@ namespace Test
 
         //----------------- BLENDING -------------------//
         GLCall(glEnable(GL_BLEND));
+        // Blending equation: source_color * source_factor + destination_color * destination_factor
+        // usually source factor is the alpha channel of the source_color
+        // and destination factor 1 - the alpha channel of the source_color
+        GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
     }
 
     TestBlending::~TestBlending()
@@ -106,6 +111,13 @@ namespace Test
         (void)deltaTime;
         m_Shader->Bind();
         cameraController->GetCamera()->SetViewProjMatrix(*m_Shader);
+        for (auto pos : m_TransparentObjsPositions)
+        {
+            // negated value to loop the map in ascending object
+            // It's a little lazy to write the map iterators and stuffs..
+            float distance = -glm::length(cameraController->GetCameraPos() - pos);
+            m_SortedPositions[distance] = pos;
+        }
     }
     void TestBlending::OnRender()
     {
@@ -131,13 +143,13 @@ namespace Test
 
         //----------------- GRASS -------------------//
 
-        for (auto pos : m_GrassPositions)
+        for (auto &[dist, pos] : m_SortedPositions)
         {
             model = glm::translate(glm::mat4(1.0f), pos);
             m_Shader->SetMat4("uModel", model);
-            renderer.Draw(m_Grass, *m_Shader);
+            renderer.Draw(m_TransparentObj, *m_Shader);
         }
-    };
+        };
 
     void TestBlending::OnImGuiRender()
     {

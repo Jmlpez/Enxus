@@ -6,6 +6,7 @@
 #include "Shader.h"
 #include "Mesh.h"
 #include <array>
+#include <map>
 
 namespace Test
 {
@@ -22,10 +23,12 @@ namespace Test
 
     private:
         // private data
-        Enxus::Ref<Enxus::Mesh> m_Box, m_Floor, m_Grass;
+        Enxus::Ref<Enxus::Mesh> m_Box, m_Floor, m_TransparentObj;
         Enxus::Ref<Enxus::Shader> m_Shader;
 
-        std::array<glm::vec3, 5> m_GrassPositions;
+        std::array<glm::vec3, 5> m_TransparentObjsPositions;
+
+        std::map<float, glm::vec3> m_SortedPositions;
     };
 }
 #endif
