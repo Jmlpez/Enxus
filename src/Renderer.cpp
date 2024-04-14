@@ -46,11 +46,11 @@ namespace Enxus
         mesh->GetVAO()->Bind();
         if (mesh->HasIndices())
         {
-            GLCall(glDrawElements(GL_TRIANGLES, mesh->GetIBO()->GetCount(), GL_UNSIGNED_INT, nullptr));
+            DrawIndices(mesh->GetIBO()->GetCount());
         }
         else
         {
-            GLCall(glDrawArrays(GL_TRIANGLES, 0, mesh->GetVertices().size()));
+            DrawVertices(mesh->GetVertices().size());
         }
 
         mesh->GetVAO()->Unbind();
@@ -65,5 +65,13 @@ namespace Enxus
         {
             Draw(mesh, shader);
         }
+    }
+    inline void Renderer::DrawVertices(unsigned int numOfVertices)
+    {
+        GLCall(glDrawArrays(GL_TRIANGLES, 0, numOfVertices));
+    }
+    inline void Renderer::DrawIndices(unsigned int numOfIndices)
+    {
+        GLCall(glDrawElements(GL_TRIANGLES, numOfIndices, GL_UNSIGNED_INT, nullptr));
     }
 }
