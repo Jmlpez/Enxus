@@ -72,6 +72,10 @@ rebuild:
 	@make all
 	@echo "\n---------------------- FINISHED THE RE-BUILDING OF THE ENTIRE PROJECT -----------------------\n"
 
+test:
+	@cp tests/TestTemplate.h tests/TestNewFeature.h
+	@cp tests/TestTemplate.cpp tests/TestNewFeature.cpp
+
 clean:
 	rm -fr $(BIN_DIR)/*
 
