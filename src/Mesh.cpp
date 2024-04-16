@@ -37,11 +37,11 @@ namespace Enxus
 
     void Mesh::CreateBuffers()
     {
-        m_VertexArrayObject = std::make_shared<VertexArray>();
-        m_VertexBufferObject = std::make_shared<VertexBuffer>(&m_Vertices[0], (unsigned int)m_Vertices.size() * sizeof(VertexData));
+        m_VertexArrayObject = CreateRef<VertexArray>();
+        m_VertexBufferObject = CreateRef<VertexBuffer>(&m_Vertices[0], (unsigned int)m_Vertices.size() * sizeof(VertexData));
 
         if (m_Indices.size() > 0) // if the mesh has indices
-            m_IndexBufferObject = std::make_shared<IndexBuffer>(&m_Indices[0], (unsigned int)m_Indices.size());
+            m_IndexBufferObject = CreateRef<IndexBuffer>(&m_Indices[0], (unsigned int)m_Indices.size());
 
         /*
         VERTEX DEFAULT LAYOUT:
@@ -69,7 +69,7 @@ namespace Enxus
     {
         for (auto &[path, type] : m_MeshTextures)
         {
-            m_Textures.push_back(std::make_shared<Texture2D>(path, type));
+            m_Textures.push_back(CreateRef<Texture2D>(path, type));
         }
     }
 }

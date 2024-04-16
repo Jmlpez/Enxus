@@ -68,7 +68,7 @@ namespace Enxus
         std::vector<unsigned int> indices = ProcessIndices(mesh);
         std::vector<Ref<Texture2D>> texturesRef = ProcessTextures(mesh, scene);
 
-        return std::make_shared<Mesh>(vertices, indices, texturesRef);
+        return CreateRef<Mesh>(vertices, indices, texturesRef);
     }
 
     std::vector<VertexData> Model::ProcessVertices(aiMesh *mesh)
@@ -172,7 +172,7 @@ namespace Enxus
             textureData.type = GetTextureType(type);
 
             Ref<Texture2D>
-                texture = std::make_shared<Texture2D>(textureData);
+                texture = CreateRef<Texture2D>(textureData);
             textures.push_back(texture);
             m_LoadedTextures.push_back(texture);
         }

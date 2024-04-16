@@ -6,10 +6,10 @@ namespace Test
 {
     TestModel::TestModel() : m_LightDirection(-0.2f, -1.0f, -0.3f)
     {
-        m_Backpack = std::make_shared<Enxus::Model>("res/models/backpack/backpack.obj");
-        m_Box = std::make_shared<Enxus::Model>("res/models/box/box.obj");
+        m_Backpack = Enxus::CreateRef<Enxus::Model>("res/models/backpack/backpack.obj");
+        m_Box = Enxus::CreateRef<Enxus::Model>("res/models/box/box.obj");
 
-        m_Shader = std::make_shared<Enxus::Shader>("res/shaders/model/backpack.vert", "res/shaders/model/backpack.frag");
+        m_Shader = Enxus::CreateRef<Enxus::Shader>("res/shaders/model/backpack.vert", "res/shaders/model/backpack.frag");
 
         m_Shader->Bind();
         //----------------- Backpack position -------------------//

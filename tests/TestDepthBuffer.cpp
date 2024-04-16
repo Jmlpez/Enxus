@@ -50,7 +50,7 @@ namespace Test
             {"res/images/marble.jpg", Enxus::TextureType::DIFFUSE},
         };
 
-        m_Box = std::make_shared<Enxus::Mesh>(vertices, textures);
+        m_Box = Enxus::CreateRef<Enxus::Mesh>(vertices, textures);
         //----------------- PLANE -------------------//
         vertices = std::vector<Enxus::VertexData>{
             {glm::vec3(5.0f, -0.5f, 5.0f), glm::vec2(2.0f, 0.0f), glm::vec3(0.0f)},
@@ -63,10 +63,10 @@ namespace Test
         std::vector<Enxus::TextureData2D> texturesFloor{
             {"res/images/metal.png", Enxus::TextureType::DIFFUSE},
         };
-        m_Floor = std::make_shared<Enxus::Mesh>(vertices, texturesFloor);
+        m_Floor = Enxus::CreateRef<Enxus::Mesh>(vertices, texturesFloor);
 
-        m_NormalShader = std::make_shared<Enxus::Shader>("res/shaders/advanced-opengl/depth-test/basic.vert", "res/shaders/advanced-opengl/depth-test/basic.frag");
-        m_SingleColorShader = std::make_shared<Enxus::Shader>("res/shaders/advanced-opengl/depth-test/basic.vert", "res/shaders/advanced-opengl/depth-test/single-color.frag");
+        m_NormalShader = Enxus::CreateRef<Enxus::Shader>("res/shaders/advanced-opengl/depth-test/basic.vert", "res/shaders/advanced-opengl/depth-test/basic.frag");
+        m_SingleColorShader = Enxus::CreateRef<Enxus::Shader>("res/shaders/advanced-opengl/depth-test/basic.vert", "res/shaders/advanced-opengl/depth-test/single-color.frag");
 
         //----------------- DEPTH TESTING -------------------//
         GLCall(glEnable(GL_DEPTH_TEST));

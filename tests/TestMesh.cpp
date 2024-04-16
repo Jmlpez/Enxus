@@ -18,8 +18,8 @@ namespace Test
             {"res/images/awesomeface.png", Enxus::TextureType::DIFFUSE},
         };
 
-        m_Plane = std::make_shared<Enxus::Mesh>(vertices, indices, textures);
-        m_Shader = std::make_shared<Enxus::Shader>("res/shaders/mesh/basic.vert", "res/shaders/mesh/basic.frag");
+        m_Plane = Enxus::CreateRef<Enxus::Mesh>(vertices, indices, textures);
+        m_Shader = Enxus::CreateRef<Enxus::Shader>("res/shaders/mesh/basic.vert", "res/shaders/mesh/basic.frag");
 
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::scale(model, glm::vec3(3.0f));

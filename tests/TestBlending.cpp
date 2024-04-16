@@ -58,7 +58,7 @@ namespace Test
             {"res/images/marble.jpg", Enxus::TextureType::DIFFUSE},
         };
 
-        m_Box = std::make_shared<Enxus::Mesh>(vertices, textures);
+        m_Box = Enxus::CreateRef<Enxus::Mesh>(vertices, textures);
         //----------------- PLANE -------------------//
         vertices = std::vector<Enxus::VertexData>{
             {glm::vec3(5.0f, -0.5f, 5.0f), glm::vec2(2.0f, 0.0f), glm::vec3(0.0f)},
@@ -71,7 +71,7 @@ namespace Test
         std::vector<Enxus::TextureData2D> texturesFloor{
             {"res/images/metal.png", Enxus::TextureType::DIFFUSE},
         };
-        m_Floor = std::make_shared<Enxus::Mesh>(vertices, texturesFloor);
+        m_Floor = Enxus::CreateRef<Enxus::Mesh>(vertices, texturesFloor);
 
         //----------------- GRASS -------------------//
         std::vector<Enxus::VertexData> grassVertices{
@@ -87,11 +87,12 @@ namespace Test
             "res/images/window.png",
             Enxus::TextureType::DIFFUSE,
         }};
-        m_TransparentObj = std::make_shared<Enxus::Mesh>(grassVertices, grassTextures);
+
+        m_TransparentObj = Enxus::CreateRef<Enxus::Mesh>(grassVertices, grassTextures);
         // Create an API to set TexParameter
         // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        m_Shader = std::make_shared<Enxus::Shader>("res/shaders/advanced-opengl/blending/basic.vert",
+        m_Shader = Enxus::CreateRef<Enxus::Shader>("res/shaders/advanced-opengl/blending/basic.vert",
                                                    "res/shaders/advanced-opengl/blending/basic.frag");
 
         //----------------- BLENDING -------------------//
@@ -149,7 +150,7 @@ namespace Test
             m_Shader->SetMat4("uModel", model);
             renderer.Draw(m_TransparentObj, *m_Shader);
         }
-        };
+    };
 
     void TestBlending::OnImGuiRender()
     {
