@@ -1,5 +1,4 @@
 #include "Window.h"
-#include "utils.h"
 
 namespace Enxus
 {
@@ -7,7 +6,7 @@ namespace Enxus
     {
     public:
         Application();
-        virtual ~Application();
+        ~Application();
 
         void Run();
 

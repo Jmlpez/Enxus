@@ -5,9 +5,9 @@ namespace Enxus
 {
     bool static s_GLFWInitialized = false;
 
-    Window *Window::Create(const WindowProps &props)
+    Scope<Window>Window::Create(const WindowProps &props)
     {
-        return new Window(props);
+        return std::make_unique<Window>(props);
     }
 
     Window::Window(const WindowProps &props)

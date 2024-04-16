@@ -4,7 +4,8 @@ namespace Enxus
 {
     Application::Application()
     {
-        m_Window = CreateScope<Window>(Window::Create());
+        // m_Window = CreateScope<Window>(Window::Create());
+        m_Window = Window::Create();
     }
 
     void Application::Run()

@@ -6,6 +6,7 @@
 #include <string>
 #include <functional>
 
+#include "utils.h"
 #include "Event.h"
 
 namespace Enxus
@@ -42,7 +43,7 @@ namespace Enxus
         void SetVSync(bool enabled);
         inline bool IsVSync() { return m_Data.VSync; }
 
-        static Window *Create(const WindowProps &props = WindowProps());
+        static Scope<Window> Create(const WindowProps &props = WindowProps());
 
     private:
         void Init(const WindowProps &props);
