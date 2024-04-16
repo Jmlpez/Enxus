@@ -5,6 +5,8 @@
 
 #include "debugbreak.h"
 #include <memory> // to handle smart pointers
+#include <stdint.h>
+#include <iostream>
 
 // Force the program to stop if ASSERT fails
 #define ASSERT(x) \
