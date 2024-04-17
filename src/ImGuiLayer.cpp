@@ -17,8 +17,7 @@ namespace Enxus
     ImGuiLayer::ImGuiLayer()
         : Layer("ImGuiLayer")
     {
-        std::cout << "pepe";
-    }
+        }
     ImGuiLayer::~ImGuiLayer()
     {
     }
@@ -81,4 +80,30 @@ namespace Enxus
     void ImGuiLayer::OnEvent(Event &event)
     {
     }
+
+    bool ImGuiLayer::OnMouseButtonPressedEvent(MouseButtonPressedEvent &e)
+    {
+    }
+    bool ImGuiLayer::OnMouseButtonReleasedEvent(MouseButtonReleasedEvent &e)
+    {
+    }
+    bool ImGuiLayer::OnMouseMovedEvent(MouseMovedEvent &e)
+    {
+    }
+    bool ImGuiLayer::OnMouseScrolledEvent(MouseScrolledEvent &e)
+    {
+    }
+    bool ImGuiLayer::OnKeyPressedEvent(KeyPressedEvent &e)
+    {
+    }
+    bool ImGuiLayer::OnKeyReleasedEvent(KeyReleasedEvent &e)
+    {
+    }
+    bool ImGuiLayer::OnKeyTypedEvent(KeyTypedEvent &e)
+    {
+    }
+    bool ImGuiLayer::OnWindowResizeEvent(WindowResizeEvent &e)
+    {
+    }
+
 }

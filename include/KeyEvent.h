@@ -17,10 +17,10 @@ namespace Enxus
         int m_KeyCode;
     };
 
-    class KeyPressEvent : public KeyEvent
+    class KeyPressedEvent : public KeyEvent
     {
     public:
-        KeyPressEvent(int keyCode, int repeatCount)
+        KeyPressedEvent(int keyCode, int repeatCount)
             : KeyEvent(keyCode), m_RepeatCount(repeatCount) {}
 
         inline int GetRepeatCount() const { return m_RepeatCount; }
@@ -39,22 +39,39 @@ namespace Enxus
     private:
         int m_RepeatCount;
     };
-    class KeyReleaseEvent : public KeyEvent
+    class KeyReleasedEvent : public KeyEvent
     {
     public:
-        KeyReleaseEvent(int keyCode)
+        KeyReleasedEvent(int keyCode)
             : KeyEvent(keyCode) {}
 
         std::string ToString() const override
         {
             std::stringstream ss;
-            ss << "KeyReleaseEvent: " << m_KeyCode;
+            ss << "KeyReleasedEvent: " << m_KeyCode;
             return ss.str();
         }
 
         static EventType GetStaticType() { return EventType::KeyReleased; }
         EventType GetEventType() const override { return GetStaticType(); }
         const char *GetName() const override { return "KeyReleased"; }
+    };
+    class KeyTypedEvent : public KeyEvent
+    {
+    public:
+        KeyTypedEvent(int keyCode)
+            : KeyEvent(keyCode) {}
+
+        std::string ToString() const override
+        {
+            std::stringstream ss;
+            ss << "KeyTypedEvent: " << m_KeyCode;
+            return ss.str();
+        }
+
+        static EventType GetStaticType() { return EventType::KeyTyped; }
+        EventType GetEventType() const override { return GetStaticType(); }
+        const char *GetName() const override { return "KeyPressed"; }
     };
 }
 

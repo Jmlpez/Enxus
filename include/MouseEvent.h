@@ -2,10 +2,10 @@
 
 namespace Enxus
 {
-    class MouseMoveEvent : public Event
+    class MouseMovedEvent : public Event
     {
     public:
-        MouseMoveEvent(float xpos, float ypos)
+        MouseMovedEvent(float xpos, float ypos)
             : m_MouseX(xpos), m_MouseY(ypos) {}
 
         inline float GetMouseX() const { return m_MouseX; }
@@ -14,7 +14,7 @@ namespace Enxus
         std::string ToString() const override
         {
             std::stringstream ss;
-            ss << "MouseMoveEvent: "
+            ss << "MouseMovedEvent: "
                << "(" << m_MouseX << "," << m_MouseY << ")";
             return ss.str();
         }

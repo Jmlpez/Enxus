@@ -97,23 +97,32 @@ namespace Enxus
                 {
                 case GLFW_PRESS:
                 {
-                    KeyPressEvent event(key, 0);
+                    KeyPressedEvent event(key, 0);
                     data.EventCallback(event);
                     break;
                 }
                 case GLFW_RELEASE:
                 {
-                    KeyReleaseEvent event(key);
+                    KeyReleasedEvent event(key);
                     data.EventCallback(event);
                     break;
                 }
                 case GLFW_REPEAT:
                 {
-                    KeyPressEvent event(key, 1);
+                    KeyPressedEvent event(key, 1);
                     data.EventCallback(event);
                     break;
                 }
                 }
+            });
+        glfwSetCharCallback(
+            m_Window,
+            [](GLFWwindow *window, unsigned int keycode)
+            {
+                WindowData &data = *(WindowData *)glfwGetWindowUserPointer(window);
+
+                KeyTypedEvent event(keycode);
+                data.EventCallback(event);
             });
         glfwSetMouseButtonCallback(
             m_Window,
@@ -147,7 +156,7 @@ namespace Enxus
             {
                 WindowData data = *(WindowData *)glfwGetWindowUserPointer(window);
 
-                MouseMoveEvent event((float)xPos, (float)yPos);
+                MouseMovedEvent event((float)xPos, (float)yPos);
                 data.EventCallback(event);
             });
         glfwSetScrollCallback(

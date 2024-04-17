@@ -21,7 +21,6 @@ void ExampleLayer::OnEvent(Enxus::Event &event)
 
 Sandbox::Sandbox()
 {
-    std::cout << "pepe";
     PushLayer(new ExampleLayer());
     PushOverlay(new Enxus::ImGuiLayer());
 }
