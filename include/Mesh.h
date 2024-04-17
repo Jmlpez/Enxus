@@ -1,12 +1,13 @@
 #ifndef MESH_H
 #define MESH_H
 
+#include "base.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 #include "VertexArray.h"
 #include "Texture2D.h"
 #include "glm/glm.hpp"
-#include <vector>
+
 
 namespace Enxus
 {

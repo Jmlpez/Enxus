@@ -1,8 +1,6 @@
+#include "pch/pch.h"
 #include "Shader.h"
 #include "utils.h"
-#include <iostream>
-#include <sstream>
-#include <fstream>
 
 namespace Enxus
 {

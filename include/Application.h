@@ -1,9 +1,9 @@
 #ifndef APPLICATION_H
 #define APPLICATION_H
 
-#include "Window.h"
 #include "ApplicationEvent.h"
 #include "LayerStack.h"
+#include "Window.h"
 
 namespace Enxus
 {

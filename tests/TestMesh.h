@@ -3,7 +3,6 @@
 
 #include "Test.h"
 #include "Shader.h"
-// #include "Mesh.h"
 #include "Renderer.h"
 
 namespace Test

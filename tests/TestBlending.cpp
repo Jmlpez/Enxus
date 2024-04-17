@@ -1,7 +1,7 @@
+#include "pch/pch.h"
 #include "TestBlending.h"
 #include "imgui/imgui.h"
 #include "Renderer.h"
-#include <algorithm>
 
 namespace Test
 {

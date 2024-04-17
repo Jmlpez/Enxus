@@ -1,6 +1,6 @@
+#include "pch/pch.h"
 #include "VertexArray.h"
 #include "utils.h"
-#include <iostream>
 
 namespace Enxus
 {

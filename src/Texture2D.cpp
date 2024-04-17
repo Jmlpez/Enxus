@@ -1,3 +1,4 @@
+#include "pch/pch.h"
 #include "Texture2D.h"
 #include "utils.h"
 #include "stb_image.h"

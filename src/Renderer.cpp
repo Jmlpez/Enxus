@@ -1,5 +1,5 @@
+#include "pch/pch.h"
 #include "Renderer.h"
-#include <iostream>
 
 namespace Enxus
 {

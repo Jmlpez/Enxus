@@ -1,5 +1,5 @@
+#include "pch/pch.h"
 #include "TestModel.h"
-#include <iostream>
 #include "imgui/imgui.h"
 
 namespace Test

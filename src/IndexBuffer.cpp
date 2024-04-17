@@ -1,4 +1,6 @@
+#include "pch/pch.h"
 #include "IndexBuffer.h"
+#include "utils.h"
 
 namespace Enxus
 {

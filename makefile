@@ -4,8 +4,14 @@ TARGET = $(BIN_DIR)/main
 INCLUDE_DIR = include
 VENDOR_DIR = vendor
 IMGUI_DIR = $(VENDOR_DIR)/imgui
-TEST_DIR = tests
 SRC_DIR = src
+PCH_DIR = include/pch
+# Precompiled headers
+PCH_SRC = $(PCH_DIR)/pch.h
+PCH_OUT = $(PCH_DIR)/pch.h.gch
+PCH_FLAGS = -include $(PCH_SRC)
+
+TEST_DIR = tests
 
 # OpenGL & Include Flags
 INCLUDE_FLAGS = -I$(INCLUDE_DIR)
@@ -38,7 +44,7 @@ all: $(TARGET)
 
 # Build all cpp files inside src
 $(BIN_DIR)/%.o: $(SRC_DIR)/%.cpp $(INCLUDE_DIR)/%.h
-	$(CXX) $(CXXFLAGS) -c $< -o $@ $(INCLUDE_FLAGS) $(VENDOR_FLAGS) $(OPENGL_FLAGS)
+	$(CXX) $(CXXFLAGS) $(PCH_FLAGS) -c $< -o $@ $(INCLUDE_FLAGS) $(VENDOR_FLAGS) $(OPENGL_FLAGS)
 
 # Build stb_image cpp file inside vendor 
 $(BIN_DIR)/%.o: $(VENDOR_DIR)/%.cpp
@@ -51,11 +57,11 @@ $(BIN_DIR)/%.o: $(IMGUI_DIR)/%.cpp
 
 # Build tests
 $(BIN_DIR)/%.o: $(TEST_DIR)/%.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@ $(INCLUDE_FLAGS) $(IMGUI_FLAGS) $(VENDOR_FLAGS) $(OPENGL_FLAGS)
+	$(CXX) $(CXXFLAGS) $(PCH_FLAGS) -c $< -o $@ $(INCLUDE_FLAGS) $(IMGUI_FLAGS) $(VENDOR_FLAGS) $(OPENGL_FLAGS)
 
 # Build main
 $(TARGET): $(OBJS) main.cpp
-	$(CXX) $(CXXFLAGS) $^ -o $@ $(INCLUDE_FLAGS) $(IMGUI_FLAGS) $(VENDOR_FLAGS) $(OPENGL_FLAGS)
+	$(CXX) $(CXXFLAGS) $(PCH_FLAGS) $^ -o $@ $(INCLUDE_FLAGS) $(IMGUI_FLAGS) $(VENDOR_FLAGS) $(OPENGL_FLAGS)
 	
 
 run: all
@@ -71,6 +77,10 @@ rebuild:
 	@make clean
 	@make all
 	@echo "\n---------------------- FINISHED THE RE-BUILDING OF THE ENTIRE PROJECT -----------------------\n"
+
+pch:
+	$(CXX) $(CXXFLAGS) $(PCH_SRC) 
+
 
 test:
 	@cp tests/TestTemplate.h tests/TestNewFeature.h

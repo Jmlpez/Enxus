@@ -1,8 +1,8 @@
 #ifndef VERTEX_BUFFER_LAYOUT_H
 #define VERTEX_BUFFER_LAYOUT_H
 
+#include "base.h"
 #include "utils.h"
-#include <vector>
 
 namespace Enxus
 {

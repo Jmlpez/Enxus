@@ -1,5 +1,3 @@
-#include "utils.h"
-#include <vector>
 #include "Event.h"
 #include "Layer.h"
 

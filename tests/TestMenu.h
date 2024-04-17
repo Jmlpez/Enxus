@@ -1,10 +1,8 @@
 #ifndef TEST_MENU_H
 #define TEST_MENU_H
 
+#include "base.h"
 #include "Test.h"
-#include <iostream>
-#include <vector>
-#include <functional>
 
 namespace Test
 {

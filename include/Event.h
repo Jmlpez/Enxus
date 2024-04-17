@@ -1,9 +1,7 @@
 #ifndef EVENT_H
 #define EVENT_H
 
-#include <string>
-#include <sstream>
-#include <functional>
+#include "base.h"
 namespace Enxus
 {
     enum class EventType

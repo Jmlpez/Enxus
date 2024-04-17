@@ -1,5 +1,5 @@
+#include "pch/pch.h"
 #include "Application.h"
-#include <functional>
 
 namespace Enxus
 {

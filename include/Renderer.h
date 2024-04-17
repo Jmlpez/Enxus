@@ -1,7 +1,7 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
-#include "utils.h"
+#include "base.h"
 #include "Model.h"
 #include "Shader.h"
 

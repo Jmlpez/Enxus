@@ -1,12 +1,11 @@
 #ifndef TEST_BLENDING_H
 #define TEST_BLENDING_H
 
+#include "base.h"
 #include "utils.h"
 #include "Test.h"
 #include "Shader.h"
 #include "Mesh.h"
-#include <array>
-#include <map>
 
 namespace Test
 {

@@ -3,10 +3,8 @@
 
 #include <GLEW/glew.h>
 #include <GLFW/glfw3.h>
-#include <string>
-#include <functional>
 
-#include "utils.h"
+#include "base.h"
 #include "Event.h"
 
 namespace Enxus

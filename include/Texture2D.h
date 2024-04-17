@@ -1,7 +1,7 @@
 #ifndef TEXTURE_2D_H
 #define TEXTURE_2D_H
 
-#include <string>
+#include "base.h"
 
 namespace Enxus
 {

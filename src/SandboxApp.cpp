@@ -1,3 +1,4 @@
+#include "pch/pch.h"
 #include "SandboxApp.h"
 
 ExampleLayer::ExampleLayer() : Layer("Example")
@@ -10,6 +11,7 @@ ExampleLayer::~ExampleLayer()
 
 void ExampleLayer::OnUpdate()
 {
+
     std::cout << "ExampleLayer::Update" << std::endl;
 }
 
