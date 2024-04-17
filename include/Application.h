@@ -1,4 +1,5 @@
 #include "Window.h"
+#include "ApplicationEvent.h"
 
 namespace Enxus
 {
@@ -8,11 +9,14 @@ namespace Enxus
         Application();
         ~Application();
 
+        void OnEvent(Event &event);
         void Run();
+
+        bool CloseWindow(WindowCloseEvent &event);
 
     private:
         Scope<Window> m_Window;
-        bool m_Running;
+        bool m_Running = true;
     };
 
 }

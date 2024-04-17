@@ -18,8 +18,8 @@ namespace Enxus
         unsigned int Height;
 
         WindowProps(const std::string &title = "Enxus Engine",
-                    unsigned int width = 1366,
-                    unsigned int height = 680)
+                    unsigned int width = 800,
+                    unsigned int height = 600)
             : Title(title), Width(width), Height(height)
         {
         }
@@ -39,6 +39,8 @@ namespace Enxus
         inline unsigned int GetWidth() { return m_Data.Width; }
         inline unsigned int GetHeight() { return m_Data.Height; }
         inline std::string GetTitle() { return m_Data.Title; }
+
+        void SetEventCallback(const EventCallbackFn &callback);
 
         void SetVSync(bool enabled);
         inline bool IsVSync() { return m_Data.VSync; }
@@ -63,5 +65,6 @@ namespace Enxus
         };
         WindowData m_Data;
     };
+
 }
 #endif
