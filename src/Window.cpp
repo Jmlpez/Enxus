@@ -1,7 +1,8 @@
 #include "Window.h"
 #include "utils.h"
-#include "MouseEvent.h"
 #include "Application.h"
+#include "MouseEvent.h"
+#include "KeyEvent.h"
 
 namespace Enxus
 {
@@ -84,12 +85,34 @@ namespace Enxus
                 data.EventCallback(event);
             });
 
-        // glfwSetKeyCallback(m_Window,
-        //                    [](GLFWwindow *window, int key, int scancode, int action, int mods)
-        //                    {
-        //                        WindowData &data = *(WindowData *)glfwGetWindowUserPointer(window);
-        //                        // KeyPress Event
-        //                    });
+        glfwSetKeyCallback(
+            m_Window,
+            [](GLFWwindow *window, int key, int scancode, int action, int mods)
+            {
+                WindowData &data = *(WindowData *)glfwGetWindowUserPointer(window);
+                // KeyPress Event
+                switch (action)
+                {
+                case GLFW_PRESS:
+                {
+                    KeyPressEvent event(key, 0);
+                    data.EventCallback(event);
+                    break;
+                }
+                case GLFW_RELEASE:
+                {
+                    KeyReleaseEvent event(key);
+                    data.EventCallback(event);
+                    break;
+                }
+                case GLFW_REPEAT:
+                {
+                    KeyPressEvent event(key, 1);
+                    data.EventCallback(event);
+                    break;
+                }
+                }
+            });
         glfwSetMouseButtonCallback(
             m_Window,
             [](GLFWwindow *window, int button, int action, int mods)

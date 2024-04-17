@@ -12,7 +12,7 @@ namespace Enxus
         void OnEvent(Event &event);
         void Run();
 
-        bool CloseWindow(WindowCloseEvent &event);
+        bool OnWindowClose(WindowCloseEvent &event);
 
     private:
         Scope<Window> m_Window;
