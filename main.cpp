@@ -1,11 +1,10 @@
+#include "SandboxApp.h"
 
-#include "Application.h"
+extern Enxus::Application *Enxus::CreateApplication();
 
-int main()
+int main(int argc, char *argv[])
 {
-    Enxus::Application *App = new Enxus::Application();
-
+    auto App = Enxus::CreateApplication();
     App->Run();
-
     delete App;
 }

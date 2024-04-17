@@ -41,13 +41,15 @@ namespace Enxus
         std::cout << event;
         EventDispatcher dispatcher(event);
         dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(Application::OnWindowClose));
-    }
 
-    bool Application::OnWindowClose(WindowCloseEvent &event)
-    {
-
-        m_Running = false;
-        return true;
+        // From LayerOverlays to normal layers
+        // check for someone to handle the event and break
+        for (auto it = m_LayerStack.end() - 1; it != m_LayerStack.begin(); it--)
+        {
+            (*it)->OnEvent(event);
+            if (event.Handled)
+                break;
+        }
     }
 
     void Application::Run()
@@ -56,7 +58,24 @@ namespace Enxus
         {
             glClearColor(1.0f, 0.0f, 1.0f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT);
+
+            for (Layer *layer : m_LayerStack)
+                layer->OnUpdate();
+
             m_Window->OnUpdate();
         }
+    }
+    bool Application::OnWindowClose(WindowCloseEvent &event)
+    {
+        m_Running = false;
+        return true;
+    }
+    void Application::PushLayer(Layer *layer)
+    {
+        m_LayerStack.PushLayer(layer);
+    }
+    void Application::PushOverlay(Layer *layer)
+    {
+        m_LayerStack.PushOverlay(layer);
     }
 }
