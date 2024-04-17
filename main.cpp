@@ -7,5 +7,4 @@ int main(int argc, char *argv[])
     auto App = Enxus::CreateApplication();
     App->Run();
     delete App;
-    std::cout << "Hello\n";
 }

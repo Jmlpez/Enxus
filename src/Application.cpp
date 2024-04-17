@@ -38,14 +38,15 @@ namespace Enxus
 
     void Application::OnEvent(Event &event)
     {
-        std::cout << event;
         EventDispatcher dispatcher(event);
         dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(Application::OnWindowClose));
 
         // From LayerOverlays to normal layers
         // check for someone to handle the event and break
-        for (auto it = m_LayerStack.end() - 1; it != m_LayerStack.begin(); it--)
+
+        for (auto it = m_LayerStack.end(); it != m_LayerStack.begin();)
         {
+            it--;
             (*it)->OnEvent(event);
             if (event.Handled)
                 break;
