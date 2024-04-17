@@ -1,16 +1,24 @@
 #include "pch/pch.h"
 #include "Application.h"
+#include "utils.h"
 
 namespace Enxus
 {
 
 // Para hacer el binding mas facil se puede hacer un macro
+// La desventaja de esto es cuando la funcion tiene mas parametros, asi que habria que usar otro
+// metodo o hacerlo manual
 #define BIND_EVENT_FN(func) std::bind(&func, this, std::placeholders::_1)
-    // La desventaja de esto es cuando la funcion tiene mas parametros, asi que habria que usar otro
-    // metodo o hacerlo manual
+
+    Application *Application::s_Instance = nullptr;
     Application::Application()
     {
-        // m_Window = CreateScope<Window>(Window::Create());
+        if (s_Instance != nullptr)
+        {
+            std::cout << "[Application Error]: another instance already exist" << std::endl;
+            ASSERT(false);
+        }
+        s_Instance = this;
         m_Window = Window::Create();
 
         /*
@@ -74,9 +82,11 @@ namespace Enxus
     void Application::PushLayer(Layer *layer)
     {
         m_LayerStack.PushLayer(layer);
+        layer->OnAttach();
     }
     void Application::PushOverlay(Layer *layer)
     {
         m_LayerStack.PushOverlay(layer);
+        layer->OnAttach();
     }
 }

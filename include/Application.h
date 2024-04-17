@@ -19,6 +19,10 @@ namespace Enxus
         void PushOverlay(Layer *layer);
         void OnEvent(Event &event);
 
+        static Application &Get() { return *s_Instance; }
+
+        Scope<Window> &GetWindow() { return m_Window; }
+
     private:
         bool OnWindowClose(WindowCloseEvent &event);
 
@@ -26,6 +30,7 @@ namespace Enxus
         Scope<Window> m_Window;
         bool m_Running = true;
         LayerStack m_LayerStack;
+        static Application *s_Instance;
     };
 
     // To be defined in CLIENT

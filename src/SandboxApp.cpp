@@ -1,4 +1,5 @@
 #include "pch/pch.h"
+#include "ImGuiLayer.h"
 #include "SandboxApp.h"
 
 ExampleLayer::ExampleLayer() : Layer("Example")
@@ -20,7 +21,9 @@ void ExampleLayer::OnEvent(Enxus::Event &event)
 
 Sandbox::Sandbox()
 {
+    std::cout << "pepe";
     PushLayer(new ExampleLayer());
+    PushOverlay(new Enxus::ImGuiLayer());
 }
 
 Sandbox::~Sandbox()

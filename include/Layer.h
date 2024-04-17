@@ -1,3 +1,6 @@
+#ifndef LAYER_H
+#define LAYER_H
+
 #include "base.h"
 #include "Event.h"
 
@@ -22,3 +25,4 @@ namespace Enxus
     };
 
 }
+#endif
