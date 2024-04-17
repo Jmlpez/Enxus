@@ -2,6 +2,56 @@
 
 namespace Enxus
 {
+    class MouseMoveEvent : public Event
+    {
+    public:
+        MouseMoveEvent(float xpos, float ypos)
+            : m_MouseX(xpos), m_MouseY(ypos) {}
+
+        inline float GetMouseX() const { return m_MouseX; }
+        inline float GetMouseY() const { return m_MouseY; }
+
+        std::string ToString() const override
+        {
+            std::stringstream ss;
+            ss << "MouseMoveEvent: "
+               << "(" << m_MouseX << "," << m_MouseY << ")";
+            return ss.str();
+        }
+        static EventType GetStaticType() { return EventType::MouseMoved; }
+        EventType GetEventType() const override { return GetStaticType(); }
+        const char *GetName() const override { return "MouseMove"; }
+
+        int GetCategoryFlags() const override { return EventCategoryMouse | EventCategoryInput; }
+
+    private:
+        float m_MouseX, m_MouseY;
+    };
+
+    class MouseScrolledEvent : public Event
+    {
+    public:
+        MouseScrolledEvent(float xOffset, float yOffset)
+            : m_XOffset(xOffset), m_YOffset(yOffset) {}
+
+        inline float GetXOffset() const { return m_XOffset; }
+        inline float GetYOffset() const { return m_YOffset; }
+
+        std::string ToString() const override
+        {
+            std::stringstream ss;
+            ss << "MouseScrolledEvent: " << GetXOffset() << ", " << GetYOffset();
+            return ss.str();
+        }
+
+        static EventType GetStaticType() { return EventType::MouseScrolled; }
+        EventType GetEventType() const override { return GetStaticType(); }
+        const char *GetName() const override { return "MouseScrolled"; }
+        int GetCategoryFlags() const override { return EventCategoryMouse | EventCategoryInput; }
+
+    private:
+        float m_XOffset, m_YOffset;
+    };
 
     class MouseButtonEvent : public Event
     {

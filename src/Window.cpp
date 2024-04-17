@@ -139,6 +139,24 @@ namespace Enxus
                     break;
                 }
             });
+        glfwSetCursorPosCallback(
+            m_Window,
+            [](GLFWwindow *window, double xPos, double yPos)
+            {
+                WindowData data = *(WindowData *)glfwGetWindowUserPointer(window);
+
+                MouseMoveEvent event((float)xPos, (float)yPos);
+                data.EventCallback(event);
+            });
+        glfwSetScrollCallback(
+            m_Window,
+            [](GLFWwindow *window, double xOffset, double yOffset)
+            {
+                WindowData data = *(WindowData *)glfwGetWindowUserPointer(window);
+
+                MouseScrolledEvent event((float)xOffset, (float)yOffset);
+                data.EventCallback(event);
+            });
     }
     void Window::ShutDown()
     {

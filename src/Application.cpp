@@ -8,7 +8,6 @@ namespace Enxus
 #define BIND_EVENT_FN(func) std::bind(&func, this, std::placeholders::_1)
     // La desventaja de esto es cuando la funcion tiene mas parametros, asi que habria que usar otro
     // metodo o hacerlo manual
-
     Application::Application()
     {
         // m_Window = CreateScope<Window>(Window::Create());
@@ -55,6 +54,8 @@ namespace Enxus
     {
         while (m_Running)
         {
+            glClearColor(1.0f, 0.0f, 1.0f, 1.0f);
+            glClear(GL_COLOR_BUFFER_BIT);
             m_Window->OnUpdate();
         }
     }
