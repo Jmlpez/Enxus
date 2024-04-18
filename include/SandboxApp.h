@@ -18,6 +18,7 @@ class Sandbox : public Enxus::Application
 {
 public:
     Sandbox();
+
     ~Sandbox();
 };
 
