@@ -45,6 +45,8 @@ namespace Enxus
 
         static Scope<Window> Create(const WindowProps &props = WindowProps());
 
+        inline void *GetNativeWindow() const { return m_Window; }
+
     private:
         void Init(const WindowProps &props);
         void ShutDown();

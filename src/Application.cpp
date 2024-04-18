@@ -1,6 +1,7 @@
 #include "pch/pch.h"
 #include "Application.h"
 #include "utils.h"
+#include "Input.h"
 
 namespace Enxus
 {
@@ -11,6 +12,7 @@ namespace Enxus
 #define BIND_EVENT_FN(func) std::bind(&func, this, std::placeholders::_1)
 
     Application *Application::s_Instance = nullptr;
+
     Application::Application()
     {
         if (s_Instance != nullptr)
