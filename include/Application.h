@@ -19,9 +19,9 @@ namespace Enxus
         void PushOverlay(Layer *layer);
         void OnEvent(Event &event);
 
-        static Application &Get() { return *s_Instance; }
+        inline Window &GetWindow() { return *m_Window; }
 
-        Scope<Window> &GetWindow() { return m_Window; }
+        static Application &Get() { return *s_Instance; }
 
     private:
         bool OnWindowClose(WindowCloseEvent &event);

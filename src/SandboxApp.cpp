@@ -22,7 +22,7 @@ void ExampleLayer::OnEvent(Enxus::Event &event)
 Sandbox::Sandbox()
 {
     PushLayer(new ExampleLayer());
-    PushOverlay(new Enxus::ImGuiLayer());
+    // PushOverlay(new Enxus::ImGuiLayer());
 }
 
 Sandbox::~Sandbox()
