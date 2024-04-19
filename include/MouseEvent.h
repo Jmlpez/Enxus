@@ -1,3 +1,5 @@
+#ifndef MOUSE_EVENT_H
+#define MOUSE_EVENT_H
 #include "Event.h"
 
 namespace Enxus
@@ -100,3 +102,5 @@ namespace Enxus
         virtual const char *GetName() const override { return "MouseButtonReleased"; }
     };
 }
+
+#endif

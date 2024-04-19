@@ -3,6 +3,7 @@
 
 #include "ApplicationEvent.h"
 #include "LayerStack.h"
+#include "ImGuiLayer.h"
 #include "Window.h"
 
 namespace Enxus
@@ -29,6 +30,8 @@ namespace Enxus
 
     private:
         Scope<Window> m_Window;
+        ImGuiLayer *m_ImGuiLayer;
+
         bool m_Running = true;
         LayerStack m_LayerStack;
         static Application *s_Instance;

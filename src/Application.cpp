@@ -1,5 +1,6 @@
 #include "pch/pch.h"
 #include "Application.h"
+#include "ImGuiLayer.h"
 #include "utils.h"
 #include "Input.h"
 
@@ -23,6 +24,8 @@ namespace Enxus
         s_Instance = this;
         m_Window = Window::Create();
 
+        m_ImGuiLayer = new ImGuiLayer();
+        PushOverlay(m_ImGuiLayer);
         /*
             hacer una referencia a la funcion OnEvent
             para que sea dicha funcion la que se llame cuando se dispare
@@ -77,6 +80,11 @@ namespace Enxus
 
             for (Layer *layer : m_LayerStack)
                 layer->OnUpdate();
+
+            m_ImGuiLayer->Begin();
+            for (Layer *layer : m_LayerStack)
+                layer->OnImGuiRender();
+            m_ImGuiLayer->End();
 
             m_Window->OnUpdate();
         }
