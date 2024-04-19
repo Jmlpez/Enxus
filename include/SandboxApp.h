@@ -1,5 +1,5 @@
-#ifndef SANDBOX_APP
-#define SANDBOX_APP
+#ifndef SANDBOX_APP_H
+#define SANDBOX_APP_H
 
 #include "Application.h"
 

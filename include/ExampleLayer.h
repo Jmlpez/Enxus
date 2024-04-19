@@ -1,5 +1,5 @@
-#ifndef EXAMPLE_LAYER
-#define EXAMPLE_LAYER
+#ifndef EXAMPLE_LAYER_H
+#define EXAMPLE_LAYER_H
 
 #include "Layer.h"
 

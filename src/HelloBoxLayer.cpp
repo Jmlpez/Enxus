@@ -1,0 +1,63 @@
+#include "HelloBoxLayer.h"
+#include "Renderer.h"
+#include "Application.h"
+#include "Input.h"
+#include "KeyCodes.h"
+#include "imgui/imgui.h"
+#include "GLFW/glfw3.h"
+
+HelloBoxLayer::HelloBoxLayer()
+{
+    std::vector<Enxus::VertexData> vertices{
+        {glm::vec3(0.5f, 0.0f, 0.5f), glm::vec2(1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f)},   // top right
+        {glm::vec3(0.5f, 0.0f, -0.5f), glm::vec2(1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f)},  // bottom right
+        {glm::vec3(-0.5f, 0.0f, -0.5f), glm::vec2(0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f)}, // bottom left
+        {glm::vec3(-0.5f, 0.0f, 0.5f), glm::vec2(0.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f)},  // top left
+    };
+    std::vector<unsigned int> indices{0, 1, 3,
+                                      1, 2, 3};
+
+    std::vector<Enxus::TextureData2D> textures{
+        {"res/images/container.jpg", Enxus::TextureType::DIFFUSE},
+        {"res/images/awesomeface.png", Enxus::TextureType::DIFFUSE},
+    };
+
+    m_Plane = Enxus::CreateRef<Enxus::Mesh>(vertices, indices, textures);
+    m_Shader = Enxus::CreateRef<Enxus::Shader>("res/shaders/mesh/basic.vert", "res/shaders/mesh/basic.frag");
+
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::scale(model, glm::vec3(3.0f));
+    model = glm::rotate(model, glm::radians(30.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    m_Shader->SetMat4("uModel", model);
+
+    // //----------------- CAMERA -------------------//
+
+    auto &window = Enxus::Application::Get().GetWindow();
+    m_MainCamera = Enxus::CreateRef<Enxus::Camera>(window.GetWidth(), window.GetHeight(), Enxus::CAMERA_PROJECTION::PERSPECTIVE);
+}
+
+HelloBoxLayer::~HelloBoxLayer()
+{
+}
+
+void HelloBoxLayer::OnUpdate()
+{
+
+    if (Enxus::Input::IsKeyPressed(Enxus::Key::Escape))
+        Enxus::Application::Get().Close();
+    m_Shader->Bind();
+    m_MainCamera->SetViewProjMatrix(*m_Shader);
+    //
+    Enxus::Renderer renderer;
+    renderer.Draw(m_Plane, *m_Shader);
+}
+void HelloBoxLayer::OnImGuiRender()
+{
+    // ImGui::Begin("Example");
+    // ImGui::Text("Example Text in a floating window");
+    // ImGui::End();
+}
+
+void HelloBoxLayer::OnEvent(Enxus::Event &event)
+{
+}
