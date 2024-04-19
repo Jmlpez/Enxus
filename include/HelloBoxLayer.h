@@ -2,6 +2,7 @@
 #define HELLO_BOX_LAYER_H
 
 #include "Layer.h"
+#include "Timestep.h"
 #include "Mesh.h"
 #include "Shader.h"
 #include "FreeCameraController.h"
@@ -13,7 +14,7 @@ public:
     HelloBoxLayer();
     ~HelloBoxLayer();
 
-    void OnUpdate() override;
+    void OnUpdate(Enxus::Timestep ts) override;
     void OnImGuiRender() override;
     void OnEvent(Enxus::Event &event) override;
 

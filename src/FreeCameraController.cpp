@@ -42,9 +42,9 @@ namespace Enxus
         m_Camera.SetFront(m_CameraFront);
     }
 
-    void FreeCameraController::OnUpdate(float deltaTime)
+    void FreeCameraController::OnUpdate(Timestep ts)
     {
-
+        float deltaTime = ts.GetSeconds();
         const float cameraSpeed = m_CameraTranslationSpeed * deltaTime;
         const float cameraRotationSpeed = m_CameraRotationSpeed * deltaTime;
 

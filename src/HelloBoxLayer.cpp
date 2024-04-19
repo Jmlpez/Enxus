@@ -41,11 +41,11 @@ HelloBoxLayer::~HelloBoxLayer()
 {
 }
 
-void HelloBoxLayer::OnUpdate()
+void HelloBoxLayer::OnUpdate(Enxus::Timestep ts)
 {
     if (Enxus::Input::IsKeyPressed(Enxus::Key::Escape))
         Enxus::Application::Get().Close();
-    m_CameraController->OnUpdate(0.01f);
+    m_CameraController->OnUpdate(ts);
 
     m_Shader->SetMat4("uView", m_CameraController->GetCamera().GetViewMatrix());
     m_Shader->SetMat4("uProj", m_CameraController->GetCamera().GetProjectionMatrix());

@@ -3,6 +3,7 @@
 
 #include "Camera.h"
 #include "ApplicationEvent.h"
+#include "Timestep.h"
 
 namespace Enxus
 {
@@ -16,7 +17,7 @@ namespace Enxus
 
         Camera &GetCamera() { return m_Camera; }
 
-        void OnUpdate(float deltaTime);
+        void OnUpdate(Timestep ts);
         void OnEvent(Event &event);
 
         void ResetCameraLocation();
