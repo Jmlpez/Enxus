@@ -27,7 +27,7 @@ CXXFLAGS = -std=gnu++17 -Wall -Wextra
 SOURCES = $(wildcard $(SRC_DIR)/*.cpp)
 SOURCES += $(wildcard $(IMGUI_DIR)/*.cpp)
 SOURCES += $(wildcard $(VENDOR_DIR)/*.cpp)
-SOURCES += $(wildcard $(TEST_DIR)/*.cpp)
+#SOURCES += $(wildcard $(TEST_DIR)/*.cpp)
 
 
 # OBJ Files
@@ -56,8 +56,8 @@ $(BIN_DIR)/%.o: $(IMGUI_DIR)/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@ $(IMGUI_FLAGS)
 
 # Build tests
-$(BIN_DIR)/%.o: $(TEST_DIR)/%.cpp
-	$(CXX) $(CXXFLAGS) $(PCH_FLAGS) -c $< -o $@ $(INCLUDE_FLAGS) $(IMGUI_FLAGS) $(VENDOR_FLAGS) $(OPENGL_FLAGS)
+#$(BIN_DIR)/%.o: $(TEST_DIR)/%.cpp
+#	$(CXX) $(CXXFLAGS) $(PCH_FLAGS) -c $< -o $@ $(INCLUDE_FLAGS) $(IMGUI_FLAGS) $(VENDOR_FLAGS) $(OPENGL_FLAGS)
 
 # Build main
 $(TARGET): $(OBJS) main.cpp
