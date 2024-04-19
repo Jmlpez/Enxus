@@ -51,7 +51,7 @@ void HelloBoxLayer::OnUpdate(Enxus::Timestep ts)
     m_Shader->SetMat4("uProj", m_CameraController->GetCamera().GetProjectionMatrix());
 
     m_Renderer->ClearColor(0.13f, 0.13f, 0.14f, 1.0f);
-    m_Renderer->Draw(m_Plane, *m_Shader);
+    m_Renderer->DrawMesh(m_Plane, m_Shader);
 }
 void HelloBoxLayer::OnImGuiRender()
 {

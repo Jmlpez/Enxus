@@ -10,11 +10,11 @@ namespace Enxus
         GLCall(glClear(GL_COLOR_BUFFER_BIT));
     }
 
-    void Renderer::Draw(Ref<Mesh> mesh, Shader &shader)
+    void Renderer::DrawMesh(const Ref<Mesh> &mesh, const Ref<Shader> &shader)
     {
 
         mesh->GetVAO()->Bind();
-        shader.Bind();
+        shader->Bind();
 
         /*
             Currently supported textures types
@@ -39,7 +39,7 @@ namespace Enxus
             {
                 name = "texture_specular" + std::to_string(specularNr++);
             }
-            shader.SetInt(("material." + name).c_str(), i);
+            shader->SetInt(("material." + name).c_str(), i);
             texture->Bind(i); // active the current texture slot
         }
 
@@ -57,13 +57,12 @@ namespace Enxus
         mesh->GetIBO()->Unbind();
     }
 
-    void Renderer::DrawModel(Ref<Model> model, Shader &shader)
+    void Renderer::DrawModel(const Ref<Model> &model, const Ref<Shader> &shader)
     {
-        // Draw(*model.GetMeshes()[1], shader);
         auto meshes = model->GetMeshes();
         for (auto mesh : meshes)
         {
-            Draw(mesh, shader);
+            DrawMesh(mesh, shader);
         }
     }
     inline void Renderer::DrawVertices(unsigned int numOfVertices)

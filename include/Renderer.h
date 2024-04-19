@@ -13,9 +13,8 @@ namespace Enxus
         Renderer(){};
         ~Renderer(){};
 
-        // void Draw(Mesh &mesh, Shader &shader);
-        void Draw(Ref<Mesh> mesh, Shader &shader);
-        void DrawModel(Ref<Model> model, Shader &shader);
+        void DrawMesh(const Ref<Mesh> &mesh, const Ref<Shader> &shader);
+        void DrawModel(const Ref<Model> &model, const Ref<Shader> &shader);
         void ClearColor(float red, float green, float blue, float alpha);
 
     private:
