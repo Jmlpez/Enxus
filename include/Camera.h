@@ -7,13 +7,13 @@
 
 namespace Enxus
 {
-    enum CAMERA_PROJECTION : unsigned short
+    enum class CameraProjection : unsigned short
     {
         PERSPECTIVE,
         ORTHOGRAPHIC,
     };
 
-    enum CAMERA_MOVEMENT : unsigned short
+    enum class CameraMovement : unsigned short
     {
         BACKWARD,
         FORWARD,
@@ -32,7 +32,7 @@ namespace Enxus
     private:
         unsigned int m_VpWidth, m_VpHeight;
 
-        CAMERA_PROJECTION m_Type;
+        CameraProjection m_Type;
         float m_NearPlane, m_FarPlane, m_FOV;
 
         // camera vectors
@@ -42,7 +42,7 @@ namespace Enxus
         bool cameraChanged = false;
 
     public:
-        Camera(unsigned int vpWidth, unsigned vpHeight, CAMERA_PROJECTION type, float nearPlane = 0.01f, float farPlane = 50.0f, float fov = 45.0f);
+        Camera(unsigned int vpWidth, unsigned vpHeight, CameraProjection type, float nearPlane = 0.01f, float farPlane = 50.0f, float fov = 45.0f);
         ~Camera();
 
         // update viewport
@@ -76,47 +76,5 @@ namespace Enxus
         void UpdateProjection();
     };
 
-    class FreeCameraController
-    {
-    private:
-        Camera *m_MainCamera;
-
-        float m_CameraSpeed = 1.5f, m_CameraRotationSpeed = 60.0f;
-
-        float m_Yaw = -90.0f, m_Pitch = 0.0f; // roll omitted by now
-
-        glm::vec3 m_CameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-        glm::vec3 m_CameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-        glm::vec3 m_CameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-
-    public:
-        FreeCameraController(Camera *camera);
-        ~FreeCameraController(){};
-
-        Camera *GetCamera() { return m_MainCamera; }
-
-        void ResetCameraLocation();
-
-        void ProcessKeyboardInput(CAMERA_MOVEMENT direction, float deltaTime);
-
-        // camera vectors setters/getter
-        void SetCameraPos(glm::vec3 position);
-        void SetCameraUp(glm::vec3 up);
-        void SetCameraFront(glm::vec3 front);
-
-        glm::vec3 GetCameraPos() { return m_CameraPos; }
-        glm::vec3 GetCameraUp() { return m_CameraUp; }
-        glm::vec3 GetCameraFront() { return m_CameraFront; }
-
-        // camera angles
-        void SetYaw(float degree);
-        void SetPitch(float degree);
-
-        float GetYaw() { return m_Yaw; }
-        float GetPitch() { return m_Pitch; }
-
-    private:
-        void UpdateFront();
-    };
 }
 #endif

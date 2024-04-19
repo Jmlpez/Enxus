@@ -33,7 +33,7 @@ HelloBoxLayer::HelloBoxLayer()
     // //----------------- CAMERA -------------------//
 
     auto &window = Enxus::Application::Get().GetWindow();
-    m_MainCamera = Enxus::CreateRef<Enxus::Camera>(window.GetWidth(), window.GetHeight(), Enxus::CAMERA_PROJECTION::PERSPECTIVE);
+    m_MainCamera = Enxus::CreateRef<Enxus::Camera>(window.GetWidth(), window.GetHeight(), Enxus::CameraProjection::PERSPECTIVE);
 }
 
 HelloBoxLayer::~HelloBoxLayer()
