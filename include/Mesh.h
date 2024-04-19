@@ -27,20 +27,20 @@ namespace Enxus
     class Mesh
     {
     private:
-        std::shared_ptr<VertexArray> m_VertexArrayObject;
-        std::shared_ptr<VertexBuffer> m_VertexBufferObject;
-        std::shared_ptr<IndexBuffer> m_IndexBufferObject;
+        Ref<VertexArray> m_VertexArrayObject;
+        Ref<VertexBuffer> m_VertexBufferObject;
+        Ref<IndexBuffer> m_IndexBufferObject;
 
         std::vector<VertexData> m_Vertices;
         std::vector<unsigned int> m_Indices;
         std::vector<TextureData2D> m_MeshTextures;
 
-        std::vector<std::shared_ptr<Texture2D>> m_Textures;
+        std::vector<Ref<Texture2D>> m_Textures;
 
     public:
         Mesh(std::vector<VertexData> vertices, std::vector<TextureData2D> textures);
         Mesh(std::vector<VertexData> vertices, std::vector<unsigned int> indices, std::vector<TextureData2D> textures);
-        Mesh(std::vector<VertexData> vertices, std::vector<unsigned int> indices, std::vector<std::shared_ptr<Texture2D>> texturesRef);
+        Mesh(std::vector<VertexData> vertices, std::vector<unsigned int> indices, std::vector<Ref<Texture2D>> texturesRef);
         ~Mesh();
 
         void CreateBuffers();
@@ -48,11 +48,11 @@ namespace Enxus
 
         const std::vector<VertexData> &GetVertices() const { return m_Vertices; }
         const std::vector<unsigned int> &GetIndices() const { return m_Indices; }
-        const std::vector<std::shared_ptr<Texture2D>> &GetTextures() const { return m_Textures; }
+        const std::vector<Ref<Texture2D>> &GetTextures() const { return m_Textures; }
 
-        std::shared_ptr<VertexArray> GetVAO() const { return m_VertexArrayObject; }
-        std::shared_ptr<VertexBuffer> GetVBO() const { return m_VertexBufferObject; }
-        std::shared_ptr<IndexBuffer> GetIBO() const { return m_IndexBufferObject; }
+        Ref<VertexArray> GetVAO() const { return m_VertexArrayObject; }
+        Ref<VertexBuffer> GetVBO() const { return m_VertexBufferObject; }
+        Ref<IndexBuffer> GetIBO() const { return m_IndexBufferObject; }
 
         // smart pointers has the bool operator overloaded
         bool HasIndices() { return (bool)m_IndexBufferObject; }
