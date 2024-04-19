@@ -5,6 +5,7 @@
 
 #define BIT(n) 1 << n
 
+#define BIND_EVENT_FN(func) std::bind(&func, this, std::placeholders::_1)
 /*
 It's more semantic to use Scope and Ref, to refer the unique and shared pointers of my Engine. Idea from The Cherno :)
 In the future, I can make my own class or my own reference count system.

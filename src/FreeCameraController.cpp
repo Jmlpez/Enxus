@@ -1,14 +1,20 @@
+#include "pch/pch.h"
 #include "FreeCameraController.h"
+#include "base.h"
+#include "Input.h"
+#include "Event.h"
+#include "ApplicationEvent.h"
+#include "KeyCodes.h"
 
 namespace Enxus
 {
 
-    FreeCameraController::FreeCameraController(Camera *camera)
+    FreeCameraController::FreeCameraController(float aspectRatio)
+        : m_Camera(45.0f, aspectRatio, 0.01f, 50.0f)
     {
-        m_MainCamera = camera;
-        m_MainCamera->SetPos(m_CameraPos);
-        m_MainCamera->SetUp(m_CameraUp);
-        m_MainCamera->SetFront(m_CameraFront);
+        m_Camera.SetPos(m_CameraPos);
+        m_Camera.SetUp(m_CameraUp);
+        m_Camera.SetFront(m_CameraFront);
     };
 
     void FreeCameraController::ResetCameraLocation()
@@ -17,9 +23,9 @@ namespace Enxus
         m_CameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
         m_CameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 
-        m_MainCamera->SetPos(m_CameraPos);
-        m_MainCamera->SetUp(m_CameraUp);
-        m_MainCamera->SetFront(m_CameraFront);
+        m_Camera.SetPos(m_CameraPos);
+        m_Camera.SetUp(m_CameraUp);
+        m_Camera.SetFront(m_CameraFront);
 
         SetYaw(-90.0f);
         SetPitch(0.0f);
@@ -33,66 +39,64 @@ namespace Enxus
         frontAux.z = sin(glm::radians(m_Yaw)) * cos(glm::radians(m_Pitch));
 
         m_CameraFront = glm::normalize(frontAux);
-        m_MainCamera->SetFront(m_CameraFront);
+        m_Camera.SetFront(m_CameraFront);
     }
 
-    void FreeCameraController::ProcessKeyboardInput(CameraMovement direction, float deltaTime)
+    void FreeCameraController::OnUpdate(float deltaTime)
     {
 
-        const float cameraSpeed = m_CameraSpeed * deltaTime;
+        const float cameraSpeed = m_CameraTranslationSpeed * deltaTime;
         const float cameraRotationSpeed = m_CameraRotationSpeed * deltaTime;
-
-        // std::cout << "Delta Time: " << miliseconds << " FPS: (" << 1.0f / deltaTime << ")" << std::endl;
 
         bool cameraMove = false;
 
         // camera locations
-        if (direction == CameraMovement::FORWARD)
+        if (Input::IsKeyPressed(Key::W))
         {
             m_CameraPos += m_CameraFront * cameraSpeed;
             cameraMove = true;
         }
-        if (direction == CameraMovement::BACKWARD)
+        if (Input::IsKeyPressed(Key::S))
         {
             m_CameraPos -= m_CameraFront * cameraSpeed;
             cameraMove = true;
         }
-        if (direction == CameraMovement::UP)
+        if (Input::IsKeyPressed(Key::Q))
         {
             m_CameraPos += m_CameraUp * cameraSpeed;
             cameraMove = true;
         }
-        if (direction == CameraMovement::DOWN)
+        if (Input::IsKeyPressed(Key::E))
         {
             m_CameraPos -= m_CameraUp * cameraSpeed;
             cameraMove = true;
         }
-        if (direction == CameraMovement::LEFT)
+        if (Input::IsKeyPressed(Key::A))
         {
             m_CameraPos -= glm::normalize(glm::cross(m_CameraFront, m_CameraUp)) * cameraSpeed;
             cameraMove = true;
         }
-        if (direction == CameraMovement::RIGHT)
+        if (Input::IsKeyPressed(Key::D))
         {
             m_CameraPos += glm::normalize(glm::cross(m_CameraFront, m_CameraUp)) * cameraSpeed;
             cameraMove = true;
         }
 
         if (cameraMove)
-            m_MainCamera->SetPos(m_CameraPos);
+            m_Camera.SetPos(m_CameraPos);
 
         // camera rotations
 
         //----------------- YAW ROTATIONS (around Y-axis) -------------------//
         bool cameraRotationKeyPress = false;
-        if (direction == CameraMovement::LEFT_ROTATION)
+        if (Input::IsKeyPressed(Key::KP4))
         {
             m_Yaw -= cameraRotationSpeed;
             if (m_Yaw <= -360.0f)
                 m_Yaw += 360.0f;
             cameraRotationKeyPress = true;
         }
-        if (direction == CameraMovement::RIGHT_ROTATION)
+        if (Input::IsKeyPressed(Key::KP6))
         {
             m_Yaw += cameraRotationSpeed;
             if (m_Yaw >= 360.0f)
@@ -100,12 +104,12 @@ namespace Enxus
             cameraRotationKeyPress = true;
         }
         //----------------- PITCH ROTATIONS (around X-axis) -------------------//
-        if (direction == CameraMovement::UP_ROTATION)
+        if (Input::IsKeyPressed(Key::KP8))
         {
             m_Pitch -= cameraRotationSpeed;
             cameraRotationKeyPress = true;
         }
-        if (direction == CameraMovement::DOWN_ROTATION)
+        if (Input::IsKeyPressed(Key::KP2))
         {
             m_Pitch += cameraRotationSpeed;
             cameraRotationKeyPress = true;
@@ -121,23 +125,36 @@ namespace Enxus
 
         UpdateFront();
     }
+    void FreeCameraController::OnEvent(Event &event)
+    {
+        EventDispatcher dispatcher(event);
+        dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(FreeCameraController::OnResize));
+    }
+
+    bool FreeCameraController::OnResize(WindowResizeEvent &event)
+    {
+        unsigned int width = event.GetWidth();
+        unsigned int height = event.GetHeight();
+        m_Camera.SetViewportSize(width, height);
+        return true;
+    }
 
     void FreeCameraController::SetCameraPos(glm::vec3 position)
     {
         m_CameraPos = position;
-        m_MainCamera->SetPos(m_CameraPos);
+        m_Camera.SetPos(m_CameraPos);
     }
     void FreeCameraController::SetCameraUp(glm::vec3 up)
     {
         m_CameraUp = up;
-        m_MainCamera->SetUp(m_CameraUp);
+        m_Camera.SetUp(m_CameraUp);
     }
     void FreeCameraController::SetCameraFront(glm::vec3 front)
     {
         m_CameraFront = front;
-        m_MainCamera->SetFront(m_CameraFront);
+        m_Camera.SetFront(m_CameraFront);
     }
-
+    // camera angles
     void FreeCameraController::SetYaw(float degree)
     {
         m_Yaw = degree;
@@ -148,4 +165,5 @@ namespace Enxus
         m_Pitch = degree;
         UpdateFront();
     }
+
 }

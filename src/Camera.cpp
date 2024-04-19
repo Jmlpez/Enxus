@@ -4,55 +4,37 @@
 namespace Enxus
 {
 
-    Camera::Camera(unsigned int vpWidth,
-                   unsigned vpHeight,
-                   CameraProjection type,
-                   float nearPlane,
-                   float farPlane,
-                   float fov)
-        : m_VpWidth(vpWidth),
-          m_VpHeight(vpHeight),
-          m_Type(type),
+    Camera::Camera(
+        float fov,
+        float aspectRatio,
+        float nearPlane,
+        float farPlane)
+        : m_FOV(fov),
+          m_AspectRatio(aspectRatio),
           m_NearPlane(nearPlane),
-          m_FarPlane(farPlane),
-          m_FOV(fov)
+          m_FarPlane(farPlane)
     {
 
-        m_Pos = glm::vec3(0.0f, 0.0f, 3.0f);
-        m_Up = glm::vec3(0.0f, 1.0f, 0.0f);
-        m_Front = glm::vec3(0.0f, 0.0f, -1.0f);
-
         // in this case is the first calculation
-        UpdateProjection();
-        UpdateView();
+        RecalculateView();
+        RecalculateProjection();
     }
 
     Camera::~Camera()
     {
     }
 
-    void Camera::UpdateView()
+    void Camera::RecalculateView()
     {
         m_View = glm::lookAt(m_Pos, m_Pos + m_Front, m_Up);
-        cameraChanged = false;
     }
 
-    void Camera::UpdateProjection()
+    void Camera::RecalculateProjection()
     {
-        switch (m_Type)
-        {
-        case CameraProjection::PERSPECTIVE:
-            m_Proj = glm::perspective(glm::radians(m_FOV), (float)m_VpWidth / (float)m_VpHeight, m_NearPlane, m_FarPlane);
-            break;
-        case CameraProjection::ORTHOGRAPHIC:
-            m_Proj = glm::ortho(-m_VpWidth / 2.0f, m_VpWidth / 2.0f, -m_VpHeight / 2.0f, m_VpHeight / 2.0f, m_NearPlane, m_FarPlane);
-            break;
-        default:
-            break;
-        }
+        m_Proj = glm::perspective(glm::radians(m_FOV), m_AspectRatio, m_NearPlane, m_FarPlane);
     }
 
-    void Camera::OnResize(unsigned int vpWidth, unsigned int vpHeight)
+    void Camera::SetViewportSize(unsigned int vpWidth, unsigned int vpHeight)
     {
         // if nothing change just return
         if (m_VpWidth == vpWidth && m_VpHeight == vpHeight)
@@ -60,42 +42,24 @@ namespace Enxus
 
         m_VpWidth = vpWidth;
         m_VpHeight = vpHeight;
-        UpdateProjection();
-    }
-
-    void Camera::SetCameraAttr(Shader &shader)
-    {
-        if (cameraChanged)
-            UpdateView();
-
-        shader.SetMat4("uProj", m_Proj);
-        shader.SetMat4("uView", m_View);
-        // set other attributes uniforms (e.g position, direction, etc)
-    }
-
-    void Camera::SetViewProjMatrix(Shader &shader)
-    {
-        if (cameraChanged)
-            UpdateView();
-
-        shader.SetMat4("uProj", m_Proj);
-        shader.SetMat4("uView", m_View);
+        m_AspectRatio = m_VpWidth / m_VpHeight;
+        RecalculateProjection();
     }
 
     void Camera::SetPos(glm::vec3 position)
     {
         m_Pos = position;
-        cameraChanged = true;
+        RecalculateView();
     }
     void Camera::SetUp(glm::vec3 up)
     {
         m_Up = up;
-        cameraChanged = true;
+        RecalculateView();
     }
     void Camera::SetFront(glm::vec3 front)
     {
         m_Front = front;
-        cameraChanged = true;
+        RecalculateView();
     }
 
 }

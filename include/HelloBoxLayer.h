@@ -4,7 +4,8 @@
 #include "Layer.h"
 #include "Mesh.h"
 #include "Shader.h"
-#include "Camera.h"
+#include "FreeCameraController.h"
+#include "Renderer.h"
 
 class HelloBoxLayer : public Enxus::Layer
 {
@@ -19,6 +20,7 @@ public:
 private:
     Enxus::Ref<Enxus::Mesh> m_Plane;
     Enxus::Ref<Enxus::Shader> m_Shader;
-    Enxus::Ref<Enxus::Camera> m_MainCamera;
+    Enxus::Scope<Enxus::FreeCameraController> m_CameraController;
+    Enxus::Ref<Enxus::Renderer> m_Renderer;
 };
 #endif

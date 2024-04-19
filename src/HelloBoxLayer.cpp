@@ -4,7 +4,6 @@
 #include "Input.h"
 #include "KeyCodes.h"
 #include "imgui/imgui.h"
-#include "GLFW/glfw3.h"
 
 HelloBoxLayer::HelloBoxLayer()
 {
@@ -30,10 +29,12 @@ HelloBoxLayer::HelloBoxLayer()
     model = glm::rotate(model, glm::radians(30.0f), glm::vec3(1.0f, 0.0f, 0.0f));
     m_Shader->SetMat4("uModel", model);
 
-    // //----------------- CAMERA -------------------//
+    //----------------- RENDERER -------------------//
+    m_Renderer = Enxus::CreateRef<Enxus::Renderer>();
 
+    // //----------------- CAMERA -------------------//
     auto &window = Enxus::Application::Get().GetWindow();
-    m_MainCamera = Enxus::CreateRef<Enxus::Camera>(window.GetWidth(), window.GetHeight(), Enxus::CameraProjection::PERSPECTIVE);
+    m_CameraController = Enxus::CreateScope<Enxus::FreeCameraController>((float)window.GetWidth() / (float)window.GetHeight());
 }
 
 HelloBoxLayer::~HelloBoxLayer()
@@ -42,20 +43,21 @@ HelloBoxLayer::~HelloBoxLayer()
 
 void HelloBoxLayer::OnUpdate()
 {
-
     if (Enxus::Input::IsKeyPressed(Enxus::Key::Escape))
         Enxus::Application::Get().Close();
-    m_Shader->Bind();
-    m_MainCamera->SetViewProjMatrix(*m_Shader);
-    //
-    Enxus::Renderer renderer;
-    renderer.Draw(m_Plane, *m_Shader);
+    m_CameraController->OnUpdate(0.01f);
+
+    m_Shader->SetMat4("uView", m_CameraController->GetCamera().GetViewMatrix());
+    m_Shader->SetMat4("uProj", m_CameraController->GetCamera().GetProjectionMatrix());
+
+    m_Renderer->ClearColor(0.13f, 0.13f, 0.14f, 1.0f);
+    m_Renderer->Draw(m_Plane, *m_Shader);
 }
 void HelloBoxLayer::OnImGuiRender()
 {
-    // ImGui::Begin("Example");
-    // ImGui::Text("Example Text in a floating window");
-    // ImGui::End();
+    ImGui::Begin("Example");
+    ImGui::Text("Example Text in a floating window");
+    ImGui::End();
 }
 
 void HelloBoxLayer::OnEvent(Enxus::Event &event)
