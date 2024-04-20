@@ -29,9 +29,6 @@ HelloBoxLayer::HelloBoxLayer()
     model = glm::rotate(model, glm::radians(30.0f), glm::vec3(1.0f, 0.0f, 0.0f));
     m_Shader->SetMat4("uModel", model);
 
-    //----------------- RENDERER -------------------//
-    m_Renderer = Enxus::CreateRef<Enxus::Renderer>();
-
     // //----------------- CAMERA -------------------//
     auto &window = Enxus::Application::Get().GetWindow();
     m_CameraController = Enxus::CreateScope<Enxus::FreeCameraController>((float)window.GetWidth() / (float)window.GetHeight());
@@ -50,8 +47,8 @@ void HelloBoxLayer::OnUpdate(Enxus::Timestep ts)
     m_Shader->SetMat4("uView", m_CameraController->GetCamera().GetViewMatrix());
     m_Shader->SetMat4("uProj", m_CameraController->GetCamera().GetProjectionMatrix());
 
-    m_Renderer->ClearColor(0.13f, 0.13f, 0.14f, 1.0f);
-    m_Renderer->DrawMesh(m_Plane, m_Shader);
+    Enxus::Renderer::ClearColor(0.13f, 0.13f, 0.14f, 1.0f);
+    Enxus::Renderer::DrawMesh(m_Plane, m_Shader);
 }
 void HelloBoxLayer::OnImGuiRender()
 {

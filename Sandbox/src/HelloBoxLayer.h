@@ -22,6 +22,5 @@ private:
     Enxus::Ref<Enxus::Mesh> m_Plane;
     Enxus::Ref<Enxus::Shader> m_Shader;
     Enxus::Scope<Enxus::FreeCameraController> m_CameraController;
-    Enxus::Ref<Enxus::Renderer> m_Renderer;
 };
 #endif

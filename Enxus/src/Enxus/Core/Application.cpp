@@ -3,6 +3,7 @@
 #include "Application.h"
 #include "ImGuiLayer.h"
 #include "utils.h"
+#include "Renderer.h"
 #include "Input.h"
 
 namespace Enxus
@@ -99,6 +100,12 @@ namespace Enxus
         m_Running = false;
         return true;
     }
+    bool Application::OnWindowResize(WindowResizeEvent &event)
+    {
+        Renderer::SetViewport(0, 0, event.GetWidth(), event.GetHeight());
+        return true;
+    }
+
     void Application::PushLayer(Layer *layer)
     {
         m_LayerStack.PushLayer(layer);

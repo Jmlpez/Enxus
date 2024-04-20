@@ -1,16 +1,23 @@
 #include "pch.h"
 #include "Renderer.h"
+#include "utils.h"
 
 namespace Enxus
 {
+    Renderer *Renderer::s_RendererInstance = new Renderer();
 
-    void Renderer::ClearColor(float red, float green, float blue, float alpha)
+    void Renderer::SetViewportImpl(unsigned int x, unsigned int y, unsigned int width, unsigned int height)
+    {
+        GLCall(glViewport(x, y, width, height));
+    }
+
+    void Renderer::ClearColorImpl(float red, float green, float blue, float alpha)
     {
         GLCall(glClearColor(red, green, blue, alpha));
         GLCall(glClear(GL_COLOR_BUFFER_BIT));
     }
 
-    void Renderer::DrawMesh(const Ref<Mesh> &mesh, const Ref<Shader> &shader)
+    void Renderer::DrawMeshImpl(const Ref<Mesh> &mesh, const Ref<Shader> &shader)
     {
 
         mesh->GetVAO()->Bind();
@@ -57,7 +64,7 @@ namespace Enxus
         mesh->GetIBO()->Unbind();
     }
 
-    void Renderer::DrawModel(const Ref<Model> &model, const Ref<Shader> &shader)
+    void Renderer::DrawModelImpl(const Ref<Model> &model, const Ref<Shader> &shader)
     {
         auto meshes = model->GetMeshes();
         for (auto mesh : meshes)
