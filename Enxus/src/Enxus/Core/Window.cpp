@@ -54,12 +54,9 @@ namespace Enxus
             std::cout << "[GLFW Error]: Could not create a window :(" << std::endl;
             ASSERT(false);
         }
-        glfwMakeContextCurrent(m_Window);
-        if (glewInit() != GLEW_OK)
-        {
-            std::cout << "[GLEW Error]: failed to initialize glew :(" << std::endl;
-            ASSERT(false);
-        }
+
+        m_GraphicsContext = CreateScope<OpenGLContext>(m_Window);
+        m_GraphicsContext->Init();
 
         glfwSetWindowUserPointer(m_Window, &m_Data);
         SetVSync(true);
@@ -73,7 +70,8 @@ namespace Enxus
                 data.Width = width;
                 data.Height = height;
 
-                // glViewport(0, 0, data.Width, data.Height);
+                // For the moment
+                glViewport(0, 0, data.Width, data.Height);
 
                 WindowResizeEvent event(width, height);
                 data.EventCallback(event);
@@ -182,8 +180,8 @@ namespace Enxus
 
     void Window::OnUpdate()
     {
-        glfwSwapBuffers(m_Window);
         glfwPollEvents();
+        m_GraphicsContext->SwapBuffers();
     }
 
     void Window::SetVSync(bool enabled)

@@ -62,4 +62,5 @@ void HelloBoxLayer::OnImGuiRender()
 
 void HelloBoxLayer::OnEvent(Enxus::Event &event)
 {
+    m_CameraController->OnEvent(event);
 }

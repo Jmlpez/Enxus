@@ -59,7 +59,7 @@ sandbox:
 	$(MAKE) -C $(SANDBOX_DIR)
 
 
-run: all enxus sandbox
+run: enxus sandbox all
 	@echo "\n---------------------- RUNING -----------------------\n"
 	@$(TARGET)
 	@echo "\n------------------- END OF RUNING -------------------\n"	

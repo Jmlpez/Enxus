@@ -42,7 +42,7 @@ namespace Enxus
 
         m_VpWidth = vpWidth;
         m_VpHeight = vpHeight;
-        m_AspectRatio = m_VpWidth / m_VpHeight;
+        m_AspectRatio = (float)m_VpWidth / (float)m_VpHeight;
         RecalculateProjection();
     }
 

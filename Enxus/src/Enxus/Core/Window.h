@@ -6,6 +6,7 @@
 
 #include "Base.h"
 #include "Event.h"
+#include "OpenGLContext.h"
 
 namespace Enxus
 {
@@ -53,6 +54,7 @@ namespace Enxus
 
     private:
         GLFWwindow *m_Window;
+        Scope<OpenGLContext> m_GraphicsContext;
 
         struct WindowData
         {
