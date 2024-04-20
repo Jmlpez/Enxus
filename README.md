@@ -1,13 +1,9 @@
-## OpenGL Test Menu App
+## Enxus Game Engine
 
-A SandBox app to test some OpenGL feature by creating an isolated test.
+A game Engine created for the sake of learning 😄.
 
-The App have been designed as an Core Engine with abstractions of OpenGL buffers and shaders etc.
-For example to load a model you can type:
 
-```cpp
-Model box("path/to/box.obj");
-```
+I used OpenGL as the graphics library but this can change in the future.
 
 ### Vendor dependencies
 - *Assimp*: To import/export models with several formats from softwares like blender, 3DMax etc.
