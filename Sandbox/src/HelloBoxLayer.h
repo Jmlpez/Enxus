@@ -20,6 +20,7 @@ public:
 
 private:
     Enxus::Ref<Enxus::Mesh> m_Plane;
+    Enxus::Ref<Enxus::Texture2D> m_ExampleTexture;
     Enxus::Ref<Enxus::Shader> m_Shader;
     Enxus::Scope<Enxus::FreeCameraController> m_CameraController;
 };

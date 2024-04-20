@@ -25,17 +25,13 @@ namespace Enxus
 
     class Texture2D
     {
-    private:
-        unsigned int m_RendererId;
-        int m_Width, m_Height, m_NrChannels;
-        unsigned char *m_LocalBuffer; // texture data
-
-        TextureData2D m_TextureData;
 
     public:
         Texture2D(const TextureData2D &textureData);
         Texture2D(const std::string &texturePath, TextureType type = TextureType::DIFFUSE);
         ~Texture2D();
+
+        unsigned int GetRendererId() const { return m_RendererId; }
 
         void Bind(unsigned int slot = 0) const;
         void Unbind() const;
@@ -48,6 +44,13 @@ namespace Enxus
     private:
         void CreateTexture2D();
         void LoadImage();
+
+    private:
+        unsigned int m_RendererId;
+        int m_Width, m_Height, m_NrChannels;
+        unsigned char *m_LocalBuffer; // texture data
+
+        TextureData2D m_TextureData;
     };
 }
 
