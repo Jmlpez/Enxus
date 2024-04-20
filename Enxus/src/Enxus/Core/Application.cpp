@@ -59,6 +59,7 @@ namespace Enxus
     {
         EventDispatcher dispatcher(event);
         dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(Application::OnWindowClose));
+        dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(Application::OnWindowResize));
 
         // From LayerOverlays to normal layers
         // check for someone to handle the event and break
@@ -103,7 +104,7 @@ namespace Enxus
     bool Application::OnWindowResize(WindowResizeEvent &event)
     {
         Renderer::SetViewport(0, 0, event.GetWidth(), event.GetHeight());
-        return true;
+        return false; // to continue propagating the event
     }
 
     void Application::PushLayer(Layer *layer)

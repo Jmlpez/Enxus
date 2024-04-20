@@ -27,7 +27,7 @@ namespace Enxus
 
     private:
         bool OnWindowClose(WindowCloseEvent &event);
-        bool OnWindowResize(WindowResizeEvent &e);
+        bool OnWindowResize(WindowResizeEvent &event);
 
     private:
         Scope<Window>
