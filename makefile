@@ -88,8 +88,10 @@ pepe: pepe.cpp
 
 clean:
 	rm -fr $(BIN_DIR)/*
-clean-full:
-	$(MAKE) clean
+clean-enxus:
 	$(MAKE) -C $(ENXUS_DIR) clean
+clean-sandbox:
 	$(MAKE) -C $(SANDBOX_DIR) clean
+clean-full: clean clean-enxus clean-sandbox
+	
 

@@ -1,23 +1,22 @@
-#ifndef HELLO_BOX_LAYER_H
-#define HELLO_BOX_LAYER_H
+#ifndef EDITOR_H
+#define EDITOR_H
 
 #include "Enxus.h"
 
-class HelloBoxLayer : public Enxus::Layer
+class Editor : public Enxus::Layer
 {
 public:
-    HelloBoxLayer();
-    ~HelloBoxLayer();
+    Editor();
+    ~Editor();
 
     void OnUpdate(Enxus::Timestep ts) override;
     void OnEvent(Enxus::Event &event) override;
     void OnImGuiRender() override;
 
 private:
-    Enxus::Ref<Enxus::Mesh> m_Plane;
-    Enxus::Ref<Enxus::Texture2D> m_ExampleTexture;
-    Enxus::Ref<Enxus::Framebuffer> m_Framebuffer;
+    Enxus::Ref<Enxus::Model> m_Box;
     Enxus::Ref<Enxus::Shader> m_Shader;
+    Enxus::Scope<Enxus::Framebuffer> m_Framebuffer;
     Enxus::Scope<Enxus::FreeCameraController> m_CameraController;
 };
 #endif

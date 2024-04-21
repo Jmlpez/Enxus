@@ -1,15 +1,17 @@
 #include "pch.h"
 #include "SandboxApp.h"
 #include "ExampleLayer.h"
-#include "HelloBoxLayer.h"
+// #include "HelloBoxLayer.h"
+#include "Editor.h"
 
 Sandbox::Sandbox()
 {
 
     // Enxus::Layer *example = new ExampleLayer();
 
-    Enxus::Layer *example = new HelloBoxLayer();
-    PushLayer(example);
+    // Enxus::Layer *example = new HelloBoxLayer();
+    Enxus::Layer *editor = new Editor();
+    PushLayer(editor);
 }
 
 Sandbox::~Sandbox()

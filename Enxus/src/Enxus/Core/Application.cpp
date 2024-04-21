@@ -25,6 +25,8 @@ namespace Enxus
         s_Instance = this;
         m_Window = Window::Create();
 
+        Renderer::Init();
+
         m_ImGuiLayer = new ImGuiLayer();
         PushOverlay(m_ImGuiLayer);
         /*

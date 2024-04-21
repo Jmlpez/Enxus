@@ -6,6 +6,16 @@ namespace Enxus
 {
     Renderer *Renderer::s_RendererInstance = new Renderer();
 
+    void Renderer::InitImpl()
+    {
+        //----------------- OpenGL State Initialization -------------------//
+
+        GLCall(glEnable(GL_BLEND));
+        GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+
+        GLCall(glEnable(GL_DEPTH_TEST));
+    }
+
     void Renderer::SetViewportImpl(unsigned int x, unsigned int y, unsigned int width, unsigned int height)
     {
         GLCall(glViewport(x, y, width, height));
@@ -14,7 +24,10 @@ namespace Enxus
     void Renderer::ClearColorImpl(float red, float green, float blue, float alpha)
     {
         GLCall(glClearColor(red, green, blue, alpha));
-        GLCall(glClear(GL_COLOR_BUFFER_BIT));
+    }
+    void Renderer::ClearImpl()
+    {
+        GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
     }
 
     void Renderer::DrawMeshImpl(const Ref<Mesh> &mesh, const Ref<Shader> &shader)
