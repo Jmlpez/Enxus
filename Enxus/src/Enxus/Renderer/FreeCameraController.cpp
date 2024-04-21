@@ -128,14 +128,17 @@ namespace Enxus
     void FreeCameraController::OnEvent(Event &event)
     {
         EventDispatcher dispatcher(event);
-        dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(FreeCameraController::OnResize));
+        dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(FreeCameraController::OnWindowResized));
     }
 
-    bool FreeCameraController::OnResize(WindowResizeEvent &event)
+    void FreeCameraController::OnResize(unsigned int width, unsigned int height)
     {
-        unsigned int width = event.GetWidth();
-        unsigned int height = event.GetHeight();
         m_Camera.SetViewportSize(width, height);
+    }
+
+    bool FreeCameraController::OnWindowResized(WindowResizeEvent &event)
+    {
+        OnResize((float)event.GetWidth(), (float)event.GetHeight());
         return true;
     }
 

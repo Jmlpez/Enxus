@@ -20,6 +20,8 @@ namespace Enxus
         void OnUpdate(Timestep ts);
         void OnEvent(Event &event);
 
+        void OnResize(unsigned int width, unsigned int height);
+
         void ResetCameraLocation();
         // camera vectors setters/getter
         void SetCameraPos(glm::vec3 position);
@@ -38,7 +40,7 @@ namespace Enxus
         float GetPitch() { return m_Pitch; }
 
     private:
-        bool OnResize(WindowResizeEvent &event);
+        bool OnWindowResized(WindowResizeEvent &event);
         void UpdateFront();
 
     private:

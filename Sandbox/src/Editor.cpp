@@ -3,7 +3,7 @@
 #include "imgui/imgui.h"
 
 Editor::Editor()
-    : Layer("Editor Layer"), m_ViewportSize(600.0f, 300.0f)
+    : Layer("Editor Layer"), m_ViewportSize(0.0f, 0.0f)
 {
 
     //----------------- CAMERA -------------------//
@@ -48,13 +48,17 @@ void Editor::OnUpdate(Enxus::Timestep ts)
     m_Shader->SetMat4("uProj", m_CameraController->GetCamera().GetProjectionMatrix());
     m_Shader->Unbind();
 
-    m_Framebuffer->Bind();
     {
-        Enxus::Renderer::ClearColor(0.13f, 0.13f, 0.14f, 1.0f);
-        Enxus::Renderer::Clear();
-        Enxus::Renderer::DrawModel(m_Box, m_Shader);
+        // Rendering
+        m_Framebuffer->Bind();
+        Enxus::Renderer::SetViewport(0, 0, m_ViewportSize.x, m_ViewportSize.y);
+        {
+            Enxus::Renderer::ClearColor(0.13f, 0.13f, 0.14f, 1.0f);
+            Enxus::Renderer::Clear();
+            Enxus::Renderer::DrawModel(m_Box, m_Shader);
+        }
+        m_Framebuffer->Unbind();
     }
-    m_Framebuffer->Unbind();
 }
 
 void Editor::OnImGuiRender()
@@ -131,6 +135,7 @@ void Editor::OnImGuiRender()
 
     {
         // Scene
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
         ImGui::Begin("Viewport");
 
         ImVec2 viewport = ImGui::GetContentRegionAvail();
@@ -140,12 +145,13 @@ void Editor::OnImGuiRender()
         {
             m_ViewportSize = {viewport.x, viewport.y};
             m_Framebuffer->Resize((unsigned int)viewport.x, (unsigned int)viewport.y);
+            m_CameraController->OnResize((unsigned int)viewport.x, (unsigned int)viewport.y);
         }
 
         size_t textureID = m_Framebuffer->GetColorAttachmentRendererID();
         ImGui::Image((void *)textureID, ImVec2(m_ViewportSize.x, m_ViewportSize.y), ImVec2{0, 1}, ImVec2{1, 0});
-
         ImGui::End();
+        ImGui::PopStyleVar();
     }
 
     ImGui::End();
