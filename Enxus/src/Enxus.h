@@ -23,6 +23,7 @@
 #include "Enxus/Renderer/VertexBuffer.h"
 #include "Enxus/Renderer/IndexBuffer.h"
 #include "Enxus/Renderer/VertexArray.h"
+#include "Enxus/Renderer/Framebuffer.h"
 #include "Enxus/Renderer/Model.h"
 #include "Enxus/Renderer/Mesh.h"
 // -----------------------------------

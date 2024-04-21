@@ -26,7 +26,7 @@ HelloBoxLayer::HelloBoxLayer()
 
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::scale(model, glm::vec3(3.0f));
-    model = glm::rotate(model, glm::radians(30.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
     m_Shader->SetMat4("uModel", model);
 
     // //----------------- CAMERA -------------------//
@@ -35,6 +35,12 @@ HelloBoxLayer::HelloBoxLayer()
 
     //----------------- EXAMPLE TEXTURE -------------------//
     m_ExampleTexture = Enxus::CreateRef<Enxus::Texture2D>("Sandbox/res/images/container.jpg", Enxus::TextureType::DIFFUSE);
+
+    //----------------- FRAMEBUFFER -------------------//
+    Enxus::FramebufferSpecification fbspec;
+    fbspec.Width = 800;
+    fbspec.Height = 600;
+    m_Framebuffer = Enxus::CreateRef<Enxus::Framebuffer>(fbspec);
 }
 
 HelloBoxLayer::~HelloBoxLayer()
@@ -50,8 +56,11 @@ void HelloBoxLayer::OnUpdate(Enxus::Timestep ts)
     m_Shader->SetMat4("uView", m_CameraController->GetCamera().GetViewMatrix());
     m_Shader->SetMat4("uProj", m_CameraController->GetCamera().GetProjectionMatrix());
 
+    m_Framebuffer->Bind();
     Enxus::Renderer::ClearColor(0.13f, 0.13f, 0.14f, 1.0f);
+
     Enxus::Renderer::DrawMesh(m_Plane, m_Shader);
+    m_Framebuffer->Unbind();
 }
 void HelloBoxLayer::OnImGuiRender()
 {
@@ -119,8 +128,10 @@ void HelloBoxLayer::OnImGuiRender()
     ImGui::Begin("Example");
     ImGui::Text("Example Text in a floating window");
 
-    unsigned int textureId = m_ExampleTexture->GetRendererId();
-    ImGui::Image((void *)textureId, ImVec2(256.0f, 256.0f));
+    // using size_t (aka unsigned long) to remove warning
+    // size_t textureId = m_ExampleTexture->GetRendererId();
+    size_t textureID = m_Framebuffer->GetColorAttachmentRendererID();
+    ImGui::Image((void *)textureID, ImVec2(400.0f, 300.0f));
     ImGui::End();
 
     ImGui::End();
