@@ -16,7 +16,9 @@ public:
 private:
     Enxus::Ref<Enxus::Model> m_Box;
     Enxus::Ref<Enxus::Shader> m_Shader;
-    Enxus::Scope<Enxus::Framebuffer> m_Framebuffer;
     Enxus::Scope<Enxus::FreeCameraController> m_CameraController;
+    Enxus::Scope<Enxus::Framebuffer> m_Framebuffer;
+
+    glm::vec2 m_ViewportSize;
 };
 #endif

@@ -3,7 +3,7 @@
 #include "imgui/imgui.h"
 
 Editor::Editor()
-    : Layer("Editor Layer")
+    : Layer("Editor Layer"), m_ViewportSize(600.0f, 300.0f)
 {
 
     //----------------- CAMERA -------------------//
@@ -120,14 +120,33 @@ void Editor::OnImGuiRender()
         ImGui::EndMenuBar();
     }
 
-    ImGui::Begin("Example");
-    ImGui::Text("Example Text in a floating window");
+    {
+        // Menu
+        ImGui::Begin("Example");
+        ImGui::Text("Example Text in a floating window");
+        // using size_t (aka unsigned long) to remove warning
+        // size_t textureId = m_ExampleTexture->GetRendererId();
+        ImGui::End();
+    }
 
-    // using size_t (aka unsigned long) to remove warning
-    // size_t textureId = m_ExampleTexture->GetRendererId();
-    size_t textureID = m_Framebuffer->GetColorAttachmentRendererID();
-    ImGui::Image((void *)textureID, ImVec2(400.0f, 300.0f));
-    ImGui::End();
+    {
+        // Scene
+        ImGui::Begin("Viewport");
+
+        ImVec2 viewport = ImGui::GetContentRegionAvail();
+
+        // In case of resizing
+        if (viewport.x != m_ViewportSize.x || viewport.y != m_ViewportSize.y)
+        {
+            m_ViewportSize = {viewport.x, viewport.y};
+            m_Framebuffer->Resize((unsigned int)viewport.x, (unsigned int)viewport.y);
+        }
+
+        size_t textureID = m_Framebuffer->GetColorAttachmentRendererID();
+        ImGui::Image((void *)textureID, ImVec2(m_ViewportSize.x, m_ViewportSize.y), ImVec2{0, 1}, ImVec2{1, 0});
+
+        ImGui::End();
+    }
 
     ImGui::End();
 }

@@ -18,6 +18,7 @@ namespace Enxus
 
         // means that state is not valid so recreate it
         void Invalidate();
+        void Resize(unsigned int width, unsigned int height);
 
         void Bind();
         void Unbind();

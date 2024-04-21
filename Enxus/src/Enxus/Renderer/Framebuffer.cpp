@@ -6,17 +6,27 @@ namespace Enxus
 {
 
     Framebuffer::Framebuffer(const FramebufferSpecification &spec)
-        : m_Specification(spec)
+        : m_RendererID(0), m_ColorAttachment(0), m_DepthAttachment(0), m_Specification(spec)
     {
         Invalidate();
     }
 
     Framebuffer::~Framebuffer()
     {
-        GLCall(glDeleteBuffers(1, &m_RendererID));
+        GLCall(glDeleteFramebuffers(1, &m_RendererID));
+        GLCall(glDeleteTextures(1, &m_ColorAttachment));
+        GLCall(glDeleteTextures(1, &m_DepthAttachment));
     }
     void Framebuffer::Invalidate()
     {
+        // if already exist the buffer then remove everything to recreate it
+        if (m_RendererID)
+        {
+            GLCall(glDeleteFramebuffers(1, &m_RendererID));
+            GLCall(glDeleteTextures(1, &m_ColorAttachment));
+            GLCall(glDeleteTextures(1, &m_DepthAttachment));
+        }
+
         GLCall(glCreateFramebuffers(1, &m_RendererID));
         GLCall(glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID));
 
@@ -54,4 +64,10 @@ namespace Enxus
         GLCall(glBindFramebuffer(GL_FRAMEBUFFER, 0));
     }
 
+    void Framebuffer::Resize(unsigned int width, unsigned int height)
+    {
+        m_Specification.Width = width;
+        m_Specification.Height = height;
+        Invalidate();
+    }
 }
