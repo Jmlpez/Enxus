@@ -25,6 +25,11 @@ VENDOR_FLAGS += -I$(ENXUS_VENDOR_DIR)/debugbreak
 SANDBOX_FLAGS = -I$(SANDBOX_DIR)/src/
 OPENGL_FLAGS = -lglfw -lGL -lGLEW -lX11 -lpthread -lassimp -lXrandr -lXi -ldl
 
+# Precompiled headers
+PCH_DIR = $(ENXUS_DIR)/src
+PCH_SRC = $(PCH_DIR)/pch.h
+PCH_FLAGS = -include $(PCH_SRC)
+
 # Compiler
 CXX = g++
 CXXFLAGS = -std=gnu++17 -Wall -Wextra
@@ -52,7 +57,7 @@ all: $(TARGET)
 # Build main
 $(TARGET): $(OBJS) main.cpp
 	$(CXX) $(CXXFLAGS) $(PCH_FLAGS) $^ -o $@ $(ENXUS_INCLUDE_FLAGS) $(VENDOR_FLAGS) $(SANDBOX_FLAGS) $(OPENGL_FLAGS)
-
+	
 enxus:
 	$(MAKE) -C $(ENXUS_DIR)
 sandbox:

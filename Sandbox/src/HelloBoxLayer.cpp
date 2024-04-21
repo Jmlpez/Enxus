@@ -1,13 +1,12 @@
+#include "pch.h"
+#include "Enxus.h"
 #include "HelloBoxLayer.h"
-#include "Renderer.h"
-#include "Application.h"
-#include "Input.h"
-#include "KeyCodes.h"
 #include "imgui/imgui.h"
 
 HelloBoxLayer::HelloBoxLayer()
     : Layer("HelloBox Layer")
 {
+
     std::vector<Enxus::VertexData> vertices{
         {glm::vec3(0.5f, 0.0f, 0.5f), glm::vec2(1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f)},   // top right
         {glm::vec3(0.5f, 0.0f, -0.5f), glm::vec2(1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f)},  // bottom right
