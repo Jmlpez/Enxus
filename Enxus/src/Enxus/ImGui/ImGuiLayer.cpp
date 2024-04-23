@@ -21,6 +21,21 @@ namespace Enxus
     ImGuiLayer::~ImGuiLayer()
     {
     }
+    void ImGuiLayer::OnEvent(Event &event)
+    {
+        /*
+        Dont propagate Window Resize Event beyond this layer
+        The Camera Controller updates the aspect ratio when that event is call,
+        but the event holds the size of the window, not the viewport.
+        // if (event.GetEventType() == WindowResizeEvent::GetStaticType())
+        //     event.Handled = true;
+        */
+        if (m_BlockEvents)
+        {
+            ImGuiIO &io = ImGui::GetIO();
+            event.Handled |= event.IsInCategory(EventCategory::EventCategoryMouse) & io.WantCaptureMouse;
+        }
+    }
     void ImGuiLayer::OnAttach()
     {
         // Setup Dear ImGui context
@@ -31,9 +46,6 @@ namespace Enxus
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
         // io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
         io.ConfigFlags |= ImGuiConfigFlags_DockingEnable; // Enable Docking
-        // io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable; // Enable Multi-Viewport / Platform Windows
-        //  io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoTaskBarIcons;
-        //  io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
 
         // Setup Dear ImGui style
         ImGui::StyleColorsDark();
@@ -77,20 +89,6 @@ namespace Enxus
         // Rendering
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-        // if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-        // {
-        //     GLFWwindow *backup_current_context = glfwGetCurrentContext();
-        //     ImGui::UpdatePlatformWindows();
-        //     ImGui::RenderPlatformWindowsDefault();
-        //     glfwMakeContextCurrent(backup_current_context);
-        // }
-    }
-
-    void ImGuiLayer::OnImGuiRender()
-    {
-        // static bool show = true;
-        // ImGui::ShowDemoWindow(&show);
     }
 
 }

@@ -66,12 +66,11 @@ namespace Enxus
         // From LayerOverlays to normal layers
         // check for someone to handle the event and break
 
-        for (auto it = m_LayerStack.end(); it != m_LayerStack.begin();)
+        for (auto it = m_LayerStack.rbegin(); it != m_LayerStack.rend(); it++)
         {
-            it--;
-            (*it)->OnEvent(event);
             if (event.Handled)
                 break;
+            (*it)->OnEvent(event);
         }
     }
 
@@ -84,8 +83,8 @@ namespace Enxus
             Timestep timestep = time - m_LastFrameTime;
             m_LastFrameTime = time;
 
-            glClearColor(1.0f, 0.0f, 1.0f, 1.0f);
-            glClear(GL_COLOR_BUFFER_BIT);
+            Renderer::ClearColor(1.0f, 0.0f, 1.0f, 1.0f);
+            Renderer::Clear();
 
             for (Layer *layer : m_LayerStack)
                 layer->OnUpdate(timestep);

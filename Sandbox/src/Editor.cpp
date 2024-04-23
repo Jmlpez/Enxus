@@ -41,7 +41,8 @@ void Editor::OnUpdate(Enxus::Timestep ts)
     if (Enxus::Input::IsKeyPressed(Enxus::Key::Escape))
         Enxus::Application::Get().Close();
 
-    m_CameraController->OnUpdate(ts);
+    if (m_IsViewportFocused)
+        m_CameraController->OnUpdate(ts);
 
     m_Shader->Bind();
     m_Shader->SetMat4("uView", m_CameraController->GetCamera().GetViewMatrix());
@@ -127,7 +128,8 @@ void Editor::OnImGuiRender()
     {
         // Menu
         ImGui::Begin("Example");
-        ImGui::Text("Example Text in a floating window");
+        for (int i = 0; i < 20; i++)
+            ImGui::Text("Example Text in a floating window");
         // using size_t (aka unsigned long) to remove warning
         // size_t textureId = m_ExampleTexture->GetRendererId();
         ImGui::End();
@@ -135,14 +137,23 @@ void Editor::OnImGuiRender()
 
     {
         // Scene
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0}); // remove the window padding
+
         ImGui::Begin("Viewport");
 
         ImVec2 viewport = ImGui::GetContentRegionAvail();
+        m_IsViewportFocused = ImGui::IsWindowFocused();
+        m_IsViewportHovered = ImGui::IsWindowHovered();
+
+        /*
+        Stop event propagation to the Editor Layer when viewport is not focused/hovered
+        */
+        Enxus::Application::Get().GetImGuiLayer()->BlockEvents(!m_IsViewportFocused || !m_IsViewportHovered);
 
         // In case of resizing
         if (viewport.x != m_ViewportSize.x || viewport.y != m_ViewportSize.y)
         {
+            std::cout << viewport.x << " " << viewport.y << std::endl;
             m_ViewportSize = {viewport.x, viewport.y};
             m_Framebuffer->Resize((unsigned int)viewport.x, (unsigned int)viewport.y);
             m_CameraController->OnResize((unsigned int)viewport.x, (unsigned int)viewport.y);

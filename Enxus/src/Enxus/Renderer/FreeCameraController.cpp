@@ -48,41 +48,41 @@ namespace Enxus
         const float cameraSpeed = m_CameraTranslationSpeed * deltaTime;
         const float cameraRotationSpeed = m_CameraRotationSpeed * deltaTime;
 
-        bool cameraMove = false;
+        bool cameraMoved = false;
 
         // camera locations
         if (Input::IsKeyPressed(Key::W))
         {
             m_CameraPos += m_CameraFront * cameraSpeed;
-            cameraMove = true;
+            cameraMoved = true;
         }
         if (Input::IsKeyPressed(Key::S))
         {
             m_CameraPos -= m_CameraFront * cameraSpeed;
-            cameraMove = true;
+            cameraMoved = true;
         }
         if (Input::IsKeyPressed(Key::Q))
         {
             m_CameraPos += m_CameraUp * cameraSpeed;
-            cameraMove = true;
+            cameraMoved = true;
         }
         if (Input::IsKeyPressed(Key::E))
         {
             m_CameraPos -= m_CameraUp * cameraSpeed;
-            cameraMove = true;
+            cameraMoved = true;
         }
         if (Input::IsKeyPressed(Key::A))
         {
             m_CameraPos -= glm::normalize(glm::cross(m_CameraFront, m_CameraUp)) * cameraSpeed;
-            cameraMove = true;
+            cameraMoved = true;
         }
         if (Input::IsKeyPressed(Key::D))
         {
             m_CameraPos += glm::normalize(glm::cross(m_CameraFront, m_CameraUp)) * cameraSpeed;
-            cameraMove = true;
+            cameraMoved = true;
         }
 
-        if (cameraMove)
+        if (cameraMoved)
             m_Camera.SetPos(m_CameraPos);
 
         // camera rotations
@@ -129,17 +129,12 @@ namespace Enxus
     {
         EventDispatcher dispatcher(event);
         dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(FreeCameraController::OnWindowResized));
+        dispatcher.Dispatch<MouseScrolledEvent>(BIND_EVENT_FN(FreeCameraController::OnMouseScrolled));
     }
 
     void FreeCameraController::OnResize(unsigned int width, unsigned int height)
     {
         m_Camera.SetViewportSize(width, height);
-    }
-
-    bool FreeCameraController::OnWindowResized(WindowResizeEvent &event)
-    {
-        OnResize((float)event.GetWidth(), (float)event.GetHeight());
-        return true;
     }
 
     void FreeCameraController::SetCameraPos(glm::vec3 position)
@@ -167,6 +162,18 @@ namespace Enxus
     {
         m_Pitch = degree;
         UpdateFront();
+    }
+
+    bool FreeCameraController::OnWindowResized(WindowResizeEvent &event)
+    {
+        std::cout << "Window Resized!" << std::endl;
+        OnResize((float)event.GetWidth(), (float)event.GetHeight());
+        return true;
+    }
+    bool FreeCameraController::OnMouseScrolled(MouseScrolledEvent &event)
+    {
+        // std::cout << "Scroll Event" << std::endl;
+        return true;
     }
 
 }

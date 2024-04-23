@@ -3,6 +3,7 @@
 
 #include "Camera.h"
 #include "ApplicationEvent.h"
+#include "MouseEvent.h"
 #include "Timestep.h"
 
 namespace Enxus
@@ -41,6 +42,7 @@ namespace Enxus
 
     private:
         bool OnWindowResized(WindowResizeEvent &event);
+        bool OnMouseScrolled(MouseScrolledEvent &event);
         void UpdateFront();
 
     private:

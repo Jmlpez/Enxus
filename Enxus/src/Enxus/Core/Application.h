@@ -23,6 +23,7 @@ namespace Enxus
         void Close();
 
         inline Window &GetWindow() { return *m_Window; }
+        inline ImGuiLayer *GetImGuiLayer() { return m_ImGuiLayer; }
         static Application &Get() { return *s_Instance; }
 
     private:
@@ -30,8 +31,7 @@ namespace Enxus
         bool OnWindowResize(WindowResizeEvent &event);
 
     private:
-        Scope<Window>
-            m_Window;
+        Scope<Window> m_Window;
         ImGuiLayer *m_ImGuiLayer;
 
         bool m_Running = true;
