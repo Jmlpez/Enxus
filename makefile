@@ -39,44 +39,34 @@ CXXFLAGS = -std=gnu++17 -Wall -Wextra
 OBJS = $(wildcard $(ENXUS_BIN_DIR)/*.o)
 OBJS += $(wildcard $(SANDBOX_BIN_DIR)/*.o)
 
-# Enxus Dependencies
-ENXUS_DEPS = $(wildcard $(ENXUS_DIR)/src/Enxus/Core/*.cpp)
-ENXUS_DEPS += $(wildcard $(ENXUS_DIR)/src/Enxus/ImGui/*.cpp)
-ENXUS_DEPS += $(wildcard $(ENXUS_DIR)/src/Enxus/Renderer/*.cpp)
-
-# Sandbox Dependencies
-SANDBOX_DEPS = $(wildcard $(SANDBOX_DIR)/src/*.cpp)
-
-# OBJ Files
-ENXUS_OBJS = $(addsuffix .o, $(basename $(notdir $(ENXUS_DEPS))))
-SANDBOX_OBJS = $(addsuffix .o, $(basename $(notdir $(SANDBOX_DEPS))))
-
 
 all: $(TARGET)
 
 # Build main
 $(TARGET): $(OBJS) main.cpp
-	$(CXX) $(CXXFLAGS) $(PCH_FLAGS) $^ -o $@ $(ENXUS_INCLUDE_FLAGS) $(VENDOR_FLAGS) $(SANDBOX_FLAGS) $(OPENGL_FLAGS)
+	$(CXX) $(CXXFLAGS) $(PCH_FLAGS) $^ -o $@  $(ENXUS_INCLUDE_FLAGS) $(VENDOR_FLAGS) $(SANDBOX_FLAGS) $(OPENGL_FLAGS)
 	
 enxus:
 	$(MAKE) -C $(ENXUS_DIR)
 sandbox:
 	$(MAKE) -C $(SANDBOX_DIR)
 
+rebuild:
+	@echo "\n---------------------- RE-BUILDING THE ENTIRE PROJECT -----------------------\n"
+	$(MAKE) -C $(ENXUS_DIR) build
+	$(MAKE) -C $(SANDBOX_DIR) build
+	$(MAKE) clean
+	$(MAKE) all
+	@echo "\n---------------------- FINISHED THE RE-BUILDING OF THE ENTIRE PROJECT -----------------------\n"
 
 run: enxus sandbox all
 	@echo "\n---------------------- RUNING -----------------------\n"
 	@$(TARGET)
 	@echo "\n------------------- END OF RUNING -------------------\n"	
 
+# Testing purposes
 pepe: pepe.cpp
 	g++ -std=gnu++17 -Wall -Wextra pepe.cpp -o pepe && ./pepe
-
-# rebuild:
-# 	@echo "\n---------------------- RE-BUILDING THE ENTIRE PROJECT -----------------------\n"
-# 	@make clean
-# 	@make all
-# 	@echo "\n---------------------- FINISHED THE RE-BUILDING OF THE ENTIRE PROJECT -----------------------\n"
 
 # pch:
 # 	$(CXX) $(CXXFLAGS) $(PCH_SRC) 
