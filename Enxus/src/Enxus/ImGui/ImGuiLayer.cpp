@@ -34,6 +34,7 @@ namespace Enxus
         {
             ImGuiIO &io = ImGui::GetIO();
             event.Handled |= event.IsInCategory(EventCategory::EventCategoryMouse) & io.WantCaptureMouse;
+            event.Handled |= event.IsInCategory(EventCategory::EventCategoryKeyboard) & io.WantCaptureKeyboard;
         }
     }
     void ImGuiLayer::OnAttach()
