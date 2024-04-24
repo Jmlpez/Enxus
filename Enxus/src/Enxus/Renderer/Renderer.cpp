@@ -32,7 +32,7 @@ namespace Enxus
     void Renderer::DrawMesh(const Ref<Mesh> &mesh, const Ref<Shader> &shader)
     {
 
-        mesh->GetVAO()->Bind();
+        mesh->GetVertexArray()->Bind();
         shader->Bind();
 
         /*
@@ -62,18 +62,18 @@ namespace Enxus
             texture->Bind(i); // active the current texture slot
         }
 
-        mesh->GetVAO()->Bind();
+        mesh->GetVertexArray()->Bind();
         if (mesh->HasIndices())
         {
-            Renderer::DrawIndices(mesh->GetIBO()->GetCount());
+            Renderer::DrawIndices(mesh->GetIndexBuffer()->GetCount());
         }
         else
         {
             Renderer::DrawVertices(mesh->GetVertices().size());
         }
 
-        mesh->GetVAO()->Unbind();
-        mesh->GetIBO()->Unbind();
+        mesh->GetVertexArray()->Unbind();
+        mesh->GetIndexBuffer()->Unbind();
     }
 
     void Renderer::DrawModel(const Ref<Model> &model, const Ref<Shader> &shader)

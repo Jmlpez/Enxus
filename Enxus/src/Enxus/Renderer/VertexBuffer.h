@@ -7,8 +7,6 @@ namespace Enxus
 {
     class VertexBuffer
     {
-    private:
-        unsigned int m_RendererId;
 
     public:
         VertexBuffer(const void *data, unsigned int size);
@@ -16,6 +14,9 @@ namespace Enxus
 
         void Bind() const;
         void Unbind() const;
+
+    private:
+        unsigned int m_RendererId;
     };
 }
 #endif

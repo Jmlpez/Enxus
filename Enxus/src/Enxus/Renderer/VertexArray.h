@@ -9,8 +9,6 @@ namespace Enxus
 
     class VertexArray
     {
-    private:
-        unsigned int m_RendererId;
 
     public:
         VertexArray();
@@ -20,6 +18,9 @@ namespace Enxus
 
         void Bind() const;
         void Unbind() const;
+
+    private:
+        unsigned int m_RendererId;
     };
 }
 

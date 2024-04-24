@@ -84,14 +84,14 @@ namespace Enxus
             tempVec.x = mesh->mVertices[i].x;
             tempVec.y = mesh->mVertices[i].y;
             tempVec.z = mesh->mVertices[i].z;
-            vertex.position = tempVec;
+            vertex.Position = tempVec;
             //----------------- NORMALS -------------------//
             if (mesh->HasNormals())
             {
                 tempVec.x = mesh->mNormals[i].x;
                 tempVec.y = mesh->mNormals[i].y;
                 tempVec.z = mesh->mNormals[i].z;
-                vertex.normal = tempVec;
+                vertex.Normal = tempVec;
             }
             //----------------- TEXTURE COORDINATES -------------------//
             // the first set of textures (assimp hold up to 8)
@@ -100,11 +100,11 @@ namespace Enxus
                 glm::vec2 coords;
                 coords.x = mesh->mTextureCoords[0][i].x;
                 coords.y = mesh->mTextureCoords[0][i].y;
-                vertex.texCoords = coords;
+                vertex.TexCoords = coords;
             }
             else
             { // does not has textures...
-                vertex.texCoords = glm::vec2(0.0f, 0.0f);
+                vertex.TexCoords = glm::vec2(0.0f, 0.0f);
             }
             vertices.push_back(vertex);
         }

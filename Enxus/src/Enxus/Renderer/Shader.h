@@ -11,12 +11,6 @@ namespace Enxus
 
     class Shader
     {
-    private:
-        unsigned int m_RendererId;
-        // to store the location of the uniforms
-        std::unordered_map<std::string, int> m_UniformLocationCache;
-        // debugging purposes
-        std::string m_VertexFilePath, m_FragmentFilePath;
 
     public:
         ~Shader();
@@ -51,6 +45,12 @@ namespace Enxus
         unsigned int CreateShader(const std::string &vertexShaderSource, const std::string &fragmentShaderSource);
         // consider add geometry shader with same template
         // unsigned int CreateShader(const std::string &vertexShaderSource, const std::string &geometryShaderSource,const std::string &fragmentShaderSource);
+    private:
+        unsigned int m_RendererId;
+        // to store the location of the uniforms
+        std::unordered_map<std::string, int> m_UniformLocationCache;
+        // debugging purposes
+        std::string m_VertexFilePath, m_FragmentFilePath;
     };
 
 }

@@ -13,28 +13,18 @@ namespace Enxus
 
     struct VertexData
     {
-        glm::vec3 position;
-        glm::vec2 texCoords;
-        glm::vec3 normal;
+        glm::vec3 Position;
+        glm::vec2 TexCoords;
+        glm::vec3 Normal;
         VertexData(glm::vec3 _position, glm::vec2 _texCoords, glm::vec3 _normal)
-            : position(_position), texCoords(_texCoords), normal(_normal)
+            : Position(_position), TexCoords(_texCoords), Normal(_normal)
         {
         }
-        VertexData() : position(0), texCoords(0), normal(0) {}
+        VertexData() : Position(0), TexCoords(0), Normal(0) {}
     };
 
     class Mesh
     {
-    private:
-        Ref<VertexArray> m_VertexArrayObject;
-        Ref<VertexBuffer> m_VertexBufferObject;
-        Ref<IndexBuffer> m_IndexBufferObject;
-
-        std::vector<VertexData> m_Vertices;
-        std::vector<unsigned int> m_Indices;
-        std::vector<TextureData2D> m_MeshTextures;
-
-        std::vector<Ref<Texture2D>> m_Textures;
 
     public:
         Mesh(std::vector<VertexData> vertices, std::vector<TextureData2D> textures);
@@ -49,12 +39,23 @@ namespace Enxus
         const std::vector<unsigned int> &GetIndices() const { return m_Indices; }
         const std::vector<Ref<Texture2D>> &GetTextures() const { return m_Textures; }
 
-        Ref<VertexArray> GetVAO() const { return m_VertexArrayObject; }
-        Ref<VertexBuffer> GetVBO() const { return m_VertexBufferObject; }
-        Ref<IndexBuffer> GetIBO() const { return m_IndexBufferObject; }
+        Ref<VertexArray> GetVertexArray() const { return m_VertexArrayObject; }
+        Ref<VertexBuffer> GetVertexBuffer() const { return m_VertexBufferObject; }
+        Ref<IndexBuffer> GetIndexBuffer() const { return m_IndexBufferObject; }
 
         // smart pointers has the bool operator overloaded
         bool HasIndices() { return (bool)m_IndexBufferObject; }
+
+    private:
+        Ref<VertexArray> m_VertexArrayObject;
+        Ref<VertexBuffer> m_VertexBufferObject;
+        Ref<IndexBuffer> m_IndexBufferObject;
+
+        std::vector<VertexData> m_Vertices;
+        std::vector<unsigned int> m_Indices;
+        std::vector<TextureData2D> m_MeshTexturesData;
+
+        std::vector<Ref<Texture2D>> m_Textures;
     };
 }
 #endif

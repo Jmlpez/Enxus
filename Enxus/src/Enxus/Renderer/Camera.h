@@ -9,20 +9,6 @@ namespace Enxus
 {
     // Camara Projection will be Perspective
 
-    enum class CameraMovement : unsigned short
-    {
-        BACKWARD,
-        FORWARD,
-        UP,
-        DOWN,
-        LEFT,
-        RIGHT,
-        LEFT_ROTATION,  // Euler Angles
-        RIGHT_ROTATION, // Euler Angles
-        UP_ROTATION,    // Euler Angles
-        DOWN_ROTATION,  // Euler Angles
-    };
-
     class Camera
     {
 

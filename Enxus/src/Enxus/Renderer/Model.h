@@ -19,12 +19,6 @@ namespace Enxus
         std::vector<Ref<Mesh>> &GetMeshes() { return m_Meshes; }
 
     private:
-        std::vector<Ref<Mesh>> m_Meshes;
-        std::string m_ModelPath, m_ModelDirPath;
-
-        // an optimization to avoid load some previously loaded texture
-        std::vector<Ref<Texture2D>> m_LoadedTextures;
-
         void LoadModel(const std::string &path);
         void ProcessNode(aiNode *node, const aiScene *scene);
         Ref<Mesh> ProcessMesh(aiMesh *mesh, const aiScene *scene);
@@ -36,6 +30,13 @@ namespace Enxus
         std::vector<Ref<Texture2D>> ProcessTextures(aiMesh *mesh, const aiScene *scene);
 
         static TextureType GetTextureType(aiTextureType type);
+    private:
+        std::vector<Ref<Mesh>> m_Meshes;
+        std::string m_ModelPath, m_ModelDirPath;
+
+        // an optimization to avoid load some previously loaded texture
+        std::vector<Ref<Texture2D>> m_LoadedTextures;
+
     };
 }
 #endif
