@@ -49,6 +49,7 @@ void Editor::OnUpdate(Enxus::Timestep ts)
     {
         m_Framebuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
         m_CameraController->OnResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+        Enxus::Renderer::SetViewport(0, 0, m_ViewportSize.x, m_ViewportSize.y);
     }
 
     m_Shader->Bind();
@@ -59,7 +60,6 @@ void Editor::OnUpdate(Enxus::Timestep ts)
     {
         // Rendering
         m_Framebuffer->Bind();
-        Enxus::Renderer::SetViewport(0, 0, m_ViewportSize.x, m_ViewportSize.y);
         {
             Enxus::Renderer::ClearColor(0.13f, 0.13f, 0.14f, 1.0f);
             Enxus::Renderer::Clear();

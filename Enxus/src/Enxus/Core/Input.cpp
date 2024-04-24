@@ -7,9 +7,7 @@
 
 namespace Enxus
 {
-
-    Input *Input::s_Instance = new Input();
-    bool Input::IsKeyPressedImpl(int keycode)
+    bool Input::IsKeyPressed(int keycode)
     {
 
         auto window = static_cast<GLFWwindow *>(Application::Get().GetWindow().GetNativeWindow());
@@ -17,27 +15,27 @@ namespace Enxus
 
         return state == GLFW_PRESS || state == GLFW_REPEAT;
     }
-    bool Input::IsMouseButtonPressedImpl(int button)
+    bool Input::IsMouseButtonPressed(int button)
     {
         auto window = static_cast<GLFWwindow *>(Application::Get().GetWindow().GetNativeWindow());
         auto state = glfwGetMouseButton(window, button);
         return state == GLFW_PRESS;
     }
-    std::pair<float, float> Input::GetMousePositionImpl()
+    std::pair<float, float> Input::GetMousePosition()
     {
         auto window = static_cast<GLFWwindow *>(Application::Get().GetWindow().GetNativeWindow());
         double xpos, ypos;
         glfwGetCursorPos(window, &xpos, &ypos);
         return {(float)xpos, (float)ypos};
     }
-    float Input::GetMouseXImpl()
+    float Input::GetMouseX()
     {
-        auto [x, y] = GetMousePosition();
+        auto [x, y] = Input::GetMousePosition();
         return x;
     }
-    float Input::GetMouseYImpl()
+    float Input::GetMouseY()
     {
-        auto [x, y] = GetMousePosition();
+        auto [x, y] = Input::GetMousePosition();
         return y;
     }
 

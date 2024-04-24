@@ -4,9 +4,8 @@
 
 namespace Enxus
 {
-    Renderer *Renderer::s_RendererInstance = new Renderer();
 
-    void Renderer::InitImpl()
+    void Renderer::Init()
     {
         //----------------- OpenGL State Initialization -------------------//
 
@@ -16,21 +15,21 @@ namespace Enxus
         GLCall(glEnable(GL_DEPTH_TEST));
     }
 
-    void Renderer::SetViewportImpl(unsigned int x, unsigned int y, unsigned int width, unsigned int height)
+    void Renderer::SetViewport(unsigned int x, unsigned int y, unsigned int width, unsigned int height)
     {
         GLCall(glViewport(x, y, width, height));
     }
 
-    void Renderer::ClearColorImpl(float red, float green, float blue, float alpha)
+    void Renderer::ClearColor(float red, float green, float blue, float alpha)
     {
         GLCall(glClearColor(red, green, blue, alpha));
     }
-    void Renderer::ClearImpl()
+    void Renderer::Clear()
     {
         GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
     }
 
-    void Renderer::DrawMeshImpl(const Ref<Mesh> &mesh, const Ref<Shader> &shader)
+    void Renderer::DrawMesh(const Ref<Mesh> &mesh, const Ref<Shader> &shader)
     {
 
         mesh->GetVAO()->Bind();
@@ -66,18 +65,18 @@ namespace Enxus
         mesh->GetVAO()->Bind();
         if (mesh->HasIndices())
         {
-            DrawIndices(mesh->GetIBO()->GetCount());
+            Renderer::DrawIndices(mesh->GetIBO()->GetCount());
         }
         else
         {
-            DrawVertices(mesh->GetVertices().size());
+            Renderer::DrawVertices(mesh->GetVertices().size());
         }
 
         mesh->GetVAO()->Unbind();
         mesh->GetIBO()->Unbind();
     }
 
-    void Renderer::DrawModelImpl(const Ref<Model> &model, const Ref<Shader> &shader)
+    void Renderer::DrawModel(const Ref<Model> &model, const Ref<Shader> &shader)
     {
         auto meshes = model->GetMeshes();
         for (auto mesh : meshes)
