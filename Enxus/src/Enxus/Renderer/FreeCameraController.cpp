@@ -166,13 +166,15 @@ namespace Enxus
 
     bool FreeCameraController::OnWindowResized(WindowResizeEvent &event)
     {
-        std::cout << "Window Resized!" << std::endl;
         OnResize((float)event.GetWidth(), (float)event.GetHeight());
         return true;
     }
     bool FreeCameraController::OnMouseScrolled(MouseScrolledEvent &event)
     {
         // std::cout << "Scroll Event" << std::endl;
+        /*
+        In the future add Zoom
+        */
         return true;
     }
 

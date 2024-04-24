@@ -44,6 +44,13 @@ void Editor::OnUpdate(Enxus::Timestep ts)
     if (m_IsViewportFocused)
         m_CameraController->OnUpdate(ts);
 
+    auto fbspec = m_Framebuffer->GetSpecification();
+    if (m_ViewportSize.x != 0 && m_ViewportSize.y != 0 && (m_ViewportSize.x != fbspec.Width || m_ViewportSize.y != fbspec.Height))
+    {
+        m_Framebuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+        m_CameraController->OnResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+    }
+
     m_Shader->Bind();
     m_Shader->SetMat4("uView", m_CameraController->GetCamera().GetViewMatrix());
     m_Shader->SetMat4("uProj", m_CameraController->GetCamera().GetProjectionMatrix());
@@ -150,15 +157,7 @@ void Editor::OnImGuiRender()
         */
         Enxus::Application::Get().GetImGuiLayer()->BlockEvents(!m_IsViewportFocused || !m_IsViewportHovered);
 
-        // In case of resizing
-        if (viewport.x != m_ViewportSize.x || viewport.y != m_ViewportSize.y)
-        {
-            std::cout << viewport.x << " " << viewport.y << std::endl;
-            m_ViewportSize = {viewport.x, viewport.y};
-            m_Framebuffer->Resize((unsigned int)viewport.x, (unsigned int)viewport.y);
-            m_CameraController->OnResize((unsigned int)viewport.x, (unsigned int)viewport.y);
-        }
-
+        m_ViewportSize = {viewport.x, viewport.y};
         size_t textureID = m_Framebuffer->GetColorAttachmentRendererID();
         ImGui::Image((void *)textureID, ImVec2(m_ViewportSize.x, m_ViewportSize.y), ImVec2{0, 1}, ImVec2{1, 0});
         ImGui::End();

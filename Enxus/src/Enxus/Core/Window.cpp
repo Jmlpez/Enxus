@@ -70,9 +70,6 @@ namespace Enxus
                 data.Width = width;
                 data.Height = height;
 
-                // The Renderer handles that
-                // glViewport(0, 0, data.Width, data.Height);
-
                 WindowResizeEvent event(width, height);
                 data.EventCallback(event);
             });

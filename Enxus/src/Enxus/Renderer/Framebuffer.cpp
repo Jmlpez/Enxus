@@ -27,7 +27,8 @@ namespace Enxus
             GLCall(glDeleteTextures(1, &m_DepthAttachment));
         }
 
-        GLCall(glCreateFramebuffers(1, &m_RendererID));
+        // GLCall(glCreateFramebuffers(1, &m_RendererID));
+        GLCall(glGenFramebuffers(1, &m_RendererID));
         GLCall(glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID));
 
         GLCall(glCreateTextures(GL_TEXTURE_2D, 1, &m_ColorAttachment));
@@ -45,7 +46,7 @@ namespace Enxus
                             GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, NULL));
         GLCall(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, m_DepthAttachment, 0));
 
-        if (!glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE)
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         {
             std::cout << "Framebuffer is incomplete!" << std::endl;
             ASSERT(false);
@@ -66,6 +67,7 @@ namespace Enxus
 
     void Framebuffer::Resize(unsigned int width, unsigned int height)
     {
+        // std::cout << width << "  " << height << std::endl;
         m_Specification.Width = width;
         m_Specification.Height = height;
         Invalidate();
