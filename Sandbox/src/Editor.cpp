@@ -16,14 +16,20 @@ Editor::Editor()
 
     //----------------- SHADER -------------------//
     m_Shader = Enxus::CreateRef<Enxus::Shader>("Sandbox/res/shaders/model/box.vert", "Sandbox/res/shaders/model/box.frag");
+    m_GridShader = Enxus::CreateRef<Enxus::Shader>("Sandbox/res/shaders/editor-grid/grid.vert", "Sandbox/res/shaders/editor-grid/grid.frag");
 
-    //----------------- MODEL -------------------//
+    //----------------- BOX MODEL -------------------//
 
     m_Box = Enxus::CreateRef<Enxus::Model>("Sandbox/res/models/box/box.obj");
 
     glm::mat4 model = glm::mat4(1.0f);
     m_Shader->Bind();
     m_Shader->SetMat4("uModel", model);
+    //----------------- GRID FLOOR -------------------//
+    m_GridFloor = Enxus::CreateScope<Grid>(50, 50, 0.25f);
+    m_GridShader->Bind();
+
+    m_GridShader->SetMat4("uModel", m_GridFloor->GetModel());
 
     //----------------- FRAMEBUFFER -------------------//
     Enxus::FramebufferSpecification fbspec;
@@ -44,25 +50,32 @@ void Editor::OnUpdate(Enxus::Timestep ts)
     if (m_IsViewportFocused)
         m_CameraController->OnUpdate(ts);
 
-    auto fbspec = m_Framebuffer->GetSpecification();
-    if (m_ViewportSize.x != 0 && m_ViewportSize.y != 0 && (m_ViewportSize.x != fbspec.Width || m_ViewportSize.y != fbspec.Height))
-    {
-        m_Framebuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
-        m_CameraController->OnResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
-        Enxus::Renderer::SetViewport(0, 0, m_ViewportSize.x, m_ViewportSize.y);
-    }
+    HandleViewportResize();
 
     m_Shader->Bind();
     m_Shader->SetMat4("uView", m_CameraController->GetCamera().GetViewMatrix());
     m_Shader->SetMat4("uProj", m_CameraController->GetCamera().GetProjectionMatrix());
     m_Shader->Unbind();
 
+    m_GridShader->Bind();
+    m_GridShader->SetMat4("uView", m_CameraController->GetCamera().GetViewMatrix());
+    m_GridShader->SetMat4("uProj", m_CameraController->GetCamera().GetProjectionMatrix());
+    m_GridShader->Unbind();
+
     {
         // Rendering
         m_Framebuffer->Bind();
+        Enxus::Renderer::ClearColor(0.13f, 0.13f, 0.14f, 1.0f);
+        Enxus::Renderer::Clear();
+        // Draw Grid floor
+        if (m_ShowGridFloor)
         {
-            Enxus::Renderer::ClearColor(0.13f, 0.13f, 0.14f, 1.0f);
-            Enxus::Renderer::Clear();
+            Enxus::Renderer::SetPolygonMode(Enxus::PolygonMode::LINE); // Draw the lines
+            Enxus::Renderer::Draw(m_GridFloor->GetVertexArray(), m_GridFloor->GetIndexBuffer(), m_GridShader);
+            Enxus::Renderer::SetPolygonMode(Enxus::PolygonMode::FILL); // Restore state
+        }
+        // Draw Box
+        {
             Enxus::Renderer::DrawModel(m_Box, m_Shader);
         }
         m_Framebuffer->Unbind();
@@ -134,9 +147,9 @@ void Editor::OnImGuiRender()
 
     {
         // Menu
-        ImGui::Begin("Example");
-        for (int i = 0; i < 20; i++)
-            ImGui::Text("Example Text in a floating window");
+        ImGui::Begin("Menu");
+        ImGui::Checkbox("Grid Floor", &m_ShowGridFloor);
+
         // using size_t (aka unsigned long) to remove warning
         // size_t textureId = m_ExampleTexture->GetRendererId();
         ImGui::End();
@@ -165,6 +178,17 @@ void Editor::OnImGuiRender()
     }
 
     ImGui::End();
+}
+
+void Editor::HandleViewportResize()
+{
+    auto fbspec = m_Framebuffer->GetSpecification();
+    if (m_ViewportSize.x != 0 && m_ViewportSize.y != 0 && (m_ViewportSize.x != fbspec.Width || m_ViewportSize.y != fbspec.Height))
+    {
+        m_Framebuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+        m_CameraController->OnResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+        Enxus::Renderer::SetViewport(0, 0, m_ViewportSize.x, m_ViewportSize.y);
+    }
 }
 
 void Editor::OnEvent(Enxus::Event &event)
