@@ -9,10 +9,14 @@ namespace Enxus
     {
         //----------------- OpenGL State Initialization -------------------//
 
+        // Blending
         GLCall(glEnable(GL_BLEND));
         GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
+        // Depth testing
         GLCall(glEnable(GL_DEPTH_TEST));
+
+        Renderer::SetPolygonMode(PolygonMode::FILL);
     }
 
     void Renderer::SetViewport(unsigned int x, unsigned int y, unsigned int width, unsigned int height)
@@ -27,6 +31,39 @@ namespace Enxus
     void Renderer::Clear()
     {
         GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+    }
+
+    void Renderer::SetPolygonMode(PolygonMode mode)
+    {
+        switch (mode)
+        {
+        case PolygonMode::POINT:
+            GLCall(glPolygonMode(GL_FRONT_AND_BACK, GL_POINT));
+            return;
+        case PolygonMode::LINE:
+            GLCall(glPolygonMode(GL_FRONT_AND_BACK, GL_LINE));
+            return;
+        case PolygonMode::FILL:
+            GLCall(glPolygonMode(GL_FRONT_AND_BACK, GL_FILL));
+            return;
+        default:
+            break;
+        }
+        std::cout << "[OpenGL Error] Invalid polygon mode" << std::endl;
+        ASSERT(false);
+    }
+
+    void Renderer::Draw(const Ref<VertexArray> &vao, const Ref<IndexBuffer> &ibo, const Ref<Shader> &shader)
+    {
+        vao->Bind();
+        ibo->Bind();
+        shader->Bind();
+
+        Renderer::DrawIndices(ibo->GetCount());
+
+        vao->Unbind();
+        ibo->Unbind();
+        shader->Unbind();
     }
 
     void Renderer::DrawMesh(const Ref<Mesh> &mesh, const Ref<Shader> &shader)
