@@ -27,7 +27,7 @@ void TestMenuLayer::OnAttach()
     // Registering tests
     m_CurrentTest = nullptr;
     RegisterTest<OpenGLTest::TestClearColor>("Clear Color");
-    // RegisterTest<OpenGLTest::TestBlending>("Blending");
+    RegisterTest<OpenGLTest::TestBlending>("Blending");
 }
 
 TestMenuLayer::~TestMenuLayer()

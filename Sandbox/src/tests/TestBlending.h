@@ -1,13 +1,10 @@
 #ifndef TEST_BLENDING_H
 #define TEST_BLENDING_H
 
-#include "Base.h"
-#include "utils.h"
 #include "Test.h"
-#include "Shader.h"
-#include "Mesh.h"
+#include "Enxus.h"
 
-namespace Test
+namespace OpenGLTest
 {
     class TestBlending : public Test
     {
@@ -16,8 +13,7 @@ namespace Test
         TestBlending();
         ~TestBlending();
 
-        void OnUpdate(float deltaTime, Enxus::FreeCameraController *cameraController) override;
-        void OnRender() override;
+        void OnUpdate(Enxus::Camera &camera) override;
         void OnImGuiRender() override;
 
     private:
@@ -26,8 +22,6 @@ namespace Test
         Enxus::Ref<Enxus::Shader> m_Shader;
 
         std::array<glm::vec3, 5> m_TransparentObjsPositions;
-
-        std::map<float, glm::vec3> m_SortedPositions;
     };
 }
 #endif

@@ -1,9 +1,8 @@
 #include "pch.h"
 #include "TestBlending.h"
 #include "imgui/imgui.h"
-#include "Renderer.h"
 
-namespace Test
+namespace OpenGLTest
 {
     TestBlending::TestBlending()
         : m_TransparentObjsPositions{
@@ -55,7 +54,7 @@ namespace Test
         };
 
         std::vector<Enxus::TextureData2D> textures{
-            {"res/images/marble.jpg", Enxus::TextureType::DIFFUSE},
+            {"Sandbox/res/images/marble.jpg", Enxus::TextureType::DIFFUSE},
         };
 
         m_Box = Enxus::CreateRef<Enxus::Mesh>(vertices, textures);
@@ -69,7 +68,7 @@ namespace Test
             {glm::vec3(5.0f, -0.5f, -5.0f), glm::vec2(2.0f, 2.0), glm::vec3(0.0f)},
         };
         std::vector<Enxus::TextureData2D> texturesFloor{
-            {"res/images/metal.png", Enxus::TextureType::DIFFUSE},
+            {"Sandbox/res/images/metal.png", Enxus::TextureType::DIFFUSE},
         };
         m_Floor = Enxus::CreateRef<Enxus::Mesh>(vertices, texturesFloor);
 
@@ -84,7 +83,7 @@ namespace Test
         };
 
         std::vector<Enxus::TextureData2D> grassTextures{{
-            "res/images/window.png",
+            "Sandbox/res/images/window.png",
             Enxus::TextureType::DIFFUSE,
         }};
 
@@ -92,8 +91,8 @@ namespace Test
         // Create an API to set TexParameter
         // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        m_Shader = Enxus::CreateRef<Enxus::Shader>("res/shaders/advanced-opengl/blending/basic.vert",
-                                                   "res/shaders/advanced-opengl/blending/basic.frag");
+        m_Shader = Enxus::CreateRef<Enxus::Shader>("Sandbox/res/shaders/advanced-opengl/blending/basic.vert",
+                                                   "Sandbox/res/shaders/advanced-opengl/blending/basic.frag");
 
         //----------------- BLENDING -------------------//
         GLCall(glEnable(GL_BLEND));
@@ -107,50 +106,51 @@ namespace Test
     {
     }
 
-    void TestBlending::OnUpdate(float deltaTime, Enxus::FreeCameraController *cameraController)
+    void TestBlending::OnUpdate(Enxus::Camera &camera)
     {
-        (void)deltaTime;
         m_Shader->Bind();
-        cameraController->GetCamera()->SetViewProjMatrix(*m_Shader);
+        // camera->SetViewProjMatrix(*m_Shader);
+        m_Shader->SetMat4("uProj", camera.GetProjectionMatrix());
+        m_Shader->SetMat4("uView", camera.GetViewMatrix());
+
+        std::map<float, glm::vec3> m_SortedPositions;
+        glm::vec3 cameraPos = camera.GetPos();
         for (auto pos : m_TransparentObjsPositions)
         {
             // negated value to loop the map in ascending object
             // It's a little lazy to write the map iterators and stuffs..
-            float distance = -glm::length(cameraController->GetCameraPos() - pos);
+            float distance = -glm::length(camera.GetPos() - pos);
             m_SortedPositions[distance] = pos;
         }
-    }
-    void TestBlending::OnRender()
-    {
-        Enxus::Renderer renderer;
-        renderer.ClearColor(0.13f, 0.14f, 0.16f, 1.0f);
+
+        Enxus::Renderer::ClearColor(0.13f, 0.14f, 0.16f, 1.0f);
 
         m_Shader->Bind();
         //----------------- FLOOR -------------------//
         glm::mat4 model = glm::mat4(1.0f);
         m_Shader->SetMat4("uModel", model);
-        renderer.Draw(m_Floor, *m_Shader);
+        Enxus::Renderer::DrawMesh(m_Floor, m_Shader);
 
         //----------------- BOXES -------------------//
 
         model = glm::translate(glm::mat4(1.0f), glm::vec3(-1.0f, 0.0f, -1.0f));
         m_Shader->SetMat4("uModel", model);
-        renderer.Draw(m_Box, *m_Shader);
+        Enxus::Renderer::DrawMesh(m_Box, m_Shader);
 
         model = glm::translate(glm::mat4(1.0f), glm::vec3(2.0f, 0.0f, 0.0f));
         m_Shader->Bind();
         m_Shader->SetMat4("uModel", model);
-        renderer.Draw(m_Box, *m_Shader);
+        Enxus::Renderer::DrawMesh(m_Box, m_Shader);
 
         //----------------- GRASS -------------------//
-
         for (auto &[dist, pos] : m_SortedPositions)
         {
+            std::cout << dist << std::endl;
             model = glm::translate(glm::mat4(1.0f), pos);
             m_Shader->SetMat4("uModel", model);
-            renderer.Draw(m_TransparentObj, *m_Shader);
+            Enxus::Renderer::DrawMesh(m_TransparentObj, m_Shader);
         }
-    };
+        };
 
     void TestBlending::OnImGuiRender()
     {
