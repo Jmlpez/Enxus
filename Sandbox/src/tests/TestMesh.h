@@ -2,10 +2,8 @@
 #define TEST_MESH_H
 
 #include "Test.h"
-#include "Shader.h"
-#include "Renderer.h"
 
-namespace Test
+namespace OpenGLTest
 {
 
     class TestMesh : public Test
@@ -15,8 +13,7 @@ namespace Test
         TestMesh();
         ~TestMesh();
 
-        void OnUpdate(float deltaTime, Enxus::FreeCameraController *cameraController) override;
-        void OnRender() override;
+        void OnUpdate(Enxus::Camera &camera) override;
         void OnImGuiRender() override;
 
     private:

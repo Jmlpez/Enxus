@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "TestMesh.h"
 
-namespace Test
+namespace OpenGLTest
 {
     TestMesh::TestMesh()
     {
@@ -15,12 +15,12 @@ namespace Test
                                           1, 2, 3};
 
         std::vector<Enxus::TextureData2D> textures{
-            {"res/images/container.jpg", Enxus::TextureType::DIFFUSE},
-            {"res/images/awesomeface.png", Enxus::TextureType::DIFFUSE},
+            {"Sandbox/res/images/container.jpg", Enxus::TextureType::DIFFUSE},
+            {"Sandbox/res/images/awesomeface.png", Enxus::TextureType::DIFFUSE},
         };
 
         m_Plane = Enxus::CreateRef<Enxus::Mesh>(vertices, indices, textures);
-        m_Shader = Enxus::CreateRef<Enxus::Shader>("res/shaders/mesh/basic.vert", "res/shaders/mesh/basic.frag");
+        m_Shader = Enxus::CreateRef<Enxus::Shader>("Sandbox/res/shaders/mesh/basic.vert", "Sandbox/res/shaders/mesh/basic.frag");
 
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::scale(model, glm::vec3(3.0f));
@@ -32,16 +32,13 @@ namespace Test
     {
     }
 
-    void TestMesh::OnUpdate(float deltaTime, Enxus::FreeCameraController *cameraController)
+    void TestMesh::OnUpdate(Enxus::Camera &camera)
     {
-        (void)deltaTime;
-        cameraController->GetCamera()->SetViewProjMatrix(*m_Shader);
+        m_Shader->SetMat4("uProj", camera.GetProjectionMatrix());
+        m_Shader->SetMat4("uView", camera.GetViewMatrix());
+
+        Enxus::Renderer::DrawMesh(m_Plane, m_Shader);
     }
-    void TestMesh::OnRender()
-    {
-        Enxus::Renderer renderer;
-        renderer.Draw(m_Plane, *m_Shader);
-    };
 
     void TestMesh::OnImGuiRender(){
 

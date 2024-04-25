@@ -2,7 +2,7 @@
 #include "TestDepthBuffer.h"
 #include "imgui/imgui.h"
 
-namespace Test
+namespace OpenGLTest
 {
     TestDepthBuffer::TestDepthBuffer()
     {
@@ -48,7 +48,7 @@ namespace Test
         };
 
         std::vector<Enxus::TextureData2D> textures{
-            {"res/images/marble.jpg", Enxus::TextureType::DIFFUSE},
+            {"Sandbox/res/images/marble.jpg", Enxus::TextureType::DIFFUSE},
         };
 
         m_Box = Enxus::CreateRef<Enxus::Mesh>(vertices, textures);
@@ -62,12 +62,12 @@ namespace Test
             {glm::vec3(5.0f, -0.5f, -5.0f), glm::vec2(2.0f, 2.0), glm::vec3(0.0f)},
         };
         std::vector<Enxus::TextureData2D> texturesFloor{
-            {"res/images/metal.png", Enxus::TextureType::DIFFUSE},
+            {"Sandbox/res/images/metal.png", Enxus::TextureType::DIFFUSE},
         };
         m_Floor = Enxus::CreateRef<Enxus::Mesh>(vertices, texturesFloor);
 
-        m_NormalShader = Enxus::CreateRef<Enxus::Shader>("res/shaders/advanced-opengl/depth-test/basic.vert", "res/shaders/advanced-opengl/depth-test/basic.frag");
-        m_SingleColorShader = Enxus::CreateRef<Enxus::Shader>("res/shaders/advanced-opengl/depth-test/basic.vert", "res/shaders/advanced-opengl/depth-test/single-color.frag");
+        m_NormalShader = Enxus::CreateRef<Enxus::Shader>("Sandbox/res/shaders/advanced-opengl/depth-test/basic.vert", "Sandbox/res/shaders/advanced-opengl/depth-test/basic.frag");
+        m_SingleColorShader = Enxus::CreateRef<Enxus::Shader>("Sandbox/res/shaders/advanced-opengl/depth-test/basic.vert", "Sandbox/res/shaders/advanced-opengl/depth-test/single-color.frag");
 
         //----------------- DEPTH TESTING -------------------//
         GLCall(glEnable(GL_DEPTH_TEST));
@@ -80,25 +80,24 @@ namespace Test
     {
     }
 
-    void TestDepthBuffer::OnUpdate(float deltaTime, Enxus::FreeCameraController *cameraController)
+    void TestDepthBuffer::OnUpdate(Enxus::Camera &camera)
     {
-        (void)deltaTime;
+
         m_NormalShader->Bind();
         m_NormalShader->SetBool("uShowDepthValue", showDepthValue);
 
         glm::mat4 model = glm::mat4(1.0f);
         m_NormalShader->SetMat4("uModel", model);
-        cameraController->GetCamera()->SetViewProjMatrix(*m_NormalShader);
+        m_NormalShader->SetMat4("uProj", camera.GetProjectionMatrix());
+        m_NormalShader->SetMat4("uView", camera.GetViewMatrix());
         m_NormalShader->Unbind();
 
         m_SingleColorShader->Bind();
         m_SingleColorShader->SetMat4("uModel", model);
-        cameraController->GetCamera()->SetViewProjMatrix(*m_SingleColorShader);
+        m_SingleColorShader->SetMat4("uProj", camera.GetProjectionMatrix());
+        m_SingleColorShader->SetMat4("uView", camera.GetViewMatrix());
         m_SingleColorShader->Unbind();
-    }
-    void TestDepthBuffer::OnRender()
-    {
-        Enxus::Renderer renderer;
+
         GLCall(glEnable(GL_DEPTH_TEST));
         GLCall(glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE));
 
@@ -106,7 +105,7 @@ namespace Test
 
         {
             GLCall(glStencilMask(0x00));
-            renderer.Draw(m_Floor, *m_NormalShader);
+            Enxus::Renderer::DrawMesh(m_Floor, m_NormalShader);
         }
         {
             //----------------- DRAW TWO BOXES NORMALY -------------------//
@@ -117,12 +116,12 @@ namespace Test
             glm::mat4 model = glm::mat4(1.0f);
             model = glm::translate(model, glm::vec3(-1.0f, 0.0f, -1.0f));
             m_NormalShader->SetMat4("uModel", model);
-            renderer.Draw(m_Box, *m_NormalShader);
+            Enxus::Renderer::DrawMesh(m_Box, m_NormalShader);
 
             model = glm::translate(glm::mat4(1.0f), glm::vec3(2.0f, 0.0f, 0.0f));
             m_NormalShader->Bind();
             m_NormalShader->SetMat4("uModel", model);
-            renderer.Draw(m_Box, *m_NormalShader);
+            Enxus::Renderer::DrawMesh(m_Box, m_NormalShader);
         }
         {
             GLCall(glStencilFunc(GL_NOTEQUAL, 1, 0xFF));
@@ -137,13 +136,13 @@ namespace Test
             model = glm::translate(glm::mat4(1.0f), glm::vec3(-1.0f, 0.0f, -1.0f));
             model = glm::scale(model, scaleValue);
             m_SingleColorShader->SetMat4("uModel", model);
-            renderer.Draw(m_Box, *m_SingleColorShader);
+            Enxus::Renderer::DrawMesh(m_Box, m_SingleColorShader);
 
             model = glm::translate(glm::mat4(1.0f), glm::vec3(2.0f, 0.0f, 0.0f));
             model = glm::scale(model, scaleValue);
             m_SingleColorShader->Bind();
             m_SingleColorShader->SetMat4("uModel", model);
-            renderer.Draw(m_Box, *m_SingleColorShader);
+            Enxus::Renderer::DrawMesh(m_Box, m_SingleColorShader);
 
             // Reset Stencil Buffer state
             GLCall(glStencilFunc(GL_ALWAYS, 1, 0xFF));

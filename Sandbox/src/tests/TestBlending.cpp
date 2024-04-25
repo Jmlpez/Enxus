@@ -145,12 +145,11 @@ namespace OpenGLTest
         //----------------- GRASS -------------------//
         for (auto &[dist, pos] : m_SortedPositions)
         {
-            std::cout << dist << std::endl;
             model = glm::translate(glm::mat4(1.0f), pos);
             m_Shader->SetMat4("uModel", model);
             Enxus::Renderer::DrawMesh(m_TransparentObj, m_Shader);
         }
-        };
+    };
 
     void TestBlending::OnImGuiRender()
     {

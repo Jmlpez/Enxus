@@ -1,7 +1,10 @@
 #include "pch.h"
 #include "TestMenuLayer.h"
 #include "TestClearColor.h"
+#include "TestMesh.h"
+#include "TestModel.h"
 #include "TestBlending.h"
+#include "TestDepthBuffer.h"
 #include "imgui/imgui.h"
 
 TestMenuLayer::TestMenuLayer()
@@ -27,7 +30,10 @@ void TestMenuLayer::OnAttach()
     // Registering tests
     m_CurrentTest = nullptr;
     RegisterTest<OpenGLTest::TestClearColor>("Clear Color");
+    RegisterTest<OpenGLTest::TestMesh>("Mesh Creation");
+    RegisterTest<OpenGLTest::TestModel>("Model Loading");
     RegisterTest<OpenGLTest::TestBlending>("Blending");
+    RegisterTest<OpenGLTest::TestDepthBuffer>("Depth Buffer");
 }
 
 TestMenuLayer::~TestMenuLayer()

@@ -2,10 +2,9 @@
 #define TEST_DEPTH_BUFFER_H
 
 #include "Test.h"
-#include "Shader.h"
-#include "Renderer.h"
 
-namespace Test
+
+namespace OpenGLTest
 {
 
     class TestDepthBuffer : public Test
@@ -15,9 +14,7 @@ namespace Test
         TestDepthBuffer();
         ~TestDepthBuffer();
 
-        // Not used
-        void OnUpdate(float deltaTime, Enxus::FreeCameraController *cameraController) override;
-        void OnRender() override;
+        void OnUpdate(Enxus::Camera &camera) override;
         void OnImGuiRender() override;
 
     private:

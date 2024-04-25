@@ -2,11 +2,8 @@
 #define TEST_MODEL_H
 
 #include "Test.h"
-#include "Shader.h"
-#include "Model.h"
-#include "Renderer.h"
 
-namespace Test
+namespace OpenGLTest
 {
 
     class TestModel : public Test
@@ -16,9 +13,7 @@ namespace Test
         TestModel();
         ~TestModel();
 
-        // Not used
-        void OnUpdate(float deltaTime, Enxus::FreeCameraController *cameraController) override;
-        void OnRender() override;
+        void OnUpdate(Enxus::Camera &camera) override;
         void OnImGuiRender() override;
 
     private:
@@ -27,7 +22,7 @@ namespace Test
         Enxus::Ref<Enxus::Shader> m_Shader;
 
         glm::vec3 m_LightDirection;
-        bool m_IsUVsFlipped = true;
+        bool m_IsUVsFlipped = false;
     };
 }
 #endif
