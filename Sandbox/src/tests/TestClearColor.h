@@ -2,8 +2,9 @@
 #define TEST_CLEAR_COLOR_H
 
 #include "Test.h"
+#include "Enxus.h"
 
-namespace Test
+namespace OpenGLTest
 {
 
     class TestClearColor : public Test
@@ -13,9 +14,7 @@ namespace Test
         TestClearColor();
         ~TestClearColor();
 
-        // Not used
-        // void OnUpdate(float deltaTime, Enxus::FreeCameraController *cameraController) override;
-        void OnRender() override;
+        void OnUpdate(Enxus::Camera &camera) override;
         void OnImGuiRender() override;
 
     private:

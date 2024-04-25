@@ -1,24 +1,17 @@
 #ifndef TEST_H
 #define TEST_H
 
-#include "Camera.h"
+#include "Enxus.h"
 
-namespace Test
+namespace OpenGLTest
 {
-
     class Test
     {
     public:
         Test(){};
         virtual ~Test(){};
-
-        virtual void OnUpdate(float deltaTime, Enxus::FreeCameraController *cameraController)
-        {
-            (void)deltaTime;
-            (void)cameraController;
-        };
-        virtual void OnRender(){};
-        virtual void OnImGuiRender(){};
+        virtual void OnUpdate(Enxus::Camera &camera) { (void)camera; }
+        virtual void OnImGuiRender() {}
     };
 }
 

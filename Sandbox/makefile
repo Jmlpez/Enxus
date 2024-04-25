@@ -27,15 +27,23 @@ OPENGL_FLAGS = -lglfw -lGL -lGLEW -lX11 -lpthread -lassimp -lXrandr -lXi -ldl
 CXX = g++
 CXXFLAGS = -std=gnu++17 -Wall -Wextra
 
+#------------------ SANDBOX ------------------
 
 # Sandbox sources dir
 SRC_DIR = src
 # Sandbox bin dir
 BIN_DIR = bin
+# Tests sourcesdir
+TESTS_DIR = $(SRC_DIR)/tests
+
+TESTS_INCLUDE_FLAGS = -I$(TESTS_DIR)
+
+
 
 # CPP Files 
 # Sandbox sources
 SOURCES = $(wildcard $(SRC_DIR)/*.cpp)
+SOURCES += $(wildcard $(TESTS_DIR)/*.cpp)
 
 
 # OBJ Files
@@ -48,9 +56,13 @@ all: $(OBJS)
 # %.o match %.cpp and match %.h (e.g: utils.o utils.cpp utils.h)
 # headers files are added as prerequisites to watch changes in those files too
 
+# Build Tests
+$(BIN_DIR)/%.o: $(TESTS_DIR)/%.cpp $(TESTS_DIR)/%.h
+	$(CXX) $(CXXFLAGS) $(PCH_FLAGS) -c $< -o $@ $(ENXUS_INCLUDE_FLAGS) $(TESTS_INCLUDE_FLAGS) $(VENDOR_FLAGS) $(OPENGL_FLAGS)
+
 # Build Sandbox
 $(BIN_DIR)/%.o: $(SRC_DIR)/%.cpp $(SRC_DIR)/%.h
-	$(CXX) $(CXXFLAGS) $(PCH_FLAGS) -c $< -o $@ $(ENXUS_INCLUDE_FLAGS) $(VENDOR_FLAGS) $(OPENGL_FLAGS)
+	$(CXX) $(CXXFLAGS) $(PCH_FLAGS) -c $< -o $@ $(ENXUS_INCLUDE_FLAGS) $(TESTS_INCLUDE_FLAGS) $(VENDOR_FLAGS) $(OPENGL_FLAGS)
 
 
 build: 

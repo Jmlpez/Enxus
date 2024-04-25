@@ -1,9 +1,8 @@
 #include "pch.h"
 #include "TestClearColor.h"
-#include "utils.h"
-#include "imgui.h"
+#include "imgui/imgui.h"
 
-namespace Test
+namespace OpenGLTest
 {
     TestClearColor::TestClearColor() : m_ClearColor{0.2f, 0.3f, 0.8f, 1.0f}
     {
@@ -12,12 +11,9 @@ namespace Test
     {
     }
 
-    // void TestClearColor::OnUpdate(float deltaTime, Enxus::FreeCameraController *cameraController)
-    // {
-    // }
-
-    void TestClearColor::OnRender()
+    void TestClearColor::OnUpdate(Enxus::Camera &camera)
     {
+        (void)camera; // remove warning
         GLCall(glClearColor(m_ClearColor[0], m_ClearColor[1], m_ClearColor[2], m_ClearColor[3]));
         GLCall(glClear(GL_COLOR_BUFFER_BIT));
     }
