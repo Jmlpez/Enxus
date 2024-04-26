@@ -6,6 +6,7 @@
 #include "TestBlending.h"
 #include "TestDepthBuffer.h"
 #include "TestMultipleLightSources.h"
+#include "TestSkyBox.h"
 #include "imgui/imgui.h"
 
 TestMenuLayer::TestMenuLayer()
@@ -40,6 +41,10 @@ void TestMenuLayer::OnAttach()
     RegisterTest<OpenGLTest::TestModel>("Model Loading");
     RegisterTest<OpenGLTest::TestBlending>("Blending");
     RegisterTest<OpenGLTest::TestDepthBuffer>("Depth Buffer");
+    RegisterTest<OpenGLTest::TestSkyBox>("SkyBox");
+
+    // start in the skybox test
+    m_CurrentTest = new OpenGLTest::TestSkyBox();
 }
 
 void TestMenuLayer::OnUpdate(Enxus::Timestep ts)
