@@ -17,8 +17,8 @@ namespace Enxus
         unsigned int Height;
 
         WindowProps(const std::string &title = "Enxus Engine",
-                    unsigned int width = 800,
-                    unsigned int height = 600)
+                    unsigned int width = 1366,
+                    unsigned int height = 720)
             : Title(title), Width(width), Height(height)
         {
         }
