@@ -5,6 +5,7 @@
 #include "TestModel.h"
 #include "TestBlending.h"
 #include "TestDepthBuffer.h"
+#include "TestMultipleLightSources.h"
 #include "imgui/imgui.h"
 
 TestMenuLayer::TestMenuLayer()
@@ -25,19 +26,20 @@ TestMenuLayer::TestMenuLayer()
     m_Framebuffer = Enxus::CreateScope<Enxus::Framebuffer>(fbspec);
 }
 
+TestMenuLayer::~TestMenuLayer()
+{
+}
+
 void TestMenuLayer::OnAttach()
 {
     // Registering tests
     m_CurrentTest = nullptr;
     RegisterTest<OpenGLTest::TestClearColor>("Clear Color");
+    RegisterTest<OpenGLTest::TestMultipleLightSources>("Basic Lighting");
     RegisterTest<OpenGLTest::TestMesh>("Mesh Creation");
     RegisterTest<OpenGLTest::TestModel>("Model Loading");
     RegisterTest<OpenGLTest::TestBlending>("Blending");
     RegisterTest<OpenGLTest::TestDepthBuffer>("Depth Buffer");
-}
-
-TestMenuLayer::~TestMenuLayer()
-{
 }
 
 void TestMenuLayer::OnUpdate(Enxus::Timestep ts)
@@ -145,6 +147,7 @@ void TestMenuLayer::OnImGuiRender()
             {
                 delete m_CurrentTest;
                 m_CurrentTest = nullptr;
+                m_CameraController->ResetCameraLocation();
             }
             if (m_CurrentTest)
                 m_CurrentTest->OnImGuiRender();

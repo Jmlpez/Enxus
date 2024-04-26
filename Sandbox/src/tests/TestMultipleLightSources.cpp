@@ -1,6 +1,6 @@
 #include "TestMultipleLightSources.h"
 
-namespace Test
+namespace OpenGLTest
 {
     TestMultipleLightSources::TestMultipleLightSources()
     {
@@ -50,11 +50,11 @@ namespace Test
                 -0.5f, 0.5f, -0.5f, /*V*/ 0.0f, 1.0f, /*Tex*/ 0.0f, 1.0f, 0.0f, /* Normal */
             };
         // cameraController = new FreeCameraController(mainCamera);
-        objVAO = new Enxus::VertexArray;
-        lightSourceVAO = new Enxus::VertexArray;
+        objVAO = Enxus::CreateRef<Enxus::VertexArray>();
+        lightSourceVAO = Enxus::CreateRef<Enxus::VertexArray>();
         // lightVBO is not needed because we already have it from the current object (is also a cube)
         // std::cout << "Hi in line "
-        objVBO = new Enxus::VertexBuffer(cubeVertices, sizeof(cubeVertices));
+        objVBO = Enxus::CreateRef<Enxus::VertexBuffer>(cubeVertices, sizeof(cubeVertices));
         Enxus::VertexBufferLayout objLayout, lightSourceLayout;
         objLayout.Push(3, GL_FLOAT); // position
         objLayout.Push(2, GL_FLOAT); // texture coordinates
@@ -67,13 +67,13 @@ namespace Test
 
         // //----------------- TEXTURES -------------------//
 
-        containerDiffuse = new Enxus::Texture2D("res/images/container2.png");
-        containerSpecular = new Enxus::Texture2D("res/images/container2_specular.png");
+        containerDiffuse = Enxus::CreateRef<Enxus::Texture2D>("Sandbox/res/images/container2.png");
+        containerSpecular = Enxus::CreateRef<Enxus::Texture2D>("Sandbox/res/images/container2_specular.png");
 
         // //----------------- SHADERS -------------------//
 
-        objShader = new Enxus::Shader("res/shaders/basic-lighting/obj.vert", "res/shaders/basic-lighting/obj.frag");
-        lightSourceShader = new Enxus::Shader("res/shaders/basic-lighting/light.vert", "res/shaders/basic-lighting/light.frag");
+        objShader = Enxus::CreateRef<Enxus::Shader>("Sandbox/res/shaders/basic-lighting/obj.vert", "Sandbox/res/shaders/basic-lighting/obj.frag");
+        lightSourceShader = Enxus::CreateRef<Enxus::Shader>("Sandbox/res/shaders/basic-lighting/light.vert", "Sandbox/res/shaders/basic-lighting/light.frag");
 
         // // bind shader program first
 
@@ -154,34 +154,26 @@ namespace Test
 
     TestMultipleLightSources::~TestMultipleLightSources()
     {
-        delete objShader;
-        delete lightSourceShader;
-        delete lightSourceVAO;
-        delete objVAO;
-        // delete objVBO;
-        delete containerDiffuse;
-        delete containerSpecular;
     }
 
-    void TestMultipleLightSources::OnUpdate(float deltaTime, Enxus::FreeCameraController *cameraController)
+    void TestMultipleLightSources::OnUpdate(Enxus::Camera &camera)
     {
-        (void)deltaTime;
+
         objShader->Bind();
-        objShader->SetVec3("uSpotLight.position", cameraController->GetCameraPos());
-        objShader->SetVec3("uSpotLight.direction", cameraController->GetCameraFront());
+        objShader->SetVec3("uSpotLight.position", camera.GetPos());
+        objShader->SetVec3("uSpotLight.direction", camera.GetFront());
 
         // send camera pos to specular light calculation
-        objShader->SetVec3("uCameraPos", cameraController->GetCameraPos());
-        cameraController->GetCamera()->SetViewProjMatrix(*objShader);
+        objShader->SetVec3("uCameraPos", camera.GetPos());
+        // cameraController->GetCamera()->SetViewProjMatrix(*objShader);
+        objShader->SetMat4("uView", camera.GetViewMatrix());
+        objShader->SetMat4("uProj", camera.GetProjectionMatrix());
 
         objShader->Unbind();
         lightSourceShader->Bind();
-        cameraController->GetCamera()->SetViewProjMatrix(*lightSourceShader);
-    }
+        lightSourceShader->SetMat4("uView", camera.GetViewMatrix());
+        lightSourceShader->SetMat4("uProj", camera.GetProjectionMatrix());
 
-    void TestMultipleLightSources::OnRender()
-    {
-        //----------------- RENDER CUBES -------------------//
         {
             objShader->Bind();
             objVAO->Bind(); // bind VAO
