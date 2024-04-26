@@ -1,4 +1,5 @@
 #include "SandboxApp.h"
+#include "TerrainGenApp.h"
 
 extern Enxus::Application *Enxus::CreateApplication();
 

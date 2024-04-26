@@ -1,13 +1,16 @@
 # Targets and Dirs
 BIN_DIR = bin
-TARGET = $(BIN_DIR)/main
+SANDBOX_TARGET = $(BIN_DIR)/main
+TERRAIN_TARGET = $(BIN_DIR)/Terrain
 ENXUS_DIR = Enxus
 ENXUS_VENDOR_DIR = Enxus/vendor
 SANDBOX_DIR = Sandbox
+TERRAIN_GEN_DIR = TerrainGen
 
 # Enxus and Sandbox binaries
 ENXUS_BIN_DIR = $(ENXUS_DIR)/bin
 SANDBOX_BIN_DIR = $(SANDBOX_DIR)/bin
+TERRAIN_GEN_BIN_DIR = $(TERRAIN_GEN_DIR)/bin
 
 
 # OpenGL & Include Flags 
@@ -22,7 +25,8 @@ VENDOR_FLAGS += -I$(ENXUS_VENDOR_DIR)/imgui
 VENDOR_FLAGS += -I$(ENXUS_VENDOR_DIR)/stb_image
 VENDOR_FLAGS += -I$(ENXUS_VENDOR_DIR)/debugbreak
 
-SANDBOX_FLAGS = -I$(SANDBOX_DIR)/src/
+SANDBOX_FLAGS = -I$(SANDBOX_DIR)/src
+TERRAIN_GEN_FLAGS = -I$(TERRAIN_GEN_DIR)/src
 OPENGL_FLAGS = -lglfw -lGL -lGLEW -lX11 -lpthread -lassimp -lXrandr -lXi -ldl
 
 # Precompiled headers
@@ -36,45 +40,60 @@ CXXFLAGS = -std=gnu++17 -Wall -Wextra
 
 # OBJ Files
 #OBJS = $(addprefix $(BIN_DIR)/, $(addsuffix .o, $(basename $(notdir $(SOURCES)))))
-OBJS = $(wildcard $(ENXUS_BIN_DIR)/*.o)
-OBJS += $(wildcard $(SANDBOX_BIN_DIR)/*.o)
+ENXUS_OBJS = $(wildcard $(ENXUS_BIN_DIR)/*.o)
+SANDBOX_OBJS += $(wildcard $(SANDBOX_BIN_DIR)/*.o)
+TERRAIN_GEN_OBJS += $(wildcard $(TERRAIN_GEN_BIN_DIR)/*.o)
 
 
-all: $(TARGET)
 
-# Build main
-$(TARGET): $(OBJS) main.cpp
-	$(CXX) $(CXXFLAGS) $(PCH_FLAGS) $^ -o $@  $(ENXUS_INCLUDE_FLAGS) $(VENDOR_FLAGS) $(SANDBOX_FLAGS) $(OPENGL_FLAGS)
+sandbox-app: $(SANDBOX_TARGET)
+terrain-app: $(TERRAIN_TARGET)
+
+# Build sandbox target
+$(SANDBOX_TARGET): $(ENXUS_OBJS) $(SANDBOX_OBJS) main.cpp
+	$(CXX) $(CXXFLAGS) $(PCH_FLAGS) $^ -o $@  $(ENXUS_INCLUDE_FLAGS) $(VENDOR_FLAGS) $(TERRAIN_GEN_FLAGS) $(SANDBOX_FLAGS) $(OPENGL_FLAGS)
+	
+# Build terrain target
+$(TERRAIN_TARGET): $(ENXUS_OBJS) $(TERRAIN_GEN_OBJS) main.cpp
+	$(CXX) $(CXXFLAGS) $(PCH_FLAGS) $^ -o $@  $(ENXUS_INCLUDE_FLAGS) $(VENDOR_FLAGS) $(TERRAIN_GEN_FLAGS) $(SANDBOX_FLAGS) $(OPENGL_FLAGS)
 	
 enxus:
-	$(MAKE) -C $(ENXUS_DIR)
+	$(MAKE) -C $(ENXUS_DIR) build
 sandbox:
-	$(MAKE) -C $(SANDBOX_DIR)
+	$(MAKE) -C $(SANDBOX_DIR) build
+terrain:
+	$(MAKE) -C $(TERRAIN_GEN_DIR) build
 
 rebuild:
 	@echo "\n---------------------- RE-BUILDING THE ENTIRE PROJECT -----------------------\n"
-	$(MAKE) -C $(ENXUS_DIR) build
-	$(MAKE) -C $(SANDBOX_DIR) build
+	$(MAKE) enxus
+	$(MAKE) sandbox
+	$(MAKE) terrain
 	$(MAKE) clean
-	$(MAKE) all
+	$(MAKE) terrain-app
+	$(MAKE) sandbox-app
 	@echo "\n---------------------- FINISHED THE RE-BUILDING OF THE ENTIRE PROJECT -----------------------\n"
 
-run: enxus sandbox all
+run-sandbox:
 	@echo "\n---------------------- RUNING -----------------------\n"
-	@$(TARGET)
+	$(MAKE) -C $(ENXUS_DIR)
+	$(MAKE) -C $(SANDBOX_DIR)
+	$(MAKE) sandbox-app
+	@$(SANDBOX_TARGET)
+	@echo "\n------------------- END OF RUNING -------------------\n"	
+
+run-terrain:
+	@echo "\n---------------------- RUNING -----------------------\n"
+	$(MAKE) -C $(ENXUS_DIR)
+	$(MAKE) -C $(TERRAIN_GEN_DIR)
+	$(MAKE) terrain-app
+	@$(TERRAIN_TARGET)
 	@echo "\n------------------- END OF RUNING -------------------\n"	
 
 # Testing purposes
 pepe: pepe.cpp
 	g++ -std=gnu++17 -Wall -Wextra pepe.cpp -o pepe && ./pepe
 
-# pch:
-# 	$(CXX) $(CXXFLAGS) $(PCH_SRC) 
-
-
-# test:
-# 	@cp tests/TestTemplate.h tests/TestNewFeature.h
-# 	@cp tests/TestTemplate.cpp tests/TestNewFeature.cpp
 
 clean:
 	rm -fr $(BIN_DIR)/*
@@ -82,6 +101,13 @@ clean-enxus:
 	$(MAKE) -C $(ENXUS_DIR) clean
 clean-sandbox:
 	$(MAKE) -C $(SANDBOX_DIR) clean
-clean-full: clean clean-enxus clean-sandbox
+clean-terrain:
+	$(MAKE) -C $(TERRAIN_GEN_DIR) clean
+
+clean-full: 
+	$(MAKE) clean-enxus
+	$(MAKE) clean-sandbox
+	$(MAKE) clean-terrain
+	$(MAKE) clean
 	
 
