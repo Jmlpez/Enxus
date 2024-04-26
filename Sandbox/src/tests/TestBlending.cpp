@@ -119,7 +119,7 @@ namespace OpenGLTest
         {
             // negated value to loop the map in ascending object
             // It's a little lazy to write the map iterators and stuffs..
-            float distance = -glm::length(camera.GetPos() - pos);
+            float distance = -glm::length(cameraPos - pos);
             m_SortedPositions[distance] = pos;
         }
 
