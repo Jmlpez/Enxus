@@ -124,9 +124,18 @@ namespace OpenGLTest
 
     void TestSkyBox::OnUpdate(Enxus::Camera &camera)
     {
-        // draw the cube map
+        // draw the objects...
+        {
+            m_BoxShader->Bind();
+            m_BoxShader->SetMat4("uView", camera.GetViewMatrix());
+            m_BoxShader->SetMat4("uProj", camera.GetProjectionMatrix());
+            Enxus::Renderer::DrawModel(m_Box, m_BoxShader);
+        }
+        // draw the skybox last
         {
             glDepthMask(GL_FALSE);
+            glDepthFunc(GL_LEQUAL);
+
             glm::mat4 viewMatrix = glm::mat4(glm::mat3(camera.GetViewMatrix()));
 
             m_SkyBoxShader->Bind();
@@ -139,14 +148,9 @@ namespace OpenGLTest
             m_SkyBoxVAO->Bind();
             glBindBuffer(GL_TEXTURE_CUBE_MAP, m_SkyBoxRendererId);
             glDrawArrays(GL_TRIANGLES, 0, 36);
-            glDepthMask(GL_TRUE);
-        }
-        // draw rest of the objects...
-        {
-            m_BoxShader->Bind();
-            m_BoxShader->SetMat4("uView", camera.GetViewMatrix());
-            m_BoxShader->SetMat4("uProj", camera.GetProjectionMatrix());
-            Enxus::Renderer::DrawModel(m_Box, m_BoxShader);
+
+            glDepthMask(GL_TRUE); // Restoring state
+            glDepthFunc(GL_LESS); // Restoring state
         }
     }
 
