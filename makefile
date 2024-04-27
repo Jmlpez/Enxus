@@ -1,7 +1,7 @@
 # Targets and Dirs
 BIN_DIR = bin
 SANDBOX_TARGET = $(BIN_DIR)/main
-TERRAIN_TARGET = $(BIN_DIR)/Terrain
+TERRAIN_GEN_TARGET = $(BIN_DIR)/Terrain
 ENXUS_DIR = Enxus
 ENXUS_VENDOR_DIR = Enxus/vendor
 SANDBOX_DIR = Sandbox
@@ -36,7 +36,8 @@ PCH_FLAGS = -include $(PCH_SRC)
 
 # Compiler
 CXX = g++
-CXXFLAGS = -std=gnu++17 -Wall -Wextra
+DEBUG_FLAGS = -g
+CXXFLAGS = -std=gnu++17 $(DEBUG_FLAGS) -Wall -Wextra
 
 # OBJ Files
 #OBJS = $(addprefix $(BIN_DIR)/, $(addsuffix .o, $(basename $(notdir $(SOURCES)))))
@@ -44,17 +45,20 @@ ENXUS_OBJS = $(wildcard $(ENXUS_BIN_DIR)/*.o)
 SANDBOX_OBJS += $(wildcard $(SANDBOX_BIN_DIR)/*.o)
 TERRAIN_GEN_OBJS += $(wildcard $(TERRAIN_GEN_BIN_DIR)/*.o)
 
+sandbox-app: 
+	$(MAKE) -C $(SANDBOX_DIR)
+	$(MAKE) $(SANDBOX_TARGET)
 
-
-sandbox-app: $(SANDBOX_TARGET)
-terrain-app: $(TERRAIN_TARGET)
+terrain-app: 
+	$(MAKE) -C $(TERRAIN_GEN_DIR)
+	$(MAKE) $(TERRAIN_GEN_TARGET)
 
 # Build sandbox target
 $(SANDBOX_TARGET): $(ENXUS_OBJS) $(SANDBOX_OBJS) main.cpp
 	$(CXX) $(CXXFLAGS) $(PCH_FLAGS) $^ -o $@  $(ENXUS_INCLUDE_FLAGS) $(VENDOR_FLAGS) $(TERRAIN_GEN_FLAGS) $(SANDBOX_FLAGS) $(OPENGL_FLAGS)
 	
 # Build terrain target
-$(TERRAIN_TARGET): $(ENXUS_OBJS) $(TERRAIN_GEN_OBJS) main.cpp
+$(TERRAIN_GEN_TARGET): $(ENXUS_OBJS) $(TERRAIN_GEN_OBJS) main.cpp
 	$(CXX) $(CXXFLAGS) $(PCH_FLAGS) $^ -o $@  $(ENXUS_INCLUDE_FLAGS) $(VENDOR_FLAGS) $(TERRAIN_GEN_FLAGS) $(SANDBOX_FLAGS) $(OPENGL_FLAGS)
 	
 enxus:
@@ -70,24 +74,23 @@ rebuild:
 	$(MAKE) sandbox
 	$(MAKE) terrain
 	$(MAKE) clean
-	$(MAKE) terrain-app
-	$(MAKE) sandbox-app
+	$(MAKE) $(SANDBOX_TARGET)
+	$(MAKE) $(TERRAIN_GEN_TARGET)
 	@echo "\n---------------------- FINISHED THE RE-BUILDING OF THE ENTIRE PROJECT -----------------------\n"
 
 run-sandbox:
-	@echo "\n---------------------- RUNING -----------------------\n"
 	$(MAKE) -C $(ENXUS_DIR)
-	$(MAKE) -C $(SANDBOX_DIR)
 	$(MAKE) sandbox-app
+	@echo "\n---------------------- RUNING -----------------------\n"
 	@$(SANDBOX_TARGET)
 	@echo "\n------------------- END OF RUNING -------------------\n"	
 
+#$(MAKE) terrain-app
 run-terrain:
-	@echo "\n---------------------- RUNING -----------------------\n"
-	$(MAKE) -C $(ENXUS_DIR)
-	$(MAKE) -C $(TERRAIN_GEN_DIR)
+	$(MAKE) -C $(ENXUS_DIR)	
 	$(MAKE) terrain-app
-	@$(TERRAIN_TARGET)
+	@echo "\n---------------------- RUNING -----------------------\n"
+	@$(TERRAIN_GEN_TARGET)
 	@echo "\n------------------- END OF RUNING -------------------\n"	
 
 # Testing purposes

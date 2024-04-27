@@ -27,7 +27,8 @@ OPENGL_FLAGS = -lglfw -lGL -lGLEW -lX11 -lpthread -lassimp -lXrandr -lXi -ldl
 
 # Compiler
 CXX = g++
-CXXFLAGS = -std=gnu++17 -Wall -Wextra
+DEBUG_FLAGS = -g
+CXXFLAGS = -std=gnu++17 $(DEBUG_FLAGS) -Wall -Wextra
 
 #------------------ TerrainGen ------------------
 
