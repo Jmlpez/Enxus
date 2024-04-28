@@ -76,9 +76,12 @@ namespace OpenGLTest
             "Sandbox/res/shaders/skybox/skybox.vert",
             "Sandbox/res/shaders/skybox/skybox.frag");
 
+        // m_BoxShader = Enxus::CreateRef<Enxus::Shader>(
+        //     "Sandbox/res/shaders/model/box.vert",
+        //     "Sandbox/res/shaders/model/box.frag");
         m_BoxShader = Enxus::CreateRef<Enxus::Shader>(
-            "Sandbox/res/shaders/model/box.vert",
-            "Sandbox/res/shaders/model/box.frag");
+            "Sandbox/res/shaders/skybox/reflect.vert",
+            "Sandbox/res/shaders/skybox/reflect.frag");
 
         //----------------- BOX MODEL -------------------//
         m_Box = Enxus::CreateRef<Enxus::Model>("Sandbox/res/models/box/box.obj");
@@ -129,6 +132,11 @@ namespace OpenGLTest
             m_BoxShader->Bind();
             m_BoxShader->SetMat4("uView", camera.GetViewMatrix());
             m_BoxShader->SetMat4("uProj", camera.GetProjectionMatrix());
+
+            m_BoxShader->SetVec3("uCameraPos", camera.GetPos());
+            glActiveTexture(GL_TEXTURE0);
+            m_BoxShader->SetInt("uSkyBoxTexture", 0);
+
             Enxus::Renderer::DrawModel(m_Box, m_BoxShader);
         }
         // draw the skybox last
