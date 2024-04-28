@@ -48,7 +48,7 @@ namespace Enxus
     private:
         unsigned int m_RendererId;
         int m_Width, m_Height, m_NrChannels;
-        unsigned char *m_LocalBuffer; // texture data
+        // unsigned char *m_LocalBuffer; // texture data
 
         TextureData2D m_TextureData;
     };

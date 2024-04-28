@@ -84,7 +84,7 @@ namespace OpenGLTest
             "Sandbox/res/shaders/skybox/reflect.frag");
 
         //----------------- BOX MODEL -------------------//
-        m_Box = Enxus::CreateRef<Enxus::Model>("Sandbox/res/models/box/box.obj");
+        m_Box = Enxus::CreateRef<Enxus::Model>("Sandbox/res/models/backpack/backpack.obj");
         m_BoxShader->Bind();
         m_BoxShader->SetMat4("uModel", glm::mat4(1.0f));
     }
@@ -99,14 +99,18 @@ namespace OpenGLTest
         GLCall(glGenTextures(1, &textureId));
         GLCall(glBindTexture(GL_TEXTURE_CUBE_MAP, textureId));
 
-        int width, height, nrChannels;
+        // to avoid load the skybox upside down
+        stbi_set_flip_vertically_on_load(false);
+
+        int width,
+            height, nrChannels;
         for (size_t i = 0; i < faces.size(); i++)
         {
             std::string fullPath = "Sandbox/res/images/skybox/" + faces[i];
             unsigned char *imageData = stbi_load(fullPath.c_str(), &width, &height, &nrChannels, 0);
             if (imageData)
             {
-                glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, imageData);
+                GLCall(glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, imageData));
                 stbi_image_free(imageData);
             }
             else
@@ -116,11 +120,11 @@ namespace OpenGLTest
                 ASSERT(false);
             }
         }
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        GLCall(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
+        GLCall(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+        GLCall(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
+        GLCall(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE));
+        GLCall(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
 
         return textureId;
     }
@@ -134,15 +138,15 @@ namespace OpenGLTest
             m_BoxShader->SetMat4("uProj", camera.GetProjectionMatrix());
 
             m_BoxShader->SetVec3("uCameraPos", camera.GetPos());
-            glActiveTexture(GL_TEXTURE0);
+            GLCall(glActiveTexture(GL_TEXTURE0));
             m_BoxShader->SetInt("uSkyBoxTexture", 0);
 
             Enxus::Renderer::DrawModel(m_Box, m_BoxShader);
         }
         // draw the skybox last
         {
-            glDepthMask(GL_FALSE);
-            glDepthFunc(GL_LEQUAL);
+            GLCall(glDepthMask(GL_FALSE));
+            GLCall(glDepthFunc(GL_LEQUAL));
 
             glm::mat4 viewMatrix = glm::mat4(glm::mat3(camera.GetViewMatrix()));
 
@@ -150,15 +154,15 @@ namespace OpenGLTest
             m_SkyBoxShader->SetMat4("uView", viewMatrix);
             m_SkyBoxShader->SetMat4("uProj", camera.GetProjectionMatrix());
 
-            glActiveTexture(GL_TEXTURE0);
+            GLCall(glActiveTexture(GL_TEXTURE0));
             m_SkyBoxShader->SetInt("uSkyBoxTexture", 0);
 
             m_SkyBoxVAO->Bind();
-            glBindBuffer(GL_TEXTURE_CUBE_MAP, m_SkyBoxRendererId);
-            glDrawArrays(GL_TRIANGLES, 0, 36);
+            GLCall(glBindTexture(GL_TEXTURE_CUBE_MAP, m_SkyBoxRendererId));
+            GLCall(glDrawArrays(GL_TRIANGLES, 0, 36));
 
-            glDepthMask(GL_TRUE); // Restoring state
-            glDepthFunc(GL_LESS); // Restoring state
+            GLCall(glDepthMask(GL_TRUE)); // Restoring state
+            GLCall(glDepthFunc(GL_LESS)); // Restoring state
         }
     }
 

@@ -33,6 +33,7 @@ namespace Enxus
 
     Mesh::~Mesh()
     {
+        m_Textures.clear();
         // smart pointers delete it selfs
     }
 

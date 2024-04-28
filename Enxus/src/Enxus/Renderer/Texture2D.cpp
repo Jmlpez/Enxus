@@ -46,7 +46,7 @@ namespace Enxus
         // instead of the top left, so this flip the Y coordinates of the image
         stbi_set_flip_vertically_on_load(true);
 
-        m_LocalBuffer = stbi_load(m_TextureData.path.c_str(), &m_Width, &m_Height, &m_NrChannels, 0);
+        unsigned char *m_LocalBuffer = stbi_load(m_TextureData.path.c_str(), &m_Width, &m_Height, &m_NrChannels, 0);
         if (!m_LocalBuffer)
         {
             std::cout << "ERROR: Failed to load texture: " << m_TextureData.path << std::endl;
@@ -69,8 +69,10 @@ namespace Enxus
         // generate mipmaps using OpenGL built-in function
         GLCall(glGenerateMipmap(GL_TEXTURE_2D));
 
+        
         // free the second image data
         stbi_image_free(m_LocalBuffer);
+        
     }
 
     void Texture2D::Bind(unsigned int slot) const
