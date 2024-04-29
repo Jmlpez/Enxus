@@ -7,6 +7,7 @@
 #include "TestDepthBuffer.h"
 #include "TestMultipleLightSources.h"
 #include "TestSkyBox.h"
+#include "TestMovingVertex.h"
 #include "imgui/imgui.h"
 
 TestMenuLayer::TestMenuLayer()
@@ -42,9 +43,10 @@ void TestMenuLayer::OnAttach()
     RegisterTest<OpenGLTest::TestBlending>("Blending");
     RegisterTest<OpenGLTest::TestDepthBuffer>("Depth Buffer");
     RegisterTest<OpenGLTest::TestSkyBox>("SkyBox");
+    RegisterTest<OpenGLTest::TestMovingVertex>("Mesh vertices updating");
 
     // start in the skybox test
-    m_CurrentTest = new OpenGLTest::TestSkyBox();
+    m_CurrentTest = new OpenGLTest::TestMovingVertex();
 }
 
 void TestMenuLayer::OnUpdate(Enxus::Timestep ts)
