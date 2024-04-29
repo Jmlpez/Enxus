@@ -159,8 +159,8 @@ void TestMenuLayer::OnImGuiRender()
             if (m_CurrentTest)
                 m_CurrentTest->OnImGuiRender();
 
-            ImGui::Text("App average %.3f ms/frame", 1000.0f / io.Framerate);
-            ImGui::Text("App average (%.1f FPS)", io.Framerate);
+            ImGui::Text("App average %.3f ms/frame", Enxus::Application::Get().GetTimestep().GetMiliseconds());
+            ImGui::Text("App average (%.1f FPS)", 1.0f / Enxus::Application::Get().GetTimestep());
         }
 
         // using size_t (aka unsigned long) to remove warning

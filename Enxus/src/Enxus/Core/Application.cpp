@@ -80,14 +80,14 @@ namespace Enxus
         while (m_Running)
         {
             float time = (float)glfwGetTime();
-            Timestep timestep = time - m_LastFrameTime;
+            m_Timestep = time - m_LastFrameTime;
             m_LastFrameTime = time;
 
             Renderer::ClearColor(1.0f, 0.0f, 1.0f, 1.0f);
             Renderer::Clear();
 
             for (Layer *layer : m_LayerStack)
-                layer->OnUpdate(timestep);
+                layer->OnUpdate(m_Timestep);
 
             m_ImGuiLayer->Begin();
             for (Layer *layer : m_LayerStack)

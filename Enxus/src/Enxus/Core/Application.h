@@ -22,6 +22,7 @@ namespace Enxus
 
         void Close();
 
+        inline Timestep GetTimestep() const { return m_Timestep; }
         inline Window &GetWindow() { return *m_Window; }
         inline ImGuiLayer *GetImGuiLayer() { return m_ImGuiLayer; }
         static Application &Get() { return *s_Instance; }
@@ -36,6 +37,7 @@ namespace Enxus
 
         bool m_Running = true;
         float m_LastFrameTime = 0.0f;
+        Timestep m_Timestep;
 
         LayerStack m_LayerStack;
         static Application *s_Instance;

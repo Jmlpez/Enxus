@@ -6,6 +6,7 @@ namespace Enxus
     class Timestep
     {
     public:
+        Timestep() : m_Time(0.0f) {}
         Timestep(float time) : m_Time(time) {}
         ~Timestep(){};
 
