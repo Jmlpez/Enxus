@@ -176,6 +176,14 @@ void EditorLayer::OnImGuiRender()
         ImGui::End();
         ImGui::PopStyleVar();
     }
+    // FPS Little Window
+    {
+        ImGui::Begin("FPS");
+        // framerate
+        ImGui::Text("App average %.3f ms/frame", Enxus::Application::Get().GetTimestep().GetMiliseconds());
+        ImGui::Text("App average (%.1f FPS)", 1.0f / Enxus::Application::Get().GetTimestep());
+        ImGui::End();
+    }
 
     ImGui::End();
 }

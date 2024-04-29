@@ -158,9 +158,6 @@ void TestMenuLayer::OnImGuiRender()
             }
             if (m_CurrentTest)
                 m_CurrentTest->OnImGuiRender();
-
-            ImGui::Text("App average %.3f ms/frame", Enxus::Application::Get().GetTimestep().GetMiliseconds());
-            ImGui::Text("App average (%.1f FPS)", 1.0f / Enxus::Application::Get().GetTimestep());
         }
 
         // using size_t (aka unsigned long) to remove warning
@@ -188,6 +185,15 @@ void TestMenuLayer::OnImGuiRender()
         ImGui::Image((void *)textureID, ImVec2(m_ViewportSize.x, m_ViewportSize.y), ImVec2{0, 1}, ImVec2{1, 0});
         ImGui::End();
         ImGui::PopStyleVar();
+    }
+
+    // FPS Little Window
+    {
+        ImGui::Begin("FPS");
+        // framerate
+        ImGui::Text("App average %.3f ms/frame", Enxus::Application::Get().GetTimestep().GetMiliseconds());
+        ImGui::Text("App average (%.1f FPS)", 1.0f / Enxus::Application::Get().GetTimestep());
+        ImGui::End();
     }
 
     ImGui::End();
