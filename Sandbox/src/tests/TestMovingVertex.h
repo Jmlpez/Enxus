@@ -28,6 +28,7 @@ namespace OpenGLTest
         std::vector<Enxus::VertexData> m_Vertices;
 
         float m_DistanceFactor = 3.0f;
+        float m_WaveSpeed = 2.0f;
         bool m_IsAnimatingVertices = true;
 
         Enxus::Ref<Enxus::Texture2D> m_Container, m_AwesomeFace;

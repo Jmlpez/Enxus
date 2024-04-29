@@ -71,11 +71,11 @@ namespace OpenGLTest
             if (m_IsAnimatingVertices)
             {
                 Enxus::VertexData newVertex = m_Vertices[0];
-                newVertex.Position.x = std::abs(glm::sin(glfwGetTime())) * m_DistanceFactor;
+                newVertex.Position.x = std::abs(glm::sin(glfwGetTime() / m_WaveSpeed)) * m_DistanceFactor;
                 m_VertexBuffer->SetData(&newVertex, sizeof(Enxus::VertexData), 0);
 
                 newVertex = m_Vertices[1];
-                newVertex.Position.x = std::abs(glm::sin(glfwGetTime())) * m_DistanceFactor;
+                newVertex.Position.x = std::abs(glm::sin(glfwGetTime() / m_WaveSpeed)) * m_DistanceFactor;
                 m_VertexBuffer->SetData(&newVertex, sizeof(Enxus::VertexData), sizeof(Enxus::VertexData));
             }
 
@@ -85,6 +85,7 @@ namespace OpenGLTest
 
     void TestMovingVertex::OnImGuiRender()
     {
+        ImGui::DragFloat("Speed", &m_WaveSpeed, 0.1f, 0.1f, 5.0f);
         ImGui::DragFloat("Distance Factor", &m_DistanceFactor, 0.05f, 0.1f, 5.0f);
         ImGui::Checkbox("Animate Vertices", &m_IsAnimatingVertices);
     };
