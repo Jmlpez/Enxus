@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "TestMovingVertex.h"
+#include "imgui/imgui.h"
 
 namespace OpenGLTest
 {
@@ -14,26 +15,18 @@ namespace OpenGLTest
         unsigned int indices[6] = {0, 1, 3,
                                    1, 2, 3};
 
-        GLCall(glGenVertexArrays(1, &m_VertexArrayID));
+        m_VertexArray = Enxus::CreateRef<Enxus::VertexArray>();
 
-        GLCall(glGenBuffers(1, &m_VertexBufferID));
-        GLCall(glBindBuffer(GL_ARRAY_BUFFER, m_VertexBufferID));
-        GLCall(glBufferData(GL_ARRAY_BUFFER, m_Vertices.size() * sizeof(Enxus::VertexData), nullptr, GL_DYNAMIC_DRAW));
-        GLCall(glBufferSubData(GL_ARRAY_BUFFER, 0, m_Vertices.size() * sizeof(Enxus::VertexData), &m_Vertices[0]));
+        m_VertexBuffer = Enxus::CreateRef<Enxus::VertexBuffer>(sizeof(m_Vertices) * sizeof(Enxus::VertexData));
+        m_VertexBuffer->SetData(&m_Vertices[0], sizeof(m_Vertices) * sizeof(Enxus::VertexData), 0);
 
-        GLCall(glBindVertexArray(m_VertexArrayID));
+        Enxus::VertexBufferLayout layout;
+        layout.Push(3, GL_FLOAT); // position
+        layout.Push(2, GL_FLOAT); // tex coords
+        layout.Push(3, GL_FLOAT); // normals
+        m_VertexArray->AddBuffer(*m_VertexBuffer, layout);
 
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (const void *)0);
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (const void *)(3 * sizeof(float)));
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (const void *)(5 * sizeof(float)));
-        glEnableVertexAttribArray(2);
-
-        GLCall(glBindVertexArray(m_VertexArrayID));
-        GLCall(glGenBuffers(1, &m_IndexBufferID));
-        GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IndexBufferID));
-        GLCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned int), indices, GL_STATIC_DRAW));
+        m_IndexBuffer = Enxus::CreateRef<Enxus::IndexBuffer>(&indices[0], sizeof(indices));
 
         m_Container = Enxus::CreateRef<Enxus::Texture2D>("Sandbox/res/images/container.jpg", Enxus::TextureType::DIFFUSE);
         m_AwesomeFace = Enxus::CreateRef<Enxus::Texture2D>("Sandbox/res/images/awesomeface.png", Enxus::TextureType::DIFFUSE);
@@ -52,14 +45,6 @@ namespace OpenGLTest
 
     TestMovingVertex::~TestMovingVertex()
     {
-
-        GLCall(glBindVertexArray(0));
-        GLCall(glBindBuffer(GL_ARRAY_BUFFER, 0));
-        GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
-
-        glDeleteVertexArrays(1, &m_VertexArrayID);
-        glDeleteBuffers(1, &m_VertexBufferID);
-        glDeleteBuffers(1, &m_IndexBufferID);
     }
 
     void TestMovingVertex::OnUpdate(Enxus::Camera &camera)
@@ -83,23 +68,25 @@ namespace OpenGLTest
                 |     |
              (2)*-----*(1)
             */
-            Enxus::VertexData newVertex = m_Vertices[0];
-            newVertex.Position.x = std::abs(glm::sin(glfwGetTime())) * 3.0f;
-            GLCall(glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Enxus::VertexData), &newVertex));
+            if (m_IsAnimatingVertices)
+            {
+                Enxus::VertexData newVertex = m_Vertices[0];
+                newVertex.Position.x = std::abs(glm::sin(glfwGetTime())) * m_DistanceFactor;
+                m_VertexBuffer->SetData(&newVertex, sizeof(Enxus::VertexData), 0);
 
-            newVertex = m_Vertices[1];
-            newVertex.Position.x = std::abs(glm::sin(glfwGetTime())) * 3.0f;
-            GLCall(glBufferSubData(GL_ARRAY_BUFFER, sizeof(Enxus::VertexData), sizeof(Enxus::VertexData), &newVertex));
+                newVertex = m_Vertices[1];
+                newVertex.Position.x = std::abs(glm::sin(glfwGetTime())) * m_DistanceFactor;
+                m_VertexBuffer->SetData(&newVertex, sizeof(Enxus::VertexData), sizeof(Enxus::VertexData));
+            }
 
-            GLCall(glBindVertexArray(m_VertexArrayID));
-            GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
+            Enxus::Renderer::Draw(m_VertexArray, m_IndexBuffer, m_Shader);
         }
-
-        // Enxus::Renderer::DrawMesh(m_Plane, m_Shader);
     }
 
-    void TestMovingVertex::OnImGuiRender(){
-
+    void TestMovingVertex::OnImGuiRender()
+    {
+        ImGui::DragFloat("Distance Factor", &m_DistanceFactor, 0.05f, 0.1f, 5.0f);
+        ImGui::Checkbox("Animate Vertices", &m_IsAnimatingVertices);
     };
 
 }
