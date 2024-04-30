@@ -8,6 +8,7 @@
 #include "TestMultipleLightSources.h"
 #include "TestSkyBox.h"
 #include "TestMovingVertex.h"
+#include "TestTriangleStrip.h"
 #include "imgui/imgui.h"
 
 TestMenuLayer::TestMenuLayer()
@@ -44,9 +45,10 @@ void TestMenuLayer::OnAttach()
     RegisterTest<OpenGLTest::TestDepthBuffer>("Depth Buffer");
     RegisterTest<OpenGLTest::TestSkyBox>("SkyBox");
     RegisterTest<OpenGLTest::TestMovingVertex>("Mesh vertices updating");
+    RegisterTest<OpenGLTest::TestTriangleStrip>("Triangle Strip");
 
     // start in the skybox test
-    m_CurrentTest = new OpenGLTest::TestMovingVertex();
+    m_CurrentTest = new OpenGLTest::TestTriangleStrip();
 }
 
 void TestMenuLayer::OnUpdate(Enxus::Timestep ts)

@@ -69,10 +69,8 @@ namespace Enxus
         // generate mipmaps using OpenGL built-in function
         GLCall(glGenerateMipmap(GL_TEXTURE_2D));
 
-        
         // free the second image data
         stbi_image_free(m_LocalBuffer);
-        
     }
 
     void Texture2D::Bind(unsigned int slot) const

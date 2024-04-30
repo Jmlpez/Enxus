@@ -17,6 +17,7 @@ EditorLayer::EditorLayer()
     //----------------- SHADER -------------------//
     m_Shader = Enxus::CreateRef<Enxus::Shader>("TerrainGen/assets/shaders/model/box.vert", "TerrainGen/assets/shaders/model/box.frag");
     m_GridShader = Enxus::CreateRef<Enxus::Shader>("TerrainGen/assets/shaders/editor-grid/grid.vert", "TerrainGen/assets/shaders/editor-grid/grid.frag");
+    m_TerrainShader = Enxus::CreateRef<Enxus::Shader>("TerrainGen/assets/shaders/heightmap/heightmap.vert", "TerrainGen/assets/shaders/heightmap/heightmap.frag");
 
     //----------------- BOX MODEL -------------------//
 
@@ -26,20 +27,30 @@ EditorLayer::EditorLayer()
     m_Shader->Bind();
     m_Shader->SetMat4("uModel", model);
     //----------------- GRID FLOOR -------------------//
-    m_GridFloor = Enxus::CreateScope<Grid>(50, 50, 0.25f);
+    m_GridFloor = Enxus::CreateScope<Grid>(50, 50, 1.0f);
     m_GridShader->Bind();
 
     m_GridShader->SetMat4("uModel", m_GridFloor->GetModel());
 
+    //----------------- TERRAIN -------------------//
+    m_Terrain = Enxus::CreateScope<HeightMapTerrain>();
+    m_Terrain->SetHeightMap("TerrainGen/assets/images/heightmaps/iceland_heightmap.png");
+    m_TerrainShader->Bind();
+    m_TerrainShader->SetMat4("uModel", glm::mat4(1.0f));
+}
+
+EditorLayer::~EditorLayer()
+{
+}
+
+void EditorLayer::OnAttach()
+{
     //----------------- FRAMEBUFFER -------------------//
     Enxus::FramebufferSpecification fbspec;
     fbspec.Width = 800;
     fbspec.Height = 600;
     m_Framebuffer = Enxus::CreateScope<Enxus::Framebuffer>(fbspec);
-}
-
-EditorLayer::~EditorLayer()
-{
+    ImGui::SetWindowFocus("Viewport");
 }
 
 void EditorLayer::OnUpdate(Enxus::Timestep ts)
@@ -62,6 +73,16 @@ void EditorLayer::OnUpdate(Enxus::Timestep ts)
     m_GridShader->SetMat4("uProj", m_CameraController->GetCamera().GetProjectionMatrix());
     m_GridShader->Unbind();
 
+    m_TerrainShader->Bind();
+    m_TerrainShader->SetMat4("uView", m_CameraController->GetCamera().GetViewMatrix());
+    m_TerrainShader->SetMat4("uProj", m_CameraController->GetCamera().GetProjectionMatrix());
+    m_TerrainShader->Unbind();
+
+    if (m_IsWireframe)
+        Enxus::Renderer::SetPolygonMode(Enxus::PolygonMode::LINE);
+    else
+        Enxus::Renderer::SetPolygonMode(Enxus::PolygonMode::FILL);
+
     {
         // Rendering
         m_Framebuffer->Bind();
@@ -74,9 +95,25 @@ void EditorLayer::OnUpdate(Enxus::Timestep ts)
             Enxus::Renderer::Draw(m_GridFloor->GetVertexArray(), m_GridFloor->GetIndexBuffer(), m_GridShader);
             Enxus::Renderer::SetPolygonMode(Enxus::PolygonMode::FILL); // Restore state
         }
+        {
+        }
         // Draw Box
         {
-            Enxus::Renderer::DrawModel(m_Box, m_Shader);
+            // Enxus::Renderer::DrawModel(m_Box, m_Shader);
+
+            // Enxus::Renderer::SetPolygonMode(Enxus::PolygonMode::LINE); // Draw the lines
+            // Enxus::Renderer::Draw(m_Terrain->GetVertexArray(), m_Terrain->GetIndexBuffer(), m_TerrainShader);
+            m_Terrain->GetVertexArray()->Bind();
+            m_Terrain->GetIndexBuffer()->Bind();
+            m_TerrainShader->Bind();
+            const uint32_t numOfStrips = m_Terrain->GetHeight() - 1;
+            const uint32_t numOfVertPerStrip = m_Terrain->GetWidth() * 2;
+            for (unsigned int strip = 0; strip < numOfStrips; strip++)
+            {
+                size_t stripOffset = strip * numOfVertPerStrip * sizeof(unsigned int);
+                glDrawElements(GL_TRIANGLE_STRIP, numOfVertPerStrip, GL_UNSIGNED_INT, (void *)stripOffset);
+            }
+            // Enxus::Renderer::SetPolygonMode(Enxus::PolygonMode::FILL); // Draw the lines
         }
         m_Framebuffer->Unbind();
     }
@@ -149,7 +186,7 @@ void EditorLayer::OnImGuiRender()
         // Menu
         ImGui::Begin("Menu");
         ImGui::Checkbox("Grid Floor", &m_ShowGridFloor);
-
+        ImGui::Checkbox("Wireframe Mode", &m_IsWireframe);
         // using size_t (aka unsigned long) to remove warning
         // size_t textureId = m_ExampleTexture->GetRendererId();
         ImGui::End();
