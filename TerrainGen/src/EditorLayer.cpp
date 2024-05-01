@@ -34,7 +34,7 @@ EditorLayer::EditorLayer()
 
     //----------------- TERRAIN -------------------//
     m_Terrain = Enxus::CreateScope<HeightMapTerrain>();
-    m_Terrain->SetHeightMap("TerrainGen/assets/images/heightmaps/iceland_heightmap.png");
+    m_Terrain->SetHeightMap("TerrainGen/assets/images/heightmaps/simple.png");
     m_TerrainShader->Bind();
     m_TerrainShader->SetMat4("uModel", glm::mat4(1.0f));
 }
@@ -99,7 +99,7 @@ void EditorLayer::OnUpdate(Enxus::Timestep ts)
         }
         // Draw Box
         {
-            // Enxus::Renderer::DrawModel(m_Box, m_Shader);
+            Enxus::Renderer::DrawModel(m_Box, m_Shader);
 
             // Enxus::Renderer::SetPolygonMode(Enxus::PolygonMode::LINE); // Draw the lines
             // Enxus::Renderer::Draw(m_Terrain->GetVertexArray(), m_Terrain->GetIndexBuffer(), m_TerrainShader);

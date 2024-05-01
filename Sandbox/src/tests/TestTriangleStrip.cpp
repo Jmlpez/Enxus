@@ -35,14 +35,16 @@ namespace OpenGLTest
 
         // m_Plane = Enxus::CreateRef<Enxus::Mesh>(vertices, indices, textures);
         m_Shader = Enxus::CreateRef<Enxus::Shader>(
-            "Sandbox/res/shaders/advanced-opengl/moving-vertex/basic.vert",
-            "Sandbox/res/shaders/advanced-opengl/moving-vertex/basic.frag");
+            "Sandbox/res/shaders/advanced-glsl/point.vert",
+            "Sandbox/res/shaders/advanced-glsl/point.frag");
 
         m_Shader->Bind();
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::scale(model, glm::vec3(3.0f));
         model = glm::rotate(model, glm::radians(30.0f), glm::vec3(1.0f, 0.0f, 0.0f));
         m_Shader->SetMat4("uModel", model);
+
+        GLCall(glEnable(GL_PROGRAM_POINT_SIZE));
     }
 
     TestTriangleStrip::~TestTriangleStrip()
@@ -62,6 +64,7 @@ namespace OpenGLTest
 
             m_Shader->SetInt("uFace", 1);
             m_AwesomeFace->Bind(1);
+
             m_VertexArray->Bind();
             m_IndexBuffer->Bind();
             // Enxus::Renderer::SetPolygonMode(Enxus::PolygonMode::LINE);
@@ -70,8 +73,13 @@ namespace OpenGLTest
             else
                 Enxus::Renderer::SetPolygonMode(Enxus::PolygonMode::FILL);
 
-            glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_INT, 0);
-            // Enxus::Renderer::Draw(m_VertexArray, m_IndexBuffer, m_Shader);
+            m_Shader->SetMat4("uModel", glm::mat4(1.0f));
+
+            GLCall(glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_INT, 0));
+
+            glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(2.0f, 0.0f, 0.0f));
+            m_Shader->SetMat4("uModel", model);
+            GLCall(glDrawElements(GL_POINTS, 4, GL_UNSIGNED_INT, 0));
         }
     }
 
