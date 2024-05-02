@@ -67,7 +67,7 @@ namespace Enxus
     {
         std::vector<VertexData> vertices = ProcessVertices(mesh);
         std::vector<unsigned int> indices = ProcessIndices(mesh);
-        std::vector<Ref<Texture2D>> texturesRef = ProcessTextures(mesh, scene);
+        std::vector<Ref<TextureMesh2D>> texturesRef = ProcessTextures(mesh, scene);
 
         return CreateRef<Mesh>(vertices, indices, texturesRef);
     }
@@ -126,9 +126,9 @@ namespace Enxus
         return indices;
     }
 
-    std::vector<Ref<Texture2D>> Model::ProcessTextures(aiMesh *mesh, const aiScene *scene)
+    std::vector<Ref<TextureMesh2D>> Model::ProcessTextures(aiMesh *mesh, const aiScene *scene)
     {
-        std::vector<Ref<Texture2D>> textures;
+        std::vector<Ref<TextureMesh2D>> textures;
         // unnecessary :
         // the check of the flag AI_SCENE_FLAGS_INCOMPLETE ensure that the object has at least one material
         // if (!(mesh->mMaterialIndex >= 0))
@@ -136,18 +136,18 @@ namespace Enxus
 
         aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
 
-        std::vector<Ref<Texture2D>> diffuseMaps = LoadMaterialTextures(material, aiTextureType_DIFFUSE);
+        std::vector<Ref<TextureMesh2D>> diffuseMaps = LoadMaterialTextures(material, aiTextureType_DIFFUSE);
         textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
 
-        std::vector<Ref<Texture2D>> specularMaps = LoadMaterialTextures(material, aiTextureType_SPECULAR);
+        std::vector<Ref<TextureMesh2D>> specularMaps = LoadMaterialTextures(material, aiTextureType_SPECULAR);
         textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 
         return textures;
     }
 
-    std::vector<Ref<Texture2D>> Model::LoadMaterialTextures(aiMaterial *mat, aiTextureType type)
+    std::vector<Ref<TextureMesh2D>> Model::LoadMaterialTextures(aiMaterial *mat, aiTextureType type)
     {
-        std::vector<Ref<Texture2D>> textures;
+        std::vector<Ref<TextureMesh2D>> textures;
         for (unsigned int i = 0; i < mat->GetTextureCount(type); i++)
         {
             aiString texPath;
@@ -168,12 +168,12 @@ namespace Enxus
             if (isTextureLoaded)
                 continue;
 
-            TextureData2D textureData;
+            TextureMesh2DData textureData;
             textureData.path = fullTexturePath;
             textureData.type = GetTextureType(type);
 
-            Ref<Texture2D>
-                texture = CreateRef<Texture2D>(textureData);
+            Ref<TextureMesh2D>
+                texture = CreateRef<TextureMesh2D>(textureData);
             textures.push_back(texture);
             m_LoadedTextures.push_back(texture);
         }

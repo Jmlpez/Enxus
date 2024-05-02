@@ -18,6 +18,7 @@ public:
 
 private:
     void HandleViewportResize();
+    void NoiseGenerationUI();
 
 private:
     glm::vec2 m_ViewportSize;
@@ -26,6 +27,8 @@ private:
 
     bool m_ShowGridFloor = false;
     bool m_IsWireframe = false;
+
+    Enxus::Scope<Enxus::Texture2D> m_NoiseTexture;
 
     Enxus::Ref<Enxus::Model> m_Box;
     Enxus::Scope<Grid> m_GridFloor;

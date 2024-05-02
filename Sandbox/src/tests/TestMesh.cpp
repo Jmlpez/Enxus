@@ -14,7 +14,7 @@ namespace OpenGLTest
         std::vector<unsigned int> indices{0, 1, 3,
                                           1, 2, 3};
 
-        std::vector<Enxus::TextureData2D> textures{
+        std::vector<Enxus::TextureMesh2DData> textures{
             {"Sandbox/res/images/container.jpg", Enxus::TextureType::DIFFUSE},
             {"Sandbox/res/images/awesomeface.png", Enxus::TextureType::DIFFUSE},
         };

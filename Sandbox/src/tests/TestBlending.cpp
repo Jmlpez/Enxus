@@ -53,7 +53,7 @@ namespace OpenGLTest
             {glm::vec3(-0.5f, 0.5f, -0.5f), glm::vec2(0.0f, 1.0), glm::vec3(0.0f)},
         };
 
-        std::vector<Enxus::TextureData2D> textures{
+        std::vector<Enxus::TextureMesh2DData> textures{
             {"Sandbox/res/images/marble.jpg", Enxus::TextureType::DIFFUSE},
         };
 
@@ -67,7 +67,7 @@ namespace OpenGLTest
             {glm::vec3(-5.0f, -0.5f, -5.0f), glm::vec2(0.0f, 2.0f), glm::vec3(0.0f)},
             {glm::vec3(5.0f, -0.5f, -5.0f), glm::vec2(2.0f, 2.0), glm::vec3(0.0f)},
         };
-        std::vector<Enxus::TextureData2D> texturesFloor{
+        std::vector<Enxus::TextureMesh2DData> texturesFloor{
             {"Sandbox/res/images/metal.png", Enxus::TextureType::DIFFUSE},
         };
         m_Floor = Enxus::CreateRef<Enxus::Mesh>(vertices, texturesFloor);
@@ -82,7 +82,7 @@ namespace OpenGLTest
             {glm::vec3(1.0f, 0.5f, 0.0f), glm::vec2(1.0f, 1.0f), glm::vec3(0.0f)},
         };
 
-        std::vector<Enxus::TextureData2D> grassTextures{{
+        std::vector<Enxus::TextureMesh2DData> grassTextures{{
             "Sandbox/res/images/window.png",
             Enxus::TextureType::DIFFUSE,
         }};

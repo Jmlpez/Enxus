@@ -91,5 +91,9 @@ namespace Enxus
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
+    void ImGuiLayer::OnImGuiRender()
+    {
+        // ImGui::ShowDemoWindow();
+    }
 
 }

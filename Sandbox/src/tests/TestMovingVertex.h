@@ -31,7 +31,7 @@ namespace OpenGLTest
         float m_WaveSpeed = 2.0f;
         bool m_IsAnimatingVertices = true;
 
-        Enxus::Ref<Enxus::Texture2D> m_Container, m_AwesomeFace;
+        Enxus::Ref<Enxus::TextureMesh2D> m_Container, m_AwesomeFace;
         Enxus::Ref<Enxus::Shader> m_Shader;
     };
 }

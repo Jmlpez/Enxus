@@ -16,7 +16,7 @@ HelloBoxLayer::HelloBoxLayer()
     std::vector<unsigned int> indices{0, 1, 3,
                                       1, 2, 3};
 
-    std::vector<Enxus::TextureData2D> textures{
+    std::vector<Enxus::TextureMesh2DData> textures{
         {"Sandbox/res/images/container.jpg", Enxus::TextureType::DIFFUSE},
         {"Sandbox/res/images/awesomeface.png", Enxus::TextureType::DIFFUSE},
     };
@@ -34,7 +34,7 @@ HelloBoxLayer::HelloBoxLayer()
     m_CameraController = Enxus::CreateScope<Enxus::FreeCameraController>((float)window.GetWidth() / (float)window.GetHeight());
 
     //----------------- EXAMPLE TEXTURE -------------------//
-    m_ExampleTexture = Enxus::CreateRef<Enxus::Texture2D>("Sandbox/res/images/container.jpg", Enxus::TextureType::DIFFUSE);
+    m_ExampleTexture = Enxus::CreateRef<Enxus::TextureMesh2D>("Sandbox/res/images/container.jpg", Enxus::TextureType::DIFFUSE);
 
     //----------------- FRAMEBUFFER -------------------//
     Enxus::FramebufferSpecification fbspec;

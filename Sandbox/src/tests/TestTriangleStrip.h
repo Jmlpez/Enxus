@@ -29,7 +29,7 @@ namespace OpenGLTest
 
         std::vector<Enxus::VertexData> m_Vertices;
 
-        Enxus::Ref<Enxus::Texture2D> m_Container, m_AwesomeFace;
+        Enxus::Ref<Enxus::TextureMesh2D> m_Container, m_AwesomeFace;
         Enxus::Ref<Enxus::Shader> m_Shader;
     };
 }

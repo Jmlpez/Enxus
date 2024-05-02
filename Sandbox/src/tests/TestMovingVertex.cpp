@@ -28,8 +28,8 @@ namespace OpenGLTest
 
         m_IndexBuffer = Enxus::CreateRef<Enxus::IndexBuffer>(&indices[0], sizeof(indices));
 
-        m_Container = Enxus::CreateRef<Enxus::Texture2D>("Sandbox/res/images/container.jpg", Enxus::TextureType::DIFFUSE);
-        m_AwesomeFace = Enxus::CreateRef<Enxus::Texture2D>("Sandbox/res/images/awesomeface.png", Enxus::TextureType::DIFFUSE);
+        m_Container = Enxus::CreateRef<Enxus::TextureMesh2D>("Sandbox/res/images/container.jpg", Enxus::TextureType::DIFFUSE);
+        m_AwesomeFace = Enxus::CreateRef<Enxus::TextureMesh2D>("Sandbox/res/images/awesomeface.png", Enxus::TextureType::DIFFUSE);
 
         // m_Plane = Enxus::CreateRef<Enxus::Mesh>(vertices, indices, textures);
         m_Shader = Enxus::CreateRef<Enxus::Shader>(

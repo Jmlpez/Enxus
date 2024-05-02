@@ -6,7 +6,7 @@ namespace Enxus
 {
 
     Mesh::Mesh(std::vector<VertexData> vertices,
-               std::vector<TextureData2D> textures) : m_Vertices(vertices), m_MeshTexturesData(textures)
+               std::vector<TextureMesh2DData> textures) : m_Vertices(vertices), m_MeshTexturesData(textures)
     {
         CreateBuffers();
         CreateTextures();
@@ -15,7 +15,7 @@ namespace Enxus
     Mesh::Mesh(
         std::vector<VertexData> vertices,
         std::vector<unsigned int> indices,
-        std::vector<TextureData2D> textures)
+        std::vector<TextureMesh2DData> textures)
         : m_Vertices(vertices), m_Indices(indices), m_MeshTexturesData(textures)
     {
         CreateBuffers();
@@ -25,7 +25,7 @@ namespace Enxus
     Mesh::Mesh(
         std::vector<VertexData> vertices,
         std::vector<unsigned int> indices,
-        std::vector<Ref<Texture2D>> texturesRef)
+        std::vector<Ref<TextureMesh2D>> texturesRef)
         : m_Vertices(vertices), m_Indices(indices), m_Textures(texturesRef)
     {
         CreateBuffers();
@@ -71,7 +71,7 @@ namespace Enxus
     {
         for (auto &[path, type] : m_MeshTexturesData)
         {
-            m_Textures.push_back(CreateRef<Texture2D>(path, type));
+            m_Textures.push_back(CreateRef<TextureMesh2D>(path, type));
         }
     }
 }

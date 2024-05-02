@@ -23,20 +23,20 @@ namespace Enxus
         void ProcessNode(aiNode *node, const aiScene *scene);
         Ref<Mesh> ProcessMesh(aiMesh *mesh, const aiScene *scene);
 
-        std::vector<Ref<Texture2D>> LoadMaterialTextures(aiMaterial *mat, aiTextureType type);
+        std::vector<Ref<TextureMesh2D>> LoadMaterialTextures(aiMaterial *mat, aiTextureType type);
 
         std::vector<VertexData> ProcessVertices(aiMesh *mesh);
         std::vector<unsigned int> ProcessIndices(aiMesh *mesh);
-        std::vector<Ref<Texture2D>> ProcessTextures(aiMesh *mesh, const aiScene *scene);
+        std::vector<Ref<TextureMesh2D>> ProcessTextures(aiMesh *mesh, const aiScene *scene);
 
         static TextureType GetTextureType(aiTextureType type);
+
     private:
         std::vector<Ref<Mesh>> m_Meshes;
         std::string m_ModelPath, m_ModelDirPath;
 
         // an optimization to avoid load some previously loaded texture
-        std::vector<Ref<Texture2D>> m_LoadedTextures;
-
+        std::vector<Ref<TextureMesh2D>> m_LoadedTextures;
     };
 }
 #endif

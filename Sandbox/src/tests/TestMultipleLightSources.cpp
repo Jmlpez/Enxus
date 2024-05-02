@@ -67,8 +67,8 @@ namespace OpenGLTest
 
         // //----------------- TEXTURES -------------------//
 
-        containerDiffuse = Enxus::CreateRef<Enxus::Texture2D>("Sandbox/res/images/container2.png");
-        containerSpecular = Enxus::CreateRef<Enxus::Texture2D>("Sandbox/res/images/container2_specular.png");
+        containerDiffuse = Enxus::CreateRef<Enxus::TextureMesh2D>("Sandbox/res/images/container2.png");
+        containerSpecular = Enxus::CreateRef<Enxus::TextureMesh2D>("Sandbox/res/images/container2_specular.png");
 
         // //----------------- SHADERS -------------------//
 

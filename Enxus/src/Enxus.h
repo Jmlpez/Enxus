@@ -20,6 +20,7 @@
 #include "Enxus/Renderer/Camera.h"
 #include "Enxus/Renderer/FreeCameraController.h"
 #include "Enxus/Renderer/Texture2D.h"
+#include "Enxus/Renderer/TextureMesh2D.h"
 #include "Enxus/Renderer/VertexBuffer.h"
 #include "Enxus/Renderer/IndexBuffer.h"
 #include "Enxus/Renderer/VertexArray.h"

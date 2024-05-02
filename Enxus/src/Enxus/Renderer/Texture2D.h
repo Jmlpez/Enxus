@@ -6,51 +6,29 @@
 namespace Enxus
 {
 
-    enum TextureType
-    {
-        DIFFUSE,
-        SPECULAR,
-        NORMAL,
-        // EMISSION,
-        // Albedo, Metallic, Roughness etc
-    };
-
-    struct TextureData2D
-    {
-        std::string path;
-        TextureType type;
-        TextureData2D(const std::string &_path, TextureType _type) : path(_path), type(_type) {}
-        TextureData2D() : path(""), type(TextureType::DIFFUSE) {}
-    };
-
     class Texture2D
     {
 
     public:
-        Texture2D(const TextureData2D &textureData);
-        Texture2D(const std::string &texturePath, TextureType type = TextureType::DIFFUSE);
+        Texture2D(uint32_t width, uint32_t height);
         ~Texture2D();
 
-        unsigned int GetRendererId() const { return m_RendererId; }
+        inline uint32_t GetWidth() const { return m_Width; }
+        inline uint32_t GetHeight() const { return m_Height; }
 
-        void Bind(unsigned int slot = 0) const;
+        void SetData(void *data, uint32_t width, uint32_t height);
+
+        void Bind(uint32_t slot = 0) const;
         void Unbind() const;
 
-        const std::string &GetPath() const { return m_TextureData.path; }
-        unsigned int GetType() const { return m_TextureData.type; }
-
-        void SetType(TextureType type) { m_TextureData.type = type; }
+        uint32_t GetRendererId() const { return m_RendererId; }
 
     private:
-        void CreateTexture2D();
-        void LoadImage();
+        void CreateTexture();
 
     private:
-        unsigned int m_RendererId;
-        int m_Width, m_Height, m_NrChannels;
-        // unsigned char *m_LocalBuffer; // texture data
-
-        TextureData2D m_TextureData;
+        uint32_t m_RendererId;
+        uint32_t m_Width, m_Height;
     };
 }
 

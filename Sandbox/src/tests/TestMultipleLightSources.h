@@ -17,7 +17,7 @@ namespace OpenGLTest
     private:
         Enxus::Ref<Enxus::Shader> objShader, lightSourceShader;
         Enxus::Ref<Enxus::VertexArray> lightSourceVAO, objVAO;
-        Enxus::Ref<Enxus::Texture2D> containerDiffuse, containerSpecular;
+        Enxus::Ref<Enxus::TextureMesh2D> containerDiffuse, containerSpecular;
         Enxus::Ref<Enxus::VertexBuffer> objVBO;
 
         glm::vec3 cubePositions[10] = {

@@ -34,9 +34,14 @@ EditorLayer::EditorLayer()
 
     //----------------- TERRAIN -------------------//
     m_Terrain = Enxus::CreateScope<HeightMapTerrain>();
-    m_Terrain->SetHeightMap("TerrainGen/assets/images/heightmaps/simple.png");
+    m_Terrain->SetHeightMap("TerrainGen/assets/images/heightmaps/quad.png");
     m_TerrainShader->Bind();
     m_TerrainShader->SetMat4("uModel", glm::mat4(1.0f));
+
+    //----------------- Noise Texture -------------------//
+    m_NoiseTexture = Enxus::CreateScope<Enxus::Texture2D>(1, 1);
+    uint32_t whiteTex = 0xffffffff;
+    m_NoiseTexture->SetData(&whiteTex, 1, 1);
 }
 
 EditorLayer::~EditorLayer()
@@ -95,24 +100,22 @@ void EditorLayer::OnUpdate(Enxus::Timestep ts)
             Enxus::Renderer::Draw(m_GridFloor->GetVertexArray(), m_GridFloor->GetIndexBuffer(), m_GridShader);
             Enxus::Renderer::SetPolygonMode(Enxus::PolygonMode::FILL); // Restore state
         }
-        {
-        }
         // Draw Box
         {
             Enxus::Renderer::DrawModel(m_Box, m_Shader);
 
             // Enxus::Renderer::SetPolygonMode(Enxus::PolygonMode::LINE); // Draw the lines
             // Enxus::Renderer::Draw(m_Terrain->GetVertexArray(), m_Terrain->GetIndexBuffer(), m_TerrainShader);
-            m_Terrain->GetVertexArray()->Bind();
-            m_Terrain->GetIndexBuffer()->Bind();
-            m_TerrainShader->Bind();
-            const uint32_t numOfStrips = m_Terrain->GetHeight() - 1;
-            const uint32_t numOfVertPerStrip = m_Terrain->GetWidth() * 2;
-            for (unsigned int strip = 0; strip < numOfStrips; strip++)
-            {
-                size_t stripOffset = strip * numOfVertPerStrip * sizeof(unsigned int);
-                glDrawElements(GL_TRIANGLE_STRIP, numOfVertPerStrip, GL_UNSIGNED_INT, (void *)stripOffset);
-            }
+            // m_Terrain->GetVertexArray()->Bind();
+            // m_Terrain->GetIndexBuffer()->Bind();
+            // m_TerrainShader->Bind();
+            // const uint32_t numOfStrips = m_Terrain->GetHeight() - 1;
+            // const uint32_t numOfVertPerStrip = m_Terrain->GetWidth() * 2;
+            // for (unsigned int strip = 0; strip < numOfStrips; strip++)
+            // {
+            //     size_t stripOffset = strip * numOfVertPerStrip * sizeof(unsigned int);
+            //     glDrawElements(GL_TRIANGLE_STRIP, numOfVertPerStrip, GL_UNSIGNED_INT, (void *)stripOffset);
+            // }
             // Enxus::Renderer::SetPolygonMode(Enxus::PolygonMode::FILL); // Draw the lines
         }
         m_Framebuffer->Unbind();
@@ -221,6 +224,20 @@ void EditorLayer::OnImGuiRender()
         ImGui::Text("App average (%.1f FPS)", 1.0f / Enxus::Application::Get().GetTimestep());
         ImGui::End();
     }
+
+    NoiseGenerationUI();
+
+    ImGui::End();
+}
+
+void EditorLayer::NoiseGenerationUI()
+{
+    // Noise Generation Properties Window
+    ImGui::Begin("Noise Generation");
+    //
+    size_t textureID = m_NoiseTexture->GetRendererId();
+    // ImGui::Image((void *)textureID, ImVec2(m_NoiseTexture->GetWidth(), m_NoiseTexture->GetHeight()), ImVec2{0, 1}, ImVec2{1, 0});
+    ImGui::Image((void *)textureID, ImVec2(100, 100), ImVec2{0, 1}, ImVec2{1, 0});
 
     ImGui::End();
 }

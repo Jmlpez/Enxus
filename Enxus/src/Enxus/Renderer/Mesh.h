@@ -5,7 +5,7 @@
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 #include "VertexArray.h"
-#include "Texture2D.h"
+#include "TextureMesh2D.h"
 #include "glm/glm.hpp"
 
 namespace Enxus
@@ -27,9 +27,9 @@ namespace Enxus
     {
 
     public:
-        Mesh(std::vector<VertexData> vertices, std::vector<TextureData2D> textures);
-        Mesh(std::vector<VertexData> vertices, std::vector<unsigned int> indices, std::vector<TextureData2D> textures);
-        Mesh(std::vector<VertexData> vertices, std::vector<unsigned int> indices, std::vector<Ref<Texture2D>> texturesRef);
+        Mesh(std::vector<VertexData> vertices, std::vector<TextureMesh2DData> textures);
+        Mesh(std::vector<VertexData> vertices, std::vector<unsigned int> indices, std::vector<TextureMesh2DData> textures);
+        Mesh(std::vector<VertexData> vertices, std::vector<unsigned int> indices, std::vector<Ref<TextureMesh2D>> texturesRef);
         ~Mesh();
 
         void CreateBuffers();
@@ -37,7 +37,7 @@ namespace Enxus
 
         const std::vector<VertexData> &GetVertices() const { return m_Vertices; }
         const std::vector<unsigned int> &GetIndices() const { return m_Indices; }
-        const std::vector<Ref<Texture2D>> &GetTextures() const { return m_Textures; }
+        const std::vector<Ref<TextureMesh2D>> &GetTextures() const { return m_Textures; }
 
         Ref<VertexArray> GetVertexArray() const { return m_VertexArrayObject; }
         Ref<VertexBuffer> GetVertexBuffer() const { return m_VertexBufferObject; }
@@ -53,9 +53,9 @@ namespace Enxus
 
         std::vector<VertexData> m_Vertices;
         std::vector<unsigned int> m_Indices;
-        std::vector<TextureData2D> m_MeshTexturesData;
+        std::vector<TextureMesh2DData> m_MeshTexturesData;
 
-        std::vector<Ref<Texture2D>> m_Textures;
+        std::vector<Ref<TextureMesh2D>> m_Textures;
     };
 }
 #endif
