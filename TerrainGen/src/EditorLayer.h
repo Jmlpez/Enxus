@@ -4,6 +4,8 @@
 #include "Enxus.h"
 #include "Grid.h"
 #include "HeightMapTerrain.h"
+#include "TerrainMesh.h"
+#include "NoiseMapGenerator.h"
 
 class EditorLayer : public Enxus::Layer
 {
@@ -18,7 +20,7 @@ public:
 
 private:
     void HandleViewportResize();
-    void NoiseGenerationUI();
+    void NoiseGeneratorPanelUI();
 
 private:
     glm::vec2 m_ViewportSize;
@@ -28,7 +30,14 @@ private:
     bool m_ShowGridFloor = false;
     bool m_IsWireframe = false;
 
-    Enxus::Scope<Enxus::Texture2D> m_NoiseTexture;
+    // Enxus::Scope<Enxus::Texture2D> m_NoiseTexture;
+
+    Enxus::Scope<TerrainMesh> m_TerrainMesh;
+
+    Enxus::Scope<NoiseMapGenerator> m_NoiseMapGen;
+
+    float m_Frequency = 0.025f, m_Lacuranity = 2.0f;
+    float m_Amplitude = 2.0f, m_Persistance = 0.5f;
 
     Enxus::Ref<Enxus::Model> m_Box;
     Enxus::Scope<Grid> m_GridFloor;

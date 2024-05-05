@@ -33,15 +33,16 @@ EditorLayer::EditorLayer()
     m_GridShader->SetMat4("uModel", m_GridFloor->GetModel());
 
     //----------------- TERRAIN -------------------//
-    m_Terrain = Enxus::CreateScope<HeightMapTerrain>();
-    m_Terrain->SetHeightMap("TerrainGen/assets/images/heightmaps/quad.png");
+    m_TerrainMesh = Enxus::CreateScope<TerrainMesh>(250, 250);
     m_TerrainShader->Bind();
     m_TerrainShader->SetMat4("uModel", glm::mat4(1.0f));
 
     //----------------- Noise Texture -------------------//
-    m_NoiseTexture = Enxus::CreateScope<Enxus::Texture2D>(1, 1);
-    uint32_t whiteTex = 0xffffffff;
-    m_NoiseTexture->SetData(&whiteTex, 1, 1);
+    // m_NoiseTexture = Enxus::CreateScope<Enxus::Texture2D>(1, 1);
+    // uint32_t whiteTex = 0xffffffff;
+    // m_NoiseTexture->SetData(&whiteTex, 1, 1);
+    //----------------- Noise Generator -------------------//
+    m_NoiseMapGen = Enxus::CreateScope<NoiseMapGenerator>(500, 500);
 }
 
 EditorLayer::~EditorLayer()
@@ -104,19 +105,18 @@ void EditorLayer::OnUpdate(Enxus::Timestep ts)
         {
             Enxus::Renderer::DrawModel(m_Box, m_Shader);
 
-            // Enxus::Renderer::SetPolygonMode(Enxus::PolygonMode::LINE); // Draw the lines
-            // Enxus::Renderer::Draw(m_Terrain->GetVertexArray(), m_Terrain->GetIndexBuffer(), m_TerrainShader);
-            // m_Terrain->GetVertexArray()->Bind();
-            // m_Terrain->GetIndexBuffer()->Bind();
-            // m_TerrainShader->Bind();
-            // const uint32_t numOfStrips = m_Terrain->GetHeight() - 1;
-            // const uint32_t numOfVertPerStrip = m_Terrain->GetWidth() * 2;
-            // for (unsigned int strip = 0; strip < numOfStrips; strip++)
-            // {
-            //     size_t stripOffset = strip * numOfVertPerStrip * sizeof(unsigned int);
-            //     glDrawElements(GL_TRIANGLE_STRIP, numOfVertPerStrip, GL_UNSIGNED_INT, (void *)stripOffset);
-            // }
-            // Enxus::Renderer::SetPolygonMode(Enxus::PolygonMode::FILL); // Draw the lines
+            Enxus::Renderer::SetPolygonMode(Enxus::PolygonMode::FILL); // Draw the lines
+            m_TerrainMesh->GetVertexArray()->Bind();
+            m_TerrainMesh->GetIndexBuffer()->Bind();
+            m_TerrainShader->Bind();
+            const uint32_t numOfStrips = m_TerrainMesh->GetHeight() - 1;
+            const uint32_t numOfVertPerStrip = m_TerrainMesh->GetWidth() * 2;
+            for (unsigned int strip = 0; strip < numOfStrips; strip++)
+            {
+                size_t stripOffset = strip * numOfVertPerStrip * sizeof(unsigned int);
+                glDrawElements(GL_TRIANGLE_STRIP, numOfVertPerStrip, GL_UNSIGNED_INT, (void *)stripOffset);
+            }
+            Enxus::Renderer::SetPolygonMode(Enxus::PolygonMode::FILL); // Draw the lines
         }
         m_Framebuffer->Unbind();
     }
@@ -225,19 +225,50 @@ void EditorLayer::OnImGuiRender()
         ImGui::End();
     }
 
-    NoiseGenerationUI();
+    NoiseGeneratorPanelUI();
 
     ImGui::End();
 }
 
-void EditorLayer::NoiseGenerationUI()
+void EditorLayer::NoiseGeneratorPanelUI()
 {
     // Noise Generation Properties Window
-    ImGui::Begin("Noise Generation");
+    ImGui::Begin("Noise Generator Panel");
     //
-    size_t textureID = m_NoiseTexture->GetRendererId();
-    // ImGui::Image((void *)textureID, ImVec2(m_NoiseTexture->GetWidth(), m_NoiseTexture->GetHeight()), ImVec2{0, 1}, ImVec2{1, 0});
-    ImGui::Image((void *)textureID, ImVec2(100, 100), ImVec2{0, 1}, ImVec2{1, 0});
+    m_NoiseMapGen->SetAmplitude(m_Amplitude);
+    m_NoiseMapGen->SetLacuranity(m_Lacuranity);
+    m_NoiseMapGen->SetPersistance(m_Persistance);
+
+    {
+        // Noise Texture Image
+        Enxus::Ref<Enxus::Texture2D> texture = m_NoiseMapGen->GetNoiseMapTexture();
+        size_t textureId = texture->GetRendererId();
+        uint32_t width = texture->GetWidth();
+        uint32_t height = texture->GetHeight();
+        ImGui::Image((void *)textureId, ImVec2(width, height), ImVec2{0, 1}, ImVec2{1, 0});
+    }
+
+    if (ImGui::DragFloat("Frequency", &m_Frequency, 0.001f, 0.005f, 0.1f))
+    {
+        m_NoiseMapGen->SetFrequency(m_Frequency);
+        // m_TerrainMesh->UpdateNoise()
+        std::vector<std::vector<float>> heightMap;
+        for (uint32_t j = 0; j < m_NoiseMapGen->GetHeight(); j++)
+        {
+            std::vector<float> vect;
+            vect.reserve(m_NoiseMapGen->GetWidth());
+            for (uint32_t i = 0; i < m_NoiseMapGen->GetHeight(); i++)
+            {
+                vect.emplace_back(m_NoiseMapGen->At(i, j));
+            }
+            heightMap.emplace_back(vect);
+        }
+
+        m_TerrainMesh->UpdateHeightFromNoise(heightMap);
+    }
+    ImGui::DragFloat("Amplitude", &m_Amplitude, 0.01f, 1.0f, 3.0f);
+    ImGui::DragFloat("Lacuranity", &m_Lacuranity, 0.01f, 1.0f, 2.0f);
+    ImGui::DragFloat("Persistance", &m_Persistance, 0.01f, 0.05f, 1.0f);
 
     ImGui::End();
 }

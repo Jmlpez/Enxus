@@ -97,6 +97,8 @@ run-terrain:
 pepe: pepe.cpp
 	g++ -std=gnu++17 -Wall -Wextra pepe.cpp -o pepe && ./pepe
 
+pch: 
+	$(CXX) $(CXXFLAGS) -c $(PCH_SRC) -o $(PCH_DIR)/pch.h.gch
 
 clean:
 	rm -fr $(BIN_DIR)/*
