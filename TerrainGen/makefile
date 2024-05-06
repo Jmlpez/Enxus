@@ -35,6 +35,8 @@ CXXFLAGS = -std=gnu++17 $(DEBUG_FLAGS) -Wall -Wextra
 # TerrainGen sources dir
 SRC_DIR = src
 CORE_DIR = $(SRC_DIR)/Core
+FAST_NOISE_LITE_DIR = $(SRC_DIR)/FastNoiseLite
+PANELS_DIR = $(SRC_DIR)/Panels
 
 # TerrainGen bin dir
 BIN_DIR = bin
@@ -44,9 +46,10 @@ BIN_DIR = bin
 # TerrainGen sources
 SOURCES = $(wildcard $(SRC_DIR)/*.cpp)
 SOURCES += $(wildcard $(CORE_DIR)/*.cpp)
+SOURCES += $(wildcard $(PANELS_DIR)/*.cpp)
 
 # Include flags
-TERRAIN_GEN_FLAGS = -I$(CORE_DIR)
+TERRAIN_GEN_FLAGS = -I$(CORE_DIR) -I$(PANELS_DIR) -I$(FAST_NOISE_LITE_DIR)
 
 # OBJ Files
 OBJS = $(addprefix $(BIN_DIR)/, $(addsuffix .o, $(basename $(notdir $(SOURCES)))))
@@ -57,9 +60,13 @@ all: $(OBJS)
 # %.o match %.cpp and match %.h (e.g: utils.o utils.cpp utils.h)
 # headers files are added as prerequisites to watch changes in those files too
 
-# Build utils & extras
+# Build Core
 $(BIN_DIR)/%.o: $(CORE_DIR)/%.cpp $(CORE_DIR)/%.h
 	$(CXX) $(CXXFLAGS) $(PCH_FLAGS) -c $< -o $@ $(ENXUS_INCLUDE_FLAGS)  $(VENDOR_FLAGS) $(OPENGL_FLAGS)
+
+# Build Panels
+$(BIN_DIR)/%.o: $(PANELS_DIR)/%.cpp $(PANELS_DIR)/%.h
+	$(CXX) $(CXXFLAGS) $(PCH_FLAGS) -c $< -o $@ $(ENXUS_INCLUDE_FLAGS) $(TERRAIN_GEN_FLAGS) $(VENDOR_FLAGS) $(OPENGL_FLAGS)
 
 # Build Terrain Generator
 $(BIN_DIR)/%.o: $(SRC_DIR)/%.cpp $(SRC_DIR)/%.h
