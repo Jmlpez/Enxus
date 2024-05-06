@@ -17,6 +17,7 @@ namespace Enxus
         inline uint32_t GetHeight() const { return m_Height; }
 
         void SetData(void *data, uint32_t width, uint32_t height);
+        void Resize(uint32_t width, uint32_t height);
 
         void Bind(uint32_t slot = 0) const;
         void Unbind() const;

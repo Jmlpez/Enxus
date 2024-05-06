@@ -5,7 +5,7 @@
 namespace Enxus
 {
     Texture2D::Texture2D(uint32_t width, uint32_t height)
-        : m_Width(width), m_Height(height)
+        : m_RendererId(0), m_Width(width), m_Height(height)
     {
         CreateTexture();
     }
@@ -17,6 +17,11 @@ namespace Enxus
 
     void Texture2D::CreateTexture()
     {
+        if (m_RendererId)
+        {
+            GLCall(glDeleteTextures(1, &m_RendererId));
+        }
+
         GLCall(glGenTextures(1, &m_RendererId));
 
         GLCall(glActiveTexture(GL_TEXTURE0));
@@ -34,6 +39,8 @@ namespace Enxus
 
     void Texture2D::SetData(void *data, uint32_t width, uint32_t height)
     {
+        if (width <= 0 || height <= 0)
+            return;
         Bind();
         GLCall(glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data));
     }
@@ -46,5 +53,14 @@ namespace Enxus
     void Texture2D::Unbind() const
     {
         GLCall(glBindTexture(GL_TEXTURE_2D, 0));
+    }
+
+    void Texture2D::Resize(uint32_t width, uint32_t height)
+    {
+        if (width <= 0 || height <= 0)
+            return;
+        m_Width = width;
+        m_Height = height;
+        CreateTexture();
     }
 }
