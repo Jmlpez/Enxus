@@ -25,22 +25,38 @@ TerrainMesh::~TerrainMesh()
 {
 }
 
-void TerrainMesh::SetNoiseMap(const std::vector<float> &noiseMap)
+void TerrainMesh::SetHeightScaleFactor(float heightScale)
 {
-    // Add a loggin system with asserts and macros
-    // ASSERT(noiseMap.size() != m_Width * m_Height);
-    // asserts are slow so keep it with the macros !
+    m_HeightScale = heightScale;
+
+    if (m_NoiseMap.empty())
+        return;
+
     for (uint32_t i = 0; i < m_Height; i++)
     {
         for (uint32_t j = 0; j < m_Width; j++)
         {
             uint32_t vertexIndex = i * m_Width + j;
-            // uint32_t noiseMapIndex = i * noiseMapWidth + j;
-            glm::vec3 position;
-            position.x = m_Vertices[vertexIndex].x;
-            position.y = noiseMap[vertexIndex] * m_HeightScale;
-            position.z = m_Vertices[vertexIndex].z;
-            m_Vertices[vertexIndex] = position;
+            float newYPos = m_NoiseMap[vertexIndex] * m_HeightScale;
+            m_Vertices[vertexIndex].y = newYPos;
+        }
+    }
+    m_VertexBufferObject->SetData(&m_Vertices[0], m_Vertices.size() * sizeof(glm::vec3));
+}
+
+void TerrainMesh::SetNoiseMap(const std::vector<float> &noiseMap)
+{
+    // Add a loggin system with asserts and macros
+    // ASSERT(noiseMap.size() != m_Width * m_Height);
+    // asserts are slow so keep it with the macros !
+    m_NoiseMap = std::move(noiseMap);
+    for (uint32_t i = 0; i < m_Height; i++)
+    {
+        for (uint32_t j = 0; j < m_Width; j++)
+        {
+            uint32_t vertexIndex = i * m_Width + j;
+            float newYPos = m_NoiseMap[vertexIndex] * m_HeightScale;
+            m_Vertices[vertexIndex].y = newYPos;
         }
     }
     m_VertexBufferObject->SetData(&m_Vertices[0], m_Vertices.size() * sizeof(glm::vec3));

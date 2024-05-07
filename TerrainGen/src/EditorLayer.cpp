@@ -167,6 +167,10 @@ void EditorLayer::OnImGuiRender()
         ImGui::Begin("Menu");
         // ImGui::Checkbox("Grid Floor", &m_ShowGridFloor);
         ImGui::Checkbox("Wireframe Mode", &m_IsWireframe);
+        if (ImGui::DragFloat("Height", &m_HeightScale, 0.1f, 0.0f, 15.0f))
+        {
+            m_TerrainMesh->SetHeightScaleFactor(m_HeightScale);
+        }
         // using size_t (aka unsigned long) to remove warning
         // size_t textureId = m_ExampleTexture->GetRendererId();
         ImGui::End();
