@@ -6,6 +6,7 @@
 #include "HeightMapTerrain.h"
 #include "TerrainMesh.h"
 #include "NoiseMapGenerator.h"
+#include "NoiseEditorPanel.h"
 
 class EditorLayer : public Enxus::Layer
 {
@@ -20,31 +21,32 @@ public:
 
 private:
     void HandleViewportResize();
-    void NoiseGeneratorPanelUI();
 
 private:
+    // Editor viewport options
     glm::vec2 m_ViewportSize;
     bool m_IsViewportFocused = false;
     bool m_IsViewportHovered = false;
 
-    bool m_ShowGridFloor = false;
+    // Scene options
     bool m_IsWireframe = false;
 
-    // Enxus::Scope<Enxus::Texture2D> m_NoiseTexture;
-
+    // Terrain Mesh
     Enxus::Scope<TerrainMesh> m_TerrainMesh;
 
-    Enxus::Scope<NoiseMapGenerator> m_NoiseMapGen;
+    // Panels
+    Enxus::Scope<NoiseEditorPanel> m_NoiseEditorPanel;
 
-    float m_Frequency = 0.025f, m_Lacuranity = 2.0f;
-    float m_Amplitude = 2.0f, m_Persistance = 0.5f;
-
+    // Models
     Enxus::Ref<Enxus::Model> m_Box;
-    Enxus::Scope<Grid> m_GridFloor;
-    Enxus::Scope<HeightMapTerrain> m_Terrain;
 
-    Enxus::Ref<Enxus::Shader> m_Shader, m_GridShader, m_TerrainShader;
+    // Shaders
+    Enxus::Ref<Enxus::Shader> m_Shader, m_TerrainShader;
+
+    // Camera
     Enxus::Scope<Enxus::FreeCameraController> m_CameraController;
+
+    // Framebuffers
     Enxus::Scope<Enxus::Framebuffer> m_Framebuffer;
 };
 #endif
