@@ -13,45 +13,49 @@ public:
 
     void OnImGuiRender();
 
-    inline bool IsUpdated() { return m_IsNewTexture; }
-    inline uint32_t GetTextureWidth() { return (uint32_t)m_TextureData.TexSizeGenX; }
-    inline uint32_t GetTextureHeight() { return (uint32_t)m_TextureData.TexSizeGenY; }
+    void SetSize(uint32_t width, uint32_t height){};
+
+    inline bool HasUpdated() { return m_NoiseUpdateFlag; }
+    inline uint32_t GetWidth() { return (uint32_t)m_GeneralNoise.Width; }
+    inline uint32_t GetHeight() { return (uint32_t)m_GeneralNoise.Height; }
     inline const std::vector<float> &GetNoiseMap() const { return m_NoiseMapArray; }
 
 private:
-    void UpdateTexture(bool newPreview);
+    void UpdateNoiseMap(bool newPreview);
 
 private:
     FastNoiseLite m_Fnl;
     FastNoiseLite m_FnlWarp;
 
-    int m_PreviewSize[2] = {250, 250};
-    bool m_PreviewDomainWarp = false;
-    bool m_PreviewAutoSize = false;
-
     // To check when update the texture image
-    bool m_IsNewTexture;
+    bool m_NoiseUpdateFlag = true;
+
+    struct NoiseTexturePreview
+    {
+        // this is the size of the generated texture using the noise
+        static const int s_TextureGeneratedWidth;
+        static const int s_TextureGeneratedHeight;
+
+        bool IsAutoSize = true;
+        float ColorTexMin = -1.0f;
+        float ColorTexMax = 1.0f;
+        // this is the display size(a.k.a the size in ImGui window)
+        int ImGuiWidth;
+        int ImGuiHeight;
+        Enxus::Scope<Enxus::Texture2D> Texture;
+
+    } m_NoisePreviewData;
 
     // its going to be used only in this class
-    unsigned char *m_PreviewPixelArray = nullptr;
 
     // will be exported to be used in the editor
+    //(if not, i would had been used a raw array)
     std::vector<float> m_NoiseMapArray;
-
-    Enxus::Scope<Enxus::Texture2D> m_NoiseTexture;
-
-    struct NoiseTextureData
-    {
-        int ImGuiTexSize[2] = {0, 0};
-        int TexSizeGenX;
-        int TexSizeGenY;
-        float ColorTexMin = -1;
-        float ColorTexMax = 1;
-
-    } m_TextureData;
 
     struct GeneralNoiseData
     {
+        int Width;
+        int Height;
         int NoiseType = 0;
         int Seed = 1337;
         float Frequency = 0.01f;
