@@ -57,7 +57,7 @@ namespace Enxus
 
     void Texture2D::Resize(uint32_t width, uint32_t height)
     {
-        if (width <= 0 || height <= 0)
+        if (width <= 0 || height <= 0 || (width == m_Width && height == m_Height))
             return;
         m_Width = width;
         m_Height = height;
