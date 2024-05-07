@@ -1,5 +1,7 @@
 #include "TerrainMesh.h"
 
+const uint32_t TerrainMesh::s_MaxTerrainSize = 3000;
+
 TerrainMesh::TerrainMesh()
 {
     m_VertexArrayObject = Enxus::CreateRef<Enxus::VertexArray>();
@@ -8,6 +10,13 @@ TerrainMesh::TerrainMesh()
 TerrainMesh::TerrainMesh(uint32_t width, uint32_t height)
     : m_Width(width), m_Height(height)
 {
+    if (m_Width >= s_MaxTerrainSize || m_Height >= s_MaxTerrainSize)
+    {
+        std::cout << "[TerrainMesh Warning] Max size allowed is  " << s_MaxTerrainSize << std::endl;
+    }
+    m_Width = std::min(m_Height, s_MaxTerrainSize);
+    m_Height = std::min(m_Width, s_MaxTerrainSize);
+
     m_VertexArrayObject = Enxus::CreateRef<Enxus::VertexArray>();
     CreateTerrain();
 }
@@ -16,18 +25,22 @@ TerrainMesh::~TerrainMesh()
 {
 }
 
-void TerrainMesh::UpdateHeightFromNoise(std::vector<std::vector<float>> noiseMap)
+void TerrainMesh::SetNoiseMap(const std::vector<float> &noiseMap)
 {
+    // Add a loggin system with asserts and macros
+    // ASSERT(noiseMap.size() != m_Width * m_Height);
+    // asserts are slow so keep it with the macros !
     for (uint32_t i = 0; i < m_Height; i++)
     {
         for (uint32_t j = 0; j < m_Width; j++)
         {
-            uint32_t index = i * m_Width + j;
+            uint32_t vertexIndex = i * m_Width + j;
+            // uint32_t noiseMapIndex = i * noiseMapWidth + j;
             glm::vec3 position;
-            position.x = m_Vertices[index].x;
-            position.y = noiseMap[i][j] * 5.0f;
-            position.z = m_Vertices[index].z;
-            m_Vertices[index] = position;
+            position.x = m_Vertices[vertexIndex].x;
+            position.y = noiseMap[vertexIndex] * m_HeightScale;
+            position.z = m_Vertices[vertexIndex].z;
+            m_Vertices[vertexIndex] = position;
         }
     }
     m_VertexBufferObject->SetData(&m_Vertices[0], m_Vertices.size() * sizeof(glm::vec3));
@@ -94,8 +107,6 @@ void TerrainMesh::CreateIndices()
         {
             indices[index] = offset + j;
             indices[index + 1] = offset + j + m_Width;
-            // indices[index + 2] = offset + j + 1;
-            // indices[index + 3] = offset + j + width + 1;
             index += 2;
         }
     }

@@ -10,7 +10,7 @@ public:
     TerrainMesh(uint32_t width, uint32_t height);
     ~TerrainMesh();
 
-    void UpdateHeightFromNoise(std::vector<std::vector<float>> noiseMap);
+    void SetNoiseMap(const std::vector<float> &noiseMap);
 
     inline Enxus::Ref<Enxus::VertexArray>
     GetVertexArray() const
@@ -23,8 +23,8 @@ public:
     void SetWidth(uint32_t width);
     void SetHeight(uint32_t height);
 
-    inline int GetWidth() const { return m_Width; }
-    inline int GetHeight() const { return m_Height; }
+    inline uint32_t GetWidth() const { return m_Width; }
+    inline uint32_t GetHeight() const { return m_Height; }
 
 private:
     void CreateTerrain();
@@ -33,9 +33,9 @@ private:
 
 private:
     uint32_t m_Width, m_Height;
-
     // float m_VertexDistance = 0.0625f;
     float m_VertexDistance = 0.5f;
+    float m_HeightScale = 5.0f;
 
     std::vector<glm::vec3> m_Vertices;
     std::vector<unsigned int> m_Indices;
@@ -44,5 +44,7 @@ private:
     Enxus::Ref<Enxus::VertexArray> m_VertexArrayObject;
     Enxus::Ref<Enxus::VertexBuffer> m_VertexBufferObject;
     Enxus::Ref<Enxus::IndexBuffer> m_IndexBufferObject;
+
+    static const uint32_t s_MaxTerrainSize;
 };
 #endif
