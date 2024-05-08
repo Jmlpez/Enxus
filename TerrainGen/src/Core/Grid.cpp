@@ -25,7 +25,7 @@ void Grid::CreateGrid(uint32_t rows, uint32_t cols)
     */
     Enxus::VertexBufferLayout layout;
     layout.Push(3, GL_FLOAT);
-    m_VertexArrayObject->AddBuffer(*m_VertexBufferObject, layout);
+    m_VertexArrayObject->AddBuffer(m_VertexBufferObject, layout);
 
     std::vector<unsigned int>
         indices = CreateIndices(rows, cols);

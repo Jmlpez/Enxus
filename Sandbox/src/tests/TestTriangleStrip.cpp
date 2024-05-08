@@ -26,7 +26,7 @@ namespace OpenGLTest
         layout.Push(3, GL_FLOAT); // position
         layout.Push(2, GL_FLOAT); // tex coords
         layout.Push(3, GL_FLOAT); // normals
-        m_VertexArray->AddBuffer(*m_VertexBuffer, layout);
+        m_VertexArray->AddBuffer(m_VertexBuffer, layout);
 
         m_IndexBuffer = Enxus::CreateRef<Enxus::IndexBuffer>(&indices[0], sizeof(indices));
 

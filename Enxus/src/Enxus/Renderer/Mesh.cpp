@@ -56,7 +56,7 @@ namespace Enxus
         layout.Push(2, GL_FLOAT);
         layout.Push(3, GL_FLOAT);
 
-        m_VertexArrayObject->AddBuffer(*m_VertexBufferObject, layout);
+        m_VertexArrayObject->AddBuffer(m_VertexBufferObject, layout);
         /*
         IGNORE:
         Assuming a struct call MeshTexture defined as:

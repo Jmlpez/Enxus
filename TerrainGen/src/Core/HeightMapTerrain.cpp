@@ -52,7 +52,7 @@ void HeightMapTerrain::CreateTerrain(int width, int height)
     Enxus::VertexBufferLayout layout;
     layout.Push(3, GL_FLOAT);
 
-    m_VertexArrayObject->AddBuffer(*m_VertexBufferObject, layout);
+    m_VertexArrayObject->AddBuffer(m_VertexBufferObject, layout);
 
     std::vector<unsigned int>
         indices = CreateIndices(width, height);

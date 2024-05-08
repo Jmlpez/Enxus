@@ -15,10 +15,10 @@ namespace Enxus
         GLCall(glDeleteVertexArrays(1, &m_RendererId));
     }
 
-    void VertexArray::AddBuffer(const VertexBuffer &vbo, const VertexBufferLayout &layout)
+    void VertexArray::AddBuffer(const Ref<VertexBuffer> &vbo, const VertexBufferLayout &layout)
     {
         Bind();
-        vbo.Bind();
+        vbo->Bind();
         const auto &elements = layout.GetElements();
         unsigned int offset = 0;
         for (unsigned int i = 0; i < elements.size(); i++)

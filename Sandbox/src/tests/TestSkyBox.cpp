@@ -57,7 +57,7 @@ namespace OpenGLTest
 
         Enxus::VertexBufferLayout layout;
         layout.Push(3, GL_FLOAT); // position (x, y, z)
-        m_SkyBoxVAO->AddBuffer(*m_SkyBoxVBO, layout);
+        m_SkyBoxVAO->AddBuffer(m_SkyBoxVBO, layout);
 
         //----------------- LOAD SKYBOX -------------------//
 

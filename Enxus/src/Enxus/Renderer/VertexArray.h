@@ -14,7 +14,7 @@ namespace Enxus
         VertexArray();
         ~VertexArray();
 
-        void AddBuffer(const VertexBuffer &vbo, const VertexBufferLayout &layout);
+        void AddBuffer(const Ref<VertexBuffer> &vbo, const VertexBufferLayout &layout);
 
         void Bind() const;
         void Unbind() const;

@@ -60,10 +60,10 @@ namespace OpenGLTest
         objLayout.Push(2, GL_FLOAT); // texture coordinates
         objLayout.Push(3, GL_FLOAT); // normal vector
 
-        objVAO->AddBuffer(*objVBO, objLayout);
+        objVAO->AddBuffer(objVBO, objLayout);
 
         lightSourceLayout.Push(3, GL_FLOAT);
-        lightSourceVAO->AddBuffer(*objVBO, objLayout);
+        lightSourceVAO->AddBuffer(objVBO, objLayout);
 
         // //----------------- TEXTURES -------------------//
 
