@@ -31,7 +31,8 @@ private:
     // Scene options
     bool m_IsWireframe = false;
 
-    float m_HeightScale = 5.0f;
+    float m_HeightScale = 1.5f;
+    float m_VertexDistance = 0.05f;
 
     // Terrain Mesh
     Enxus::Scope<TerrainMesh> m_TerrainMesh;

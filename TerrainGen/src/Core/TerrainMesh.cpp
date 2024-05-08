@@ -25,10 +25,30 @@ TerrainMesh::~TerrainMesh()
 {
 }
 
+void TerrainMesh::SetVertexDistance(float distance)
+{
+    if (distance == m_VertexDistance)
+        return;
+    m_VertexDistance = distance;
+    for (uint32_t i = 0; i < m_Height; i++)
+    {
+        for (uint32_t j = 0; j < m_Width; j++)
+        {
+            uint32_t vertexIndex = i * m_Width + j;
+
+            m_Vertices[vertexIndex].x = (-(float)m_Width / 2.0f + i) * m_VertexDistance;  // to center int x-axis
+            m_Vertices[vertexIndex].z = (-(float)m_Height / 2.0f + j) * m_VertexDistance; // to center int z-axis
+        }
+    }
+    m_VertexBufferObject->SetData(&m_Vertices[0], m_Vertices.size() * sizeof(glm::vec3));
+}
+
 void TerrainMesh::SetHeightScaleFactor(float heightScale)
 {
-    m_HeightScale = heightScale;
+    if (m_HeightScale == heightScale)
+        return;
 
+    m_HeightScale = heightScale;
     if (m_NoiseMap.empty())
         return;
 
@@ -81,7 +101,7 @@ void TerrainMesh::CreateTerrain()
     Enxus::VertexBufferLayout layout;
     layout.Push(3, GL_FLOAT);
 
-    m_VertexArrayObject->AddBuffer(*m_VertexBufferObject, layout);
+    m_VertexArrayObject->AddBuffer(m_VertexBufferObject, layout);
 
     CreateIndices();
 

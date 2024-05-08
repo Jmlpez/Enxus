@@ -171,6 +171,10 @@ void EditorLayer::OnImGuiRender()
         {
             m_TerrainMesh->SetHeightScaleFactor(m_HeightScale);
         }
+        if (ImGui::DragFloat("Distance", &m_VertexDistance, 0.01f, 0.01f, 2.0f))
+        {
+            m_TerrainMesh->SetVertexDistance(m_VertexDistance);
+        }
         // using size_t (aka unsigned long) to remove warning
         // size_t textureId = m_ExampleTexture->GetRendererId();
         ImGui::End();
