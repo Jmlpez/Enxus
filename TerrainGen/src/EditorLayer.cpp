@@ -31,6 +31,27 @@ EditorLayer::EditorLayer()
     m_TerrainMesh = Enxus::CreateScope<TerrainMesh>(250, 250);
     m_TerrainShader->Bind();
     m_TerrainShader->SetMat4("uModel", glm::mat4(1.0f));
+
+    //----------------- Sky Box -------------------//
+    m_SkyBox = Enxus::CreateRef<Enxus::SkyBox>();
+    m_SkyBox->SetCubeMapFaces(
+        {"Sandbox/res/images/skybox/right.jpg",
+         "Sandbox/res/images/skybox/left.jpg",
+         "Sandbox/res/images/skybox/top.jpg",
+         "Sandbox/res/images/skybox/bottom.jpg",
+         "Sandbox/res/images/skybox/front.jpg",
+         "Sandbox/res/images/skybox/back.jpg"});
+    // m_SkyBox->SetCubeMapFaces(
+    //     {"TerrainGen/assets/images/skybox/right.tga",
+    //      "TerrainGen/assets/images/skybox/left.tga",
+    //      "TerrainGen/assets/images/skybox/top.tga",
+    //      "TerrainGen/assets/images/skybox/bottom.tga",
+    //      "TerrainGen/assets/images/skybox/front.tga",
+    //      "TerrainGen/assets/images/skybox/back.tga"});
+
+    m_SkyBoxShader = Enxus::CreateRef<Enxus::Shader>(
+        "TerrainGen/assets/shaders/skybox/skybox.vert",
+        "TerrainGen/assets/shaders/skybox/skybox.frag");
 }
 
 EditorLayer::~EditorLayer()
@@ -95,6 +116,28 @@ void EditorLayer::OnUpdate(Enxus::Timestep ts)
                 glDrawElements(GL_TRIANGLE_STRIP, numOfVertPerStrip, GL_UNSIGNED_INT, (void *)stripOffset);
             }
         }
+        // Draw Skybox at last
+        {
+            GLCall(glDepthMask(GL_FALSE));
+            GLCall(glDepthFunc(GL_LEQUAL));
+
+            glm::mat4 viewMatrix = glm::mat4(glm::mat3(m_CameraController->GetCamera().GetViewMatrix()));
+
+            m_SkyBoxShader->Bind();
+            m_SkyBoxShader->SetMat4("uView", viewMatrix);
+            m_SkyBoxShader->SetMat4("uProj", m_CameraController->GetCamera().GetProjectionMatrix());
+
+            m_SkyBoxShader->SetInt("uSkyBoxTexture", 0);
+            m_SkyBox->Bind();
+
+            m_SkyBox->GetVertexArray()->Bind();
+
+            GLCall(glDrawArrays(GL_TRIANGLES, 0, 36));
+
+            GLCall(glDepthMask(GL_TRUE)); // Restoring state
+            GLCall(glDepthFunc(GL_LESS)); // Restoring state
+        }
+
         m_Framebuffer->Unbind();
     }
 }

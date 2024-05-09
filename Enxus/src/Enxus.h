@@ -28,6 +28,7 @@
 #include "Enxus/Renderer/Framebuffer.h"
 #include "Enxus/Renderer/Model.h"
 #include "Enxus/Renderer/Mesh.h"
+#include "Enxus/Renderer/SkyBox.h"
 // -----------------------------------
 
 #endif

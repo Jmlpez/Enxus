@@ -37,18 +37,18 @@ private:
     // Terrain Mesh
     Enxus::Scope<TerrainMesh> m_TerrainMesh;
 
+    // SkyBox
+    Enxus::Ref<Enxus::SkyBox> m_SkyBox;
+    Enxus::Ref<Enxus::Shader> m_SkyBoxShader;
+
     // Panels
     Enxus::Scope<NoiseEditorPanel> m_NoiseEditorPanel;
-
     // Models
     Enxus::Ref<Enxus::Model> m_Box;
-
     // Shaders
     Enxus::Ref<Enxus::Shader> m_Shader, m_TerrainShader;
-
     // Camera
     Enxus::Scope<Enxus::FreeCameraController> m_CameraController;
-
     // Framebuffers
     Enxus::Scope<Enxus::Framebuffer> m_Framebuffer;
 };
