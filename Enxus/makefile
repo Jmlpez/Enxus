@@ -7,6 +7,7 @@ ENXUS_CORE_DIR = $(SRC_DIR)/Enxus/Core
 ENXUS_EVENT_DIR = $(SRC_DIR)/Enxus/Event
 ENXUS_IMGUI_DIR = $(SRC_DIR)/Enxus/ImGui
 ENXUS_RENDERER_DIR = $(SRC_DIR)/Enxus/Renderer
+ENXUS_MATH_DIR = $(SRC_DIR)/Enxus/Math
 
 # Vendor Targets
 VENDOR_DIR = vendor
@@ -26,6 +27,7 @@ ENXUS_INCLUDE_FLAGS += -I$(ENXUS_CORE_DIR)
 ENXUS_INCLUDE_FLAGS += -I$(ENXUS_EVENT_DIR)
 ENXUS_INCLUDE_FLAGS += -I$(ENXUS_IMGUI_DIR)
 ENXUS_INCLUDE_FLAGS += -I$(ENXUS_RENDERER_DIR)
+ENXUS_INCLUDE_FLAGS += -I$(ENXUS_MATH_DIR)
 
 VENDOR_FLAGS = -I$(VENDOR_DIR)
 IMGUI_FLAGS = -I$(IMGUI_DIR)
@@ -41,6 +43,7 @@ CXXFLAGS = -std=gnu++17 $(DEBUG_FLAGS) -Wall -Wextra
 SOURCES = $(wildcard $(ENXUS_CORE_DIR)/*.cpp)
 SOURCES += $(wildcard $(ENXUS_IMGUI_DIR)/*.cpp)
 SOURCES += $(wildcard $(ENXUS_RENDERER_DIR)/*.cpp)
+SOURCES += $(wildcard $(ENXUS_MATH_DIR)/*.cpp)
 
 # Vendor sources
 SOURCES += $(wildcard $(IMGUI_DIR)/*.cpp)
@@ -70,7 +73,10 @@ $(BIN_DIR)/%.o: $(ENXUS_IMGUI_DIR)/%.cpp $(ENXUS_IMGUI_DIR)/%.h
 # Build Enxus Renderer
 $(BIN_DIR)/%.o: $(ENXUS_RENDERER_DIR)/%.cpp $(ENXUS_RENDERER_DIR)/%.h
 	$(CXX) $(CXXFLAGS) $(PCH_FLAGS) -c $< -o $@ $(ENXUS_INCLUDE_FLAGS) $(VENDOR_FLAGS) $(OPENGL_FLAGS)
-	@echo $(SOURCES)
+
+# Build Enxus Math Utils
+$(BIN_DIR)/%.o: $(ENXUS_MATH_DIR)/%.cpp $(ENXUS_MATH_DIR)/%.h
+	$(CXX) $(CXXFLAGS) $(PCH_FLAGS) -c $< -o $@ $(ENXUS_INCLUDE_FLAGS) $(VENDOR_FLAGS) $(OPENGL_FLAGS)
 
 # Build Imgui
 $(BIN_DIR)/%.o: $(IMGUI_DIR)/%.cpp
@@ -80,7 +86,7 @@ $(BIN_DIR)/%.o: $(IMGUI_DIR)/%.cpp
 $(BIN_DIR)/%.o: $(STB_IMAGE_DIR)/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@ 
 
-build: 
+build:  
 	@echo "\n---------------------- BUILDING ENXUS ENGINE -----------------------\n"
 	@make clean
 	@make all
