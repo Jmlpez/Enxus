@@ -167,11 +167,11 @@ void EditorLayer::OnImGuiRender()
         ImGui::Begin("Menu");
         // ImGui::Checkbox("Grid Floor", &m_ShowGridFloor);
         ImGui::Checkbox("Wireframe Mode", &m_IsWireframe);
-        if (ImGui::DragFloat("Height", &m_HeightScale, 0.1f, 0.0f, 15.0f))
+        if (ImGui::DragFloat("Height", &m_HeightScale, 0.01f, 0.0f, 15.0f))
         {
             m_TerrainMesh->SetHeightScaleFactor(m_HeightScale);
         }
-        if (ImGui::DragFloat("Distance", &m_VertexDistance, 0.01f, 0.01f, 2.0f))
+        if (ImGui::DragFloat("Distance", &m_VertexDistance, 0.001f, 0.01f, 2.0f))
         {
             m_TerrainMesh->SetVertexDistance(m_VertexDistance);
         }

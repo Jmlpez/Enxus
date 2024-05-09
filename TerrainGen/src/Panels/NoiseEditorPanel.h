@@ -13,7 +13,7 @@ public:
 
     void OnImGuiRender();
 
-    void SetSize(uint32_t width, uint32_t height){};
+    void SetSize(uint32_t width, uint32_t height) {};
 
     inline bool HasUpdated() { return m_NoiseUpdateFlag; }
     inline uint32_t GetWidth() { return (uint32_t)m_GeneralNoise.Width; }
@@ -24,17 +24,28 @@ private:
     void UpdateNoiseMap(bool newPreview);
 
 private:
+    // this is the size of the generated texture using the noise
+    static const int s_TextureGeneratedWidth;
+    static const int s_TextureGeneratedHeight;
+
     FastNoiseLite m_Fnl;
     FastNoiseLite m_FnlWarp;
 
     // To check when update the texture image
     bool m_NoiseUpdateFlag = true;
 
+    struct FalloffMapData
+    {
+        bool IsActivated = false;
+        float Beta = 2.2f;
+
+        // same width and height that the noise map texture
+        Enxus::Scope<Enxus::Texture2D> Texture;
+
+    } m_FalloffMap;
+
     struct NoiseTexturePreview
     {
-        // this is the size of the generated texture using the noise
-        static const int s_TextureGeneratedWidth;
-        static const int s_TextureGeneratedHeight;
 
         bool IsAutoSize = true;
         float ColorTexMin = -1.0f;

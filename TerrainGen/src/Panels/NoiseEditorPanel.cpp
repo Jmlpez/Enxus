@@ -1,8 +1,8 @@
 #include "pch.h"
 #include "NoiseEditorPanel.h"
 
-const int NoiseEditorPanel::NoiseTexturePreview::s_TextureGeneratedWidth = 400;
-const int NoiseEditorPanel::NoiseTexturePreview::s_TextureGeneratedHeight = 400;
+const int NoiseEditorPanel::s_TextureGeneratedWidth = 400;
+const int NoiseEditorPanel::s_TextureGeneratedHeight = 400;
 
 NoiseEditorPanel::NoiseEditorPanel()
 {
@@ -10,8 +10,11 @@ NoiseEditorPanel::NoiseEditorPanel()
     m_GeneralNoise.Height = 250;
 
     m_NoisePreviewData.Texture =
-        Enxus::CreateScope<Enxus::Texture2D>(m_NoisePreviewData.s_TextureGeneratedWidth,
-                                             m_NoisePreviewData.s_TextureGeneratedHeight);
+        Enxus::CreateScope<Enxus::Texture2D>(s_TextureGeneratedWidth,
+                                             s_TextureGeneratedHeight);
+    m_FalloffMap.Texture =
+        Enxus::CreateScope<Enxus::Texture2D>(s_TextureGeneratedWidth,
+                                             s_TextureGeneratedHeight);
 
     // Generate the first image
     UpdateNoiseMap(true);
@@ -203,6 +206,23 @@ void NoiseEditorPanel::OnImGuiRender()
         ImGui::EndTabItem();
     }
 
+    if (ImGui::BeginTabItem("Falloff Settings"))
+    {
+        if (ImGui::Checkbox("Activate", &m_FalloffMap.IsActivated))
+        {
+            m_NoiseUpdateFlag = true;
+        }
+
+        if (ImGui::DragFloat("Beta value", &m_FalloffMap.Beta, 0.1f, 0.1f, 10.0f))
+        {
+            m_NoiseUpdateFlag = true;
+        }
+
+        ImGui::Image((void *)(intptr_t)m_FalloffMap.Texture->GetRendererId(), ImVec2(m_NoisePreviewData.ImGuiWidth, m_NoisePreviewData.ImGuiHeight));
+
+        ImGui::EndTabItem();
+    }
+
     ImGui::EndTabBar();
     ImGui::PopItemWidth();
     ImGui::End();
@@ -216,11 +236,6 @@ void NoiseEditorPanel::OnImGuiRender()
             int minSize = std::min(autoSize.x, autoSize.y);
             m_NoisePreviewData.ImGuiWidth = m_NoisePreviewData.ImGuiHeight = minSize;
         }
-
-        // if (m_NoisePreviewData.Width != m_PreviewSize[0] || m_NoisePreviewData.Height != m_PreviewSize[1])
-        // {
-        //     m_NoiseUpdateFlag = true;
-        // }
 
         UpdateNoiseMap(m_NoiseUpdateFlag);
         ImGui::Image((void *)(intptr_t)m_NoisePreviewData.Texture->GetRendererId(), ImVec2(m_NoisePreviewData.ImGuiWidth, m_NoisePreviewData.ImGuiHeight));
@@ -245,15 +260,45 @@ void NoiseEditorPanel::UpdateNoiseMap(bool newPreview)
     {
         for (int x = 0; x < m_GeneralNoise.Width; x++)
         {
-            float noise;
-            double posX = (double)(x - m_GeneralNoise.Width / 2);
-            double posY = (double)(y - m_GeneralNoise.Height / 2);
+
+            float posX = (float)(x - m_GeneralNoise.Width / 2.0f);
+            float posY = (float)(y - m_GeneralNoise.Height / 2.0f);
 
             if (m_DomainWarp.Type > 0)
             {
                 m_FnlWarp.DomainWarp(posX, posY);
             }
-            noise = m_Fnl.GetNoise(posX, posY);
+
+            // convert noise from [-1, 1] to [0, 1]
+            float noise = (m_Fnl.GetNoise(posX, posY) + 1.0f) * 0.5f;
+
+            if (m_FalloffMap.IsActivated)
+            {
+                // noise = (noise + 1.0f) * 0.5f;
+
+                float nPosX = (float)x / (float)m_GeneralNoise.Width * 2.0f - 1;
+                float nPosY = (float)y / (float)m_GeneralNoise.Height * 2.0f - 1;
+
+                float falloffValue = std::max(std::abs(nPosX), std::abs(nPosY));
+
+                float smoothValue = Enxus::Math::blend(falloffValue, m_FalloffMap.Beta);
+
+                noise = std::clamp(noise - smoothValue, 0.0f, 1.0f);
+            }
+
+            // float cNoise = std::max(std::abs(nPosX), std::abs(nPosY));
+
+            // if (cNoise < m_FalloffStart)
+            // {
+            //     cNoise = 0.0f; // fullwhite
+            // }
+            // else
+            // {
+            //     cNoise = smoothstep(lerp(0.0f, 1.0f, cNoise - m_FalloffStart));
+            // }
+
+            // float finalNoise = std::clamp(noise - cNoise, 0.0f, 1.0f);
+
             m_NoiseMapArray.emplace_back(noise);
         }
     }
@@ -262,39 +307,65 @@ void NoiseEditorPanel::UpdateNoiseMap(bool newPreview)
     float scale = 255.0f / (m_NoisePreviewData.ColorTexMax - m_NoisePreviewData.ColorTexMin);
 
     // to make easy to type..
-    int imgWidth = m_NoisePreviewData.s_TextureGeneratedWidth;
-    int imgHeight = m_NoisePreviewData.s_TextureGeneratedHeight;
+    int imgWidth = s_TextureGeneratedWidth;
+    int imgHeight = s_TextureGeneratedHeight;
 
-    unsigned char *previewPixelArray = new unsigned char[imgWidth * imgHeight * 4];
+    unsigned char *noisePreviewPixelArray = new unsigned char[imgWidth * imgHeight * 4];
+    unsigned char *falloffMapPixelArray = new unsigned char[imgWidth * imgHeight * 4];
 
     int pixelArrayIndex = 0;
     for (int y = 0; y < imgHeight; y++)
     {
         for (int x = 0; x < imgWidth; x++)
         {
-            float noise;
-            double posX = (double)(x - imgWidth / 2);
-            double posY = (double)(y - imgHeight / 2);
+
+            float posX = (float)(x - imgWidth / 2);
+            float posY = (float)(y - imgHeight / 2);
 
             if (m_DomainWarp.Type > 0)
             {
                 m_FnlWarp.DomainWarp(posX, posY);
             }
-            noise = m_Fnl.GetNoise(posX, posY);
+            float noise = m_Fnl.GetNoise(posX, posY);
 
             unsigned char cNoise = (unsigned char)std::max(0.0f, std::min(255.0f, (noise - m_NoisePreviewData.ColorTexMin) * scale));
-            previewPixelArray[pixelArrayIndex++] = cNoise;
-            previewPixelArray[pixelArrayIndex++] = cNoise;
-            previewPixelArray[pixelArrayIndex++] = cNoise;
-            previewPixelArray[pixelArrayIndex++] = 255;
+
+            // noise texture color data
+            noisePreviewPixelArray[pixelArrayIndex] = cNoise;
+            noisePreviewPixelArray[pixelArrayIndex + 1] = cNoise;
+            noisePreviewPixelArray[pixelArrayIndex + 2] = cNoise;
+            noisePreviewPixelArray[pixelArrayIndex + 3] = 255;
+
+            if (m_FalloffMap.IsActivated)
+            {
+                float nPosX = (float)x / (float)imgWidth * 2.0f - 1;
+                float nPosY = (float)y / (float)imgHeight * 2.0f - 1;
+
+                float falloffValue = std::max(std::abs(nPosX), std::abs(nPosY));
+                unsigned char falloffColor = Enxus::Math::blend(falloffValue, m_FalloffMap.Beta) * 255;
+
+                falloffMapPixelArray[pixelArrayIndex] = falloffColor;
+                falloffMapPixelArray[pixelArrayIndex + 1] = falloffColor;
+                falloffMapPixelArray[pixelArrayIndex + 2] = falloffColor;
+                falloffMapPixelArray[pixelArrayIndex + 3] = 255;
+            }
+            // falloffValue = Evaluate(falloffValue);
+
+            // unsigned char cNoise = Evaluate(falloffValue) * 255.0f;
+
+            pixelArrayIndex += 4;
         }
     }
 
-    // m_NoisePreviewData.ImGuiTexSize[0] = m_NoisePreviewData.Width;
-    // m_NoisePreviewData.ImGuiTexSize[1] = m_NoisePreviewData.Height;
-
     m_NoisePreviewData.Texture->Resize(imgWidth, imgHeight);
-    m_NoisePreviewData.Texture->SetData(previewPixelArray, imgWidth, imgHeight);
+    m_NoisePreviewData.Texture->SetData(noisePreviewPixelArray, imgWidth, imgHeight);
 
-    delete[] previewPixelArray;
+    if (m_FalloffMap.IsActivated)
+    {
+        m_FalloffMap.Texture->Resize(imgWidth, imgHeight);
+        m_FalloffMap.Texture->SetData(falloffMapPixelArray, imgWidth, imgHeight);
+    }
+
+    delete[] noisePreviewPixelArray;
+    delete[] falloffMapPixelArray;
 }
