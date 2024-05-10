@@ -34,20 +34,14 @@ EditorLayer::EditorLayer()
 
     //----------------- Sky Box -------------------//
     m_SkyBox = Enxus::CreateRef<Enxus::SkyBox>();
+
     m_SkyBox->SetCubeMapFaces(
-        {"Sandbox/res/images/skybox/right.jpg",
-         "Sandbox/res/images/skybox/left.jpg",
-         "Sandbox/res/images/skybox/top.jpg",
-         "Sandbox/res/images/skybox/bottom.jpg",
-         "Sandbox/res/images/skybox/front.jpg",
-         "Sandbox/res/images/skybox/back.jpg"});
-    // m_SkyBox->SetCubeMapFaces(
-    //     {"TerrainGen/assets/images/skybox/right.tga",
-    //      "TerrainGen/assets/images/skybox/left.tga",
-    //      "TerrainGen/assets/images/skybox/top.tga",
-    //      "TerrainGen/assets/images/skybox/bottom.tga",
-    //      "TerrainGen/assets/images/skybox/front.tga",
-    //      "TerrainGen/assets/images/skybox/back.tga"});
+        {"TerrainGen/assets/images/skybox/right.tga",
+         "TerrainGen/assets/images/skybox/left.tga",
+         "TerrainGen/assets/images/skybox/top.tga",
+         "TerrainGen/assets/images/skybox/bottom.tga",
+         "TerrainGen/assets/images/skybox/back.tga",
+         "TerrainGen/assets/images/skybox/front.tga"});
 
     m_SkyBoxShader = Enxus::CreateRef<Enxus::Shader>(
         "TerrainGen/assets/shaders/skybox/skybox.vert",
