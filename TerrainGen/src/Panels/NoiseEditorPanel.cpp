@@ -57,6 +57,20 @@ void NoiseEditorPanel::OnImGuiRender()
                 m_Fnl.SetFrequency(m_GeneralNoise.Frequency);
                 m_NoiseUpdateFlag = true;
             }
+            ImGui::PushItemWidth(50);
+            if (ImGui::DragFloat("Offset X", &m_GeneralNoise.OffsetX, 1.0f))
+            {
+                // m_Fnl.SetFrequency(m_GeneralNoise.OffsetX);
+                m_NoiseUpdateFlag = true;
+            }
+            ImGui::SameLine();
+            if (ImGui::DragFloat("Offset Y", &m_GeneralNoise.OffsetY, 1.0f))
+            {
+                // m_Fnl.SetFrequency(m_GeneralNoise.OffsetY);
+
+                m_NoiseUpdateFlag = true;
+            }
+            ImGui::PopItemWidth();
         }
 
         //----------------- FRACTAL -------------------//
@@ -191,8 +205,12 @@ void NoiseEditorPanel::OnImGuiRender()
     {
         ImGui::Checkbox("Auto Size", &m_NoisePreviewData.IsAutoSize);
         ImGui::BeginDisabled(m_NoisePreviewData.IsAutoSize);
+
+        ImGui::PushItemWidth(50);
         ImGui::DragInt("Width", &m_NoisePreviewData.ImGuiWidth, 1, 32, 2048);
+        ImGui::SameLine();
         ImGui::DragInt("Height", &m_NoisePreviewData.ImGuiHeight, 1, 32, 2048);
+        ImGui::PopItemWidth();
         ImGui::EndDisabled();
         if (ImGui::DragFloat("Black Point", &m_NoisePreviewData.ColorTexMin, 0.01f))
         {
@@ -270,12 +288,10 @@ void NoiseEditorPanel::UpdateNoiseMap(bool newPreview)
             }
 
             // convert noise from [-1, 1] to [0, 1]
-            float noise = (m_Fnl.GetNoise(posX, posY) + 1.0f) * 0.5f;
+            float noise = (m_Fnl.GetNoise(posX + m_GeneralNoise.OffsetX, posY + m_GeneralNoise.OffsetY) + 1.0f) * 0.5f;
 
             if (m_FalloffMap.IsActivated)
             {
-                // noise = (noise + 1.0f) * 0.5f;
-
                 float nPosX = (float)x / (float)m_GeneralNoise.Width * 2.0f - 1;
                 float nPosY = (float)y / (float)m_GeneralNoise.Height * 2.0f - 1;
 
@@ -285,19 +301,6 @@ void NoiseEditorPanel::UpdateNoiseMap(bool newPreview)
 
                 noise = std::clamp(noise - smoothValue, 0.0f, 1.0f);
             }
-
-            // float cNoise = std::max(std::abs(nPosX), std::abs(nPosY));
-
-            // if (cNoise < m_FalloffStart)
-            // {
-            //     cNoise = 0.0f; // fullwhite
-            // }
-            // else
-            // {
-            //     cNoise = smoothstep(lerp(0.0f, 1.0f, cNoise - m_FalloffStart));
-            // }
-
-            // float finalNoise = std::clamp(noise - cNoise, 0.0f, 1.0f);
 
             m_NoiseMapArray.emplace_back(noise);
         }
@@ -326,7 +329,7 @@ void NoiseEditorPanel::UpdateNoiseMap(bool newPreview)
             {
                 m_FnlWarp.DomainWarp(posX, posY);
             }
-            float noise = m_Fnl.GetNoise(posX, posY);
+            float noise = m_Fnl.GetNoise(posX + m_GeneralNoise.OffsetX, posY + m_GeneralNoise.OffsetY);
 
             unsigned char cNoise = (unsigned char)std::max(0.0f, std::min(255.0f, (noise - m_NoisePreviewData.ColorTexMin) * scale));
 

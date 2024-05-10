@@ -69,7 +69,11 @@ private:
         int Height;
         int NoiseType = 0;
         int Seed = 1337;
+
         float Frequency = 0.01f;
+        float OffsetX = 0.0f;
+        float OffsetY = 0.0f;
+
     } m_GeneralNoise;
 
     struct FractalNoiseData

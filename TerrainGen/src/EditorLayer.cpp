@@ -8,7 +8,6 @@ EditorLayer::EditorLayer()
 {
 
     //----------------- CAMERA -------------------//
-
     auto &window = Enxus::Application::Get().GetWindow();
     unsigned int width = window.GetWidth();
     unsigned int height = window.GetHeight();
