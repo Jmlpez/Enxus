@@ -3,6 +3,18 @@
 
 #include "Enxus.h"
 
+struct TerrainVertex
+{
+    glm::vec3 Position;
+    glm::vec2 TexCoord;
+
+    TerrainVertex(glm::vec3 position)
+        : Position(position), TexCoord(0, 0) {}
+
+    TerrainVertex(glm::vec3 position, glm::vec2 texCoord)
+        : Position(position), TexCoord(texCoord) {}
+};
+
 class TerrainMesh
 {
 public:
@@ -15,6 +27,8 @@ public:
     void SetVertexDistance(float distance);
     void SetWidth(uint32_t width);
     void SetHeight(uint32_t height);
+
+    inline Enxus::Ref<Enxus::TextureMesh2D> GetGrassTexture()const {return m_GrassTexture;}
 
     inline uint32_t GetWidth() const { return m_Width; }
     inline uint32_t GetHeight() const { return m_Height; }
@@ -36,10 +50,10 @@ private:
 
     std::vector<float> m_NoiseMap;
 
-    std::vector<glm::vec3> m_Vertices;
-    std::vector<unsigned int> m_Indices;
+    std::vector<TerrainVertex> m_Vertices;
 
-    // Enxus::Ref<Enxus::Mesh> m_Terrain;
+    Enxus::Ref<Enxus::TextureMesh2D> m_GrassTexture;
+
     Enxus::Ref<Enxus::VertexArray> m_VertexArrayObject;
     Enxus::Ref<Enxus::VertexBuffer> m_VertexBufferObject;
     Enxus::Ref<Enxus::IndexBuffer> m_IndexBufferObject;

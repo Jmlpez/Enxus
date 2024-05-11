@@ -5,6 +5,8 @@ const uint32_t TerrainMesh::s_MaxTerrainSize = 1000;
 TerrainMesh::TerrainMesh()
 {
     m_VertexArrayObject = Enxus::CreateRef<Enxus::VertexArray>();
+    m_GrassTexture = Enxus::CreateRef<Enxus::TextureMesh2D>("TerrainGen/assets/images/container.png",
+                                                            Enxus::TextureType::DIFFUSE);
 }
 
 TerrainMesh::TerrainMesh(uint32_t width, uint32_t height)
@@ -18,6 +20,10 @@ TerrainMesh::TerrainMesh(uint32_t width, uint32_t height)
     m_Height = std::min(m_Width, s_MaxTerrainSize);
 
     m_VertexArrayObject = Enxus::CreateRef<Enxus::VertexArray>();
+
+    m_GrassTexture = Enxus::CreateRef<Enxus::TextureMesh2D>("TerrainGen/assets/images/grass-albedo.png",
+                                                            Enxus::TextureType::DIFFUSE);
+
     CreateTerrain();
 }
 
@@ -36,11 +42,11 @@ void TerrainMesh::SetVertexDistance(float distance)
         {
             uint32_t vertexIndex = i * m_Width + j;
 
-            m_Vertices[vertexIndex].x = (-(float)m_Width / 2.0f + i) * m_VertexDistance;  // to center int x-axis
-            m_Vertices[vertexIndex].z = (-(float)m_Height / 2.0f + j) * m_VertexDistance; // to center int z-axis
+            m_Vertices[vertexIndex].Position.x = (-(float)m_Width / 2.0f + i) * m_VertexDistance;  // to center int x-axis
+            m_Vertices[vertexIndex].Position.z = (-(float)m_Height / 2.0f + j) * m_VertexDistance; // to center int z-axis
         }
     }
-    m_VertexBufferObject->SetData(&m_Vertices[0], m_Vertices.size() * sizeof(glm::vec3));
+    m_VertexBufferObject->SetData(&m_Vertices[0], m_Vertices.size() * sizeof(TerrainVertex));
 }
 
 void TerrainMesh::SetHeightScaleFactor(float heightScale)
@@ -58,10 +64,10 @@ void TerrainMesh::SetHeightScaleFactor(float heightScale)
         {
             uint32_t vertexIndex = i * m_Width + j;
             float newYPos = m_NoiseMap[vertexIndex] * m_HeightScale;
-            m_Vertices[vertexIndex].y = newYPos;
+            m_Vertices[vertexIndex].Position.y = newYPos;
         }
     }
-    m_VertexBufferObject->SetData(&m_Vertices[0], m_Vertices.size() * sizeof(glm::vec3));
+    m_VertexBufferObject->SetData(&m_Vertices[0], m_Vertices.size() * sizeof(TerrainVertex));
 }
 
 void TerrainMesh::SetNoiseMap(const std::vector<float> &noiseMap)
@@ -76,10 +82,10 @@ void TerrainMesh::SetNoiseMap(const std::vector<float> &noiseMap)
         {
             uint32_t vertexIndex = i * m_Width + j;
             float newYPos = m_NoiseMap[vertexIndex] * m_HeightScale;
-            m_Vertices[vertexIndex].y = newYPos;
+            m_Vertices[vertexIndex].Position.y = newYPos;
         }
     }
-    m_VertexBufferObject->SetData(&m_Vertices[0], m_Vertices.size() * sizeof(glm::vec3));
+    m_VertexBufferObject->SetData(&m_Vertices[0], m_Vertices.size() * sizeof(TerrainVertex));
 }
 
 void TerrainMesh::SetWidth(uint32_t width)
@@ -108,14 +114,16 @@ void TerrainMesh::SetHeight(uint32_t height)
 void TerrainMesh::CreateTerrain()
 {
     CreateVertices();
-    m_VertexBufferObject = Enxus::CreateRef<Enxus::VertexBuffer>(&m_Vertices[0], m_Vertices.size() * sizeof(glm::vec3));
+    m_VertexBufferObject = Enxus::CreateRef<Enxus::VertexBuffer>(&m_Vertices[0], m_Vertices.size() * sizeof(TerrainVertex));
 
     /*
-        Grid Vertex Layout
+        Terrain Vertex Layout
         x, y, z --> position
+        x, y --> texture coordinates
     */
     Enxus::VertexBufferLayout layout;
     layout.Push(3, GL_FLOAT);
+    layout.Push(2, GL_FLOAT);
 
     m_VertexArrayObject->AddBuffer(m_VertexBufferObject, layout);
 
@@ -125,7 +133,7 @@ void TerrainMesh::CreateTerrain()
 
 void TerrainMesh::CreateVertices()
 {
-    std::vector<glm::vec3> vertices;
+    std::vector<TerrainVertex> vertices;
     vertices.reserve(m_Width * m_Height);
 
     for (uint32_t i = 0; i < m_Height; i++)
@@ -136,7 +144,15 @@ void TerrainMesh::CreateVertices()
             position.x = (-(float)m_Width / 2.0f + i) * m_VertexDistance;  // to center int x-axis
             position.y = 0.0f;                                             // flat plane
             position.z = (-(float)m_Height / 2.0f + j) * m_VertexDistance; // to center int z-axis
-            vertices.emplace_back(position);
+
+            glm::vec2 texCoord;
+            texCoord.x = (1.0f / (float)m_Width) * j;
+            texCoord.y = (1.0f / (float)m_Height) * i;
+
+            vertices.emplace_back(
+                TerrainVertex(
+                    position,
+                    texCoord));
         }
     }
     m_Vertices = std::move(vertices);

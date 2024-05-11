@@ -108,6 +108,8 @@ void EditorLayer::OnUpdate(Enxus::Timestep ts)
             m_TerrainMesh->GetVertexArray()->Bind();
             m_TerrainMesh->GetIndexBuffer()->Bind();
             m_TerrainShader->Bind();
+            m_TerrainShader->SetInt("uGrass", 0);
+            m_TerrainMesh->GetGrassTexture()->Bind();
             const uint32_t numOfStrips = m_TerrainMesh->GetHeight() - 1;
             const uint32_t numOfVertPerStrip = m_TerrainMesh->GetWidth() * 2;
             for (unsigned int strip = 0; strip < numOfStrips; strip++)
