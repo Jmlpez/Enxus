@@ -45,10 +45,15 @@ namespace Enxus
     void FreeCameraController::OnUpdate(Timestep ts)
     {
         float deltaTime = ts.GetSeconds();
-        const float cameraSpeed = m_CameraTranslationSpeed * deltaTime;
-        const float cameraRotationSpeed = m_CameraRotationSpeed * deltaTime;
+        float cameraSpeed = m_CameraTranslationSpeed * deltaTime;
+        float cameraRotationSpeed = m_CameraRotationSpeed * deltaTime;
 
         bool cameraMoved = false;
+
+        if (Input::IsKeyPressed(Key::LeftShift))
+        {
+            cameraSpeed *= 5;
+        }
 
         // camera locations
         if (Input::IsKeyPressed(Key::W))
