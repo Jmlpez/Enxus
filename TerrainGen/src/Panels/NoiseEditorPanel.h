@@ -22,7 +22,8 @@ public:
     inline const std::vector<float> &GetNoiseMap() const { return m_NoiseMapArray; }
 
 private:
-    void UpdateNoiseMap(bool newPreview);
+    void UpdateNoiseMap(bool newMap);
+    void UpdateNoiseTexturePreview(bool newPreview);
 
 private:
     // this is the size of the generated texture using the noise
@@ -61,7 +62,7 @@ private:
     // its going to be used only in this class
 
     // will be exported to be used in the editor
-    //(if not, i would had been used a raw array)
+    //(if not, I would had used a raw array)
     std::vector<float> m_NoiseMapArray;
 
     struct GeneralNoiseData

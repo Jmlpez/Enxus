@@ -241,8 +241,6 @@ void EditorLayer::OnImGuiRender()
         ImGui::Text("App average (%.1f FPS)", 1.0f / Enxus::Application::Get().GetTimestep());
         ImGui::End();
     }
-
-    // NoiseGeneratorPanelUI();
     m_NoiseEditorPanel->OnImGuiRender();
     if (m_NoiseEditorPanel->HasUpdated())
     {

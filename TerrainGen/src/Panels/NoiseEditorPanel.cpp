@@ -18,6 +18,7 @@ NoiseEditorPanel::NoiseEditorPanel()
 
     // Generate the first image
     UpdateNoiseMap(true);
+    UpdateNoiseTexturePreview(true);
 }
 
 void NoiseEditorPanel::SetWidth(uint32_t width)
@@ -212,6 +213,22 @@ void NoiseEditorPanel::OnImGuiRender()
 
         ImGui::EndTabItem();
     }
+    if (ImGui::BeginTabItem("Falloff Settings"))
+    {
+        if (ImGui::Checkbox("Activate", &m_FalloffMap.IsActivated))
+        {
+            m_NoiseUpdateFlag = true;
+        }
+
+        if (ImGui::DragFloat("Beta value", &m_FalloffMap.Beta, 0.1f, 0.1f, 10.0f))
+        {
+            m_NoiseUpdateFlag = true;
+        }
+
+        ImGui::Image((void *)(intptr_t)m_FalloffMap.Texture->GetRendererId(), ImVec2(m_NoisePreviewData.ImGuiWidth, m_NoisePreviewData.ImGuiHeight));
+
+        ImGui::EndTabItem();
+    }
     if (ImGui::BeginTabItem("Preview Settings"))
     {
         ImGui::Checkbox("Auto Size", &m_NoisePreviewData.IsAutoSize);
@@ -235,23 +252,6 @@ void NoiseEditorPanel::OnImGuiRender()
         ImGui::EndTabItem();
     }
 
-    if (ImGui::BeginTabItem("Falloff Settings"))
-    {
-        if (ImGui::Checkbox("Activate", &m_FalloffMap.IsActivated))
-        {
-            m_NoiseUpdateFlag = true;
-        }
-
-        if (ImGui::DragFloat("Beta value", &m_FalloffMap.Beta, 0.1f, 0.1f, 10.0f))
-        {
-            m_NoiseUpdateFlag = true;
-        }
-
-        ImGui::Image((void *)(intptr_t)m_FalloffMap.Texture->GetRendererId(), ImVec2(m_NoisePreviewData.ImGuiWidth, m_NoisePreviewData.ImGuiHeight));
-
-        ImGui::EndTabItem();
-    }
-
     ImGui::EndTabBar();
     ImGui::PopItemWidth();
     ImGui::End();
@@ -267,14 +267,15 @@ void NoiseEditorPanel::OnImGuiRender()
         }
 
         UpdateNoiseMap(m_NoiseUpdateFlag);
+        UpdateNoiseTexturePreview(m_NoiseUpdateFlag);
         ImGui::Image((void *)(intptr_t)m_NoisePreviewData.Texture->GetRendererId(), ImVec2(m_NoisePreviewData.ImGuiWidth, m_NoisePreviewData.ImGuiHeight));
         ImGui::End();
     }
 }
 
-void NoiseEditorPanel::UpdateNoiseMap(bool newPreview)
+void NoiseEditorPanel::UpdateNoiseMap(bool newMap)
 {
-    if (!newPreview)
+    if (!newMap)
     {
         return;
     }
@@ -316,7 +317,12 @@ void NoiseEditorPanel::UpdateNoiseMap(bool newPreview)
             m_NoiseMapArray.emplace_back(std::clamp(noise, 0.0f, 1.0f));
         }
     }
+}
 
+void NoiseEditorPanel::UpdateNoiseTexturePreview(bool newPreview)
+{
+    if (!newPreview)
+        return;
     // For the colors
     float scale = 255.0f / (m_NoisePreviewData.ColorTexMax - m_NoisePreviewData.ColorTexMin);
 
