@@ -20,6 +20,17 @@ NoiseEditorPanel::NoiseEditorPanel()
     UpdateNoiseMap(true);
 }
 
+void NoiseEditorPanel::SetWidth(uint32_t width)
+{
+    m_GeneralNoise.Width = width;
+    UpdateNoiseMap(true);
+}
+void NoiseEditorPanel::SetHeight(uint32_t height)
+{
+    m_GeneralNoise.Height = height;
+    UpdateNoiseMap(true);
+}
+
 void NoiseEditorPanel::OnImGuiRender()
 {
     static const char *enumNoiseType[] = {"OpenSimplex2", "OpenSimplex2S", "Cellular", "Perlin", "Value Cubic", "Value"};
@@ -302,7 +313,7 @@ void NoiseEditorPanel::UpdateNoiseMap(bool newPreview)
                 noise = std::clamp(noise - smoothValue, 0.0f, 1.0f);
             }
 
-            m_NoiseMapArray.emplace_back(noise);
+            m_NoiseMapArray.emplace_back(std::clamp(noise, 0.0f, 1.0f));
         }
     }
 

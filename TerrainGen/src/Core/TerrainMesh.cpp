@@ -84,9 +84,25 @@ void TerrainMesh::SetNoiseMap(const std::vector<float> &noiseMap)
 
 void TerrainMesh::SetWidth(uint32_t width)
 {
+    m_Width = width;
+
+    m_Vertices.clear();
+    m_Indices.clear();
+    m_VertexBufferObject.reset();
+    m_IndexBufferObject.reset();
+
+    CreateTerrain();
 }
 void TerrainMesh::SetHeight(uint32_t height)
 {
+    m_Height = height;
+
+    m_Vertices.clear();
+    m_Indices.clear();
+    m_VertexBufferObject.reset();
+    m_IndexBufferObject.reset();
+
+    CreateTerrain();
 }
 
 void TerrainMesh::CreateTerrain()

@@ -9,11 +9,12 @@ class NoiseEditorPanel
 {
 public:
     NoiseEditorPanel();
-    ~NoiseEditorPanel() {}
+    ~NoiseEditorPanel(){};
 
     void OnImGuiRender();
 
-    void SetSize(uint32_t width, uint32_t height) {};
+    void SetWidth(uint32_t width);
+    void SetHeight(uint32_t height);
 
     inline bool HasUpdated() { return m_NoiseUpdateFlag; }
     inline uint32_t GetWidth() { return (uint32_t)m_GeneralNoise.Width; }

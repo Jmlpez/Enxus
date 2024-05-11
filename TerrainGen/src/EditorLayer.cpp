@@ -4,7 +4,10 @@
 #include "imgui/imgui_internal.h"
 
 EditorLayer::EditorLayer()
-    : Layer("Terrain Generator Editor Layer"), m_ViewportSize(0.0f, 0.0f)
+    : Layer("Terrain Generator Editor Layer"),
+      m_ViewportSize(0.0f, 0.0f),
+      m_TerrainWidth(250),
+      m_TerrainHeight(250)
 {
 
     //----------------- CAMERA -------------------//
@@ -27,7 +30,8 @@ EditorLayer::EditorLayer()
     m_Shader->SetMat4("uModel", model);
 
     //----------------- TERRAIN -------------------//
-    m_TerrainMesh = Enxus::CreateScope<TerrainMesh>(250, 250);
+
+    m_TerrainMesh = Enxus::CreateScope<TerrainMesh>(m_TerrainWidth, m_TerrainHeight);
     m_TerrainShader->Bind();
     m_TerrainShader->SetMat4("uModel", glm::mat4(1.0f));
 
@@ -61,6 +65,10 @@ void EditorLayer::OnAttach()
     ImGui::SetWindowFocus("Viewport");
 
     m_NoiseEditorPanel = Enxus::CreateScope<NoiseEditorPanel>();
+    m_NoiseEditorPanel->SetWidth(m_TerrainWidth);
+    m_NoiseEditorPanel->SetHeight(m_TerrainHeight);
+
+    m_TerrainMesh->SetNoiseMap(m_NoiseEditorPanel->GetNoiseMap());
 }
 
 void EditorLayer::OnUpdate(Enxus::Timestep ts)
@@ -111,6 +119,8 @@ void EditorLayer::OnUpdate(Enxus::Timestep ts)
         }
         // Draw Skybox at last
         {
+            // always render the skybox with fill mode and not wireframe
+            Enxus::Renderer::SetPolygonMode(Enxus::PolygonMode::FILL);
             GLCall(glDepthMask(GL_FALSE));
             GLCall(glDepthFunc(GL_LEQUAL));
 
@@ -198,23 +208,7 @@ void EditorLayer::OnImGuiRender()
         ImGui::EndMenuBar();
     }
 
-    {
-        // Menu
-        ImGui::Begin("Menu");
-        // ImGui::Checkbox("Grid Floor", &m_ShowGridFloor);
-        ImGui::Checkbox("Wireframe Mode", &m_IsWireframe);
-        if (ImGui::DragFloat("Height", &m_HeightScale, 0.01f, 0.0f, 15.0f))
-        {
-            m_TerrainMesh->SetHeightScaleFactor(m_HeightScale);
-        }
-        if (ImGui::DragFloat("Distance", &m_VertexDistance, 0.001f, 0.01f, 2.0f))
-        {
-            m_TerrainMesh->SetVertexDistance(m_VertexDistance);
-        }
-        // using size_t (aka unsigned long) to remove warning
-        // size_t textureId = m_ExampleTexture->GetRendererId();
-        ImGui::End();
-    }
+    TerrainMenuUI();
 
     {
         // Scene
@@ -260,6 +254,38 @@ void EditorLayer::OnImGuiRender()
         m_TerrainMesh->SetNoiseMap(m_NoiseEditorPanel->GetNoiseMap());
     }
 
+    ImGui::End();
+}
+
+void EditorLayer::TerrainMenuUI()
+{
+
+    // Menu
+    ImGui::Begin("Menu");
+    // ImGui::Checkbox("Grid Floor", &m_ShowGridFloor);
+    ImGui::PushItemWidth(80);
+    ImGui::Checkbox("Wireframe Mode", &m_IsWireframe);
+    if (ImGui::DragFloat("Height Scale Factor", &m_HeightScale, 0.01f, 0.0f, 15.0f))
+    {
+        m_TerrainMesh->SetHeightScaleFactor(m_HeightScale);
+    }
+    if (ImGui::DragFloat("Distance", &m_VertexDistance, 0.001f, 0.01f, 2.0f))
+    {
+        m_TerrainMesh->SetVertexDistance(m_VertexDistance);
+    }
+    if (ImGui::DragInt("Terrain Width", (int *)&m_TerrainWidth, 1, 10, 500))
+    {
+        m_TerrainMesh->SetWidth(m_TerrainWidth);
+        m_NoiseEditorPanel->SetWidth(m_TerrainWidth);
+        m_TerrainMesh->SetNoiseMap(m_NoiseEditorPanel->GetNoiseMap());
+    }
+    if (ImGui::DragInt("Terrain Height", (int *)&m_TerrainHeight, 1, 10, 500))
+    {
+        m_TerrainMesh->SetHeight(m_TerrainHeight);
+        m_NoiseEditorPanel->SetHeight(m_TerrainHeight);
+        m_TerrainMesh->SetNoiseMap(m_NoiseEditorPanel->GetNoiseMap());
+    }
+    ImGui::PopItemWidth();
     ImGui::End();
 }
 

@@ -21,6 +21,7 @@ public:
 
 private:
     void HandleViewportResize();
+    void TerrainMenuUI();
 
 private:
     // Editor viewport options
@@ -33,6 +34,9 @@ private:
 
     float m_HeightScale = 1.5f;
     float m_VertexDistance = 0.05f;
+
+    uint32_t m_TerrainWidth;
+    uint32_t m_TerrainHeight;
 
     // Terrain Mesh
     Enxus::Scope<TerrainMesh> m_TerrainMesh;
