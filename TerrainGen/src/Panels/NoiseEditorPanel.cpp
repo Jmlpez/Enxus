@@ -21,12 +21,12 @@ NoiseEditorPanel::NoiseEditorPanel()
     UpdateNoiseTexturePreview(true);
 }
 
-void NoiseEditorPanel::SetWidth(uint32_t width)
+void NoiseEditorPanel::SetNoiseWidth(uint32_t width)
 {
     m_GeneralNoise.Width = width;
     UpdateNoiseMap(true);
 }
-void NoiseEditorPanel::SetHeight(uint32_t height)
+void NoiseEditorPanel::SetNoiseHeight(uint32_t height)
 {
     m_GeneralNoise.Height = height;
     UpdateNoiseMap(true);

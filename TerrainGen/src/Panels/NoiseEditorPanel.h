@@ -13,12 +13,12 @@ public:
 
     void OnImGuiRender();
 
-    void SetWidth(uint32_t width);
-    void SetHeight(uint32_t height);
+    void SetNoiseWidth(uint32_t width);
+    void SetNoiseHeight(uint32_t height);
 
     inline bool HasUpdated() { return m_NoiseUpdateFlag; }
-    inline uint32_t GetWidth() { return (uint32_t)m_GeneralNoise.Width; }
-    inline uint32_t GetHeight() { return (uint32_t)m_GeneralNoise.Height; }
+    inline uint32_t GetNoiseWidth() { return (uint32_t)m_GeneralNoise.Width; }
+    inline uint32_t GetNoiseHeight() { return (uint32_t)m_GeneralNoise.Height; }
     inline const std::vector<float> &GetNoiseMap() const { return m_NoiseMapArray; }
 
 private:

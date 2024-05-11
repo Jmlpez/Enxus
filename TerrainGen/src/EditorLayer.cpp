@@ -65,9 +65,8 @@ void EditorLayer::OnAttach()
     ImGui::SetWindowFocus("Viewport");
 
     m_NoiseEditorPanel = Enxus::CreateScope<NoiseEditorPanel>();
-    m_NoiseEditorPanel->SetWidth(m_TerrainWidth);
-    m_NoiseEditorPanel->SetHeight(m_TerrainHeight);
-
+    m_NoiseEditorPanel->SetNoiseWidth(m_TerrainWidth);
+    m_NoiseEditorPanel->SetNoiseHeight(m_TerrainHeight);
     m_TerrainMesh->SetNoiseMap(m_NoiseEditorPanel->GetNoiseMap());
 }
 
@@ -246,8 +245,8 @@ void EditorLayer::OnImGuiRender()
     {
 
         ASSERT(
-            m_NoiseEditorPanel->GetWidth() == m_TerrainMesh->GetWidth() &&
-            m_NoiseEditorPanel->GetHeight() == m_TerrainMesh->GetHeight())
+            m_NoiseEditorPanel->GetNoiseWidth() == m_TerrainMesh->GetWidth() &&
+            m_NoiseEditorPanel->GetNoiseHeight() == m_TerrainMesh->GetHeight())
 
         m_TerrainMesh->SetNoiseMap(m_NoiseEditorPanel->GetNoiseMap());
     }
@@ -274,13 +273,13 @@ void EditorLayer::TerrainMenuUI()
     if (ImGui::DragInt("Terrain Width", (int *)&m_TerrainWidth, 1, 10, 500))
     {
         m_TerrainMesh->SetWidth(m_TerrainWidth);
-        m_NoiseEditorPanel->SetWidth(m_TerrainWidth);
+        m_NoiseEditorPanel->SetNoiseWidth(m_TerrainWidth);
         m_TerrainMesh->SetNoiseMap(m_NoiseEditorPanel->GetNoiseMap());
     }
     if (ImGui::DragInt("Terrain Height", (int *)&m_TerrainHeight, 1, 10, 500))
     {
         m_TerrainMesh->SetHeight(m_TerrainHeight);
-        m_NoiseEditorPanel->SetHeight(m_TerrainHeight);
+        m_NoiseEditorPanel->SetNoiseHeight(m_TerrainHeight);
         m_TerrainMesh->SetNoiseMap(m_NoiseEditorPanel->GetNoiseMap());
     }
     ImGui::PopItemWidth();
