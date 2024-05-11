@@ -1,6 +1,6 @@
 #include "TerrainMesh.h"
 
-const uint32_t TerrainMesh::s_MaxTerrainSize = 3000;
+const uint32_t TerrainMesh::s_MaxTerrainSize = 1000;
 
 TerrainMesh::TerrainMesh()
 {
@@ -87,7 +87,7 @@ void TerrainMesh::SetWidth(uint32_t width)
     m_Width = width;
 
     m_Vertices.clear();
-    m_Indices.clear();
+    //    m_Indices.clear();
     m_VertexBufferObject.reset();
     m_IndexBufferObject.reset();
 
@@ -98,7 +98,7 @@ void TerrainMesh::SetHeight(uint32_t height)
     m_Height = height;
 
     m_Vertices.clear();
-    m_Indices.clear();
+    //    m_Indices.clear();
     m_VertexBufferObject.reset();
     m_IndexBufferObject.reset();
 
@@ -119,9 +119,8 @@ void TerrainMesh::CreateTerrain()
 
     m_VertexArrayObject->AddBuffer(m_VertexBufferObject, layout);
 
-    CreateIndices();
-
-    m_IndexBufferObject = Enxus::CreateRef<Enxus::IndexBuffer>(&m_Indices[0], m_Indices.size());
+    std::vector<unsigned int> indices = std::move(CreateIndices());
+    m_IndexBufferObject = Enxus::CreateRef<Enxus::IndexBuffer>(&indices[0], indices.size());
 }
 
 void TerrainMesh::CreateVertices()
@@ -143,7 +142,7 @@ void TerrainMesh::CreateVertices()
     m_Vertices = std::move(vertices);
 }
 
-void TerrainMesh::CreateIndices()
+std::vector<unsigned int> TerrainMesh::CreateIndices()
 {
     std::vector<unsigned int> indices((m_Height - 1) * (m_Width * 2), 0);
 
@@ -162,5 +161,5 @@ void TerrainMesh::CreateIndices()
             index += 2;
         }
     }
-    m_Indices = std::move(indices);
+    return indices;
 }

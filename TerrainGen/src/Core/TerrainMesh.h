@@ -11,24 +11,22 @@ public:
     ~TerrainMesh();
 
     void SetNoiseMap(const std::vector<float> &noiseMap);
-
     void SetHeightScaleFactor(float heightScale);
     void SetVertexDistance(float distance);
-
-    inline Enxus::Ref<Enxus::VertexArray> GetVertexArray() const { return m_VertexArrayObject; }
-    inline Enxus::Ref<Enxus::VertexBuffer> GetVertexBuffer() const { return m_VertexBufferObject; }
-    inline Enxus::Ref<Enxus::IndexBuffer> GetIndexBuffer() const { return m_IndexBufferObject; }
-
     void SetWidth(uint32_t width);
     void SetHeight(uint32_t height);
 
     inline uint32_t GetWidth() const { return m_Width; }
     inline uint32_t GetHeight() const { return m_Height; }
 
+    inline Enxus::Ref<Enxus::VertexArray> GetVertexArray() const { return m_VertexArrayObject; }
+    inline Enxus::Ref<Enxus::IndexBuffer> GetIndexBuffer() const { return m_IndexBufferObject; }
+
 private:
     void CreateTerrain();
     void CreateVertices();
-    void CreateIndices();
+    // Indices for Triangle Strip
+    std::vector<unsigned int> CreateIndices();
 
 private:
     uint32_t m_Width, m_Height;
