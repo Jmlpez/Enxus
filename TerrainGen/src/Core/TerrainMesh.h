@@ -23,12 +23,13 @@ public:
     ~TerrainMesh();
 
     void SetNoiseMap(const std::vector<float> &noiseMap);
-    void SetHeightScaleFactor(float heightScale);
+    void SetElevation(float elevation);
     void SetVertexDistance(float distance);
     void SetWidth(uint32_t width);
     void SetHeight(uint32_t height);
 
-    inline Enxus::Ref<Enxus::TextureMesh2D> GetGrassTexture()const {return m_GrassTexture;}
+    inline Enxus::Ref<Enxus::TextureMesh2D> GetGrassTexture() const { return m_GrassTexture; }
+    inline Enxus::Ref<Enxus::TextureMesh2D> GetSnowTexture() const { return m_SnowTexture; }
 
     inline uint32_t GetWidth() const { return m_Width; }
     inline uint32_t GetHeight() const { return m_Height; }
@@ -46,13 +47,13 @@ private:
     uint32_t m_Width, m_Height;
     // float m_VertexDistance = 0.0625f;
     float m_VertexDistance = 0.05f;
-    float m_HeightScale = 1.5f;
+    float m_Elevation = 1.5f;
 
     std::vector<float> m_NoiseMap;
 
     std::vector<TerrainVertex> m_Vertices;
 
-    Enxus::Ref<Enxus::TextureMesh2D> m_GrassTexture;
+    Enxus::Ref<Enxus::TextureMesh2D> m_GrassTexture, m_SnowTexture;
 
     Enxus::Ref<Enxus::VertexArray> m_VertexArrayObject;
     Enxus::Ref<Enxus::VertexBuffer> m_VertexBufferObject;

@@ -19,7 +19,7 @@ EditorLayer::EditorLayer()
 
     //----------------- SHADER -------------------//
     m_Shader = Enxus::CreateRef<Enxus::Shader>("TerrainGen/assets/shaders/model/box.vert", "TerrainGen/assets/shaders/model/box.frag");
-    m_TerrainShader = Enxus::CreateRef<Enxus::Shader>("TerrainGen/assets/shaders/heightmap/heightmap.vert", "TerrainGen/assets/shaders/heightmap/heightmap.frag");
+    m_TerrainShader = Enxus::CreateRef<Enxus::Shader>("TerrainGen/assets/shaders/terrain/terrain.vert", "TerrainGen/assets/shaders/terrain/terrain.frag");
 
     //----------------- BOX MODEL -------------------//
 
@@ -110,6 +110,10 @@ void EditorLayer::OnUpdate(Enxus::Timestep ts)
             m_TerrainShader->Bind();
             m_TerrainShader->SetInt("uGrass", 0);
             m_TerrainMesh->GetGrassTexture()->Bind();
+
+            m_TerrainShader->SetInt("uSnow", 1);
+            m_TerrainMesh->GetSnowTexture()->Bind(1);
+
             const uint32_t numOfStrips = m_TerrainMesh->GetHeight() - 1;
             const uint32_t numOfVertPerStrip = m_TerrainMesh->GetWidth() * 2;
             for (unsigned int strip = 0; strip < numOfStrips; strip++)
@@ -264,9 +268,9 @@ void EditorLayer::TerrainMenuUI()
     // ImGui::Checkbox("Grid Floor", &m_ShowGridFloor);
     ImGui::PushItemWidth(80);
     ImGui::Checkbox("Wireframe Mode", &m_IsWireframe);
-    if (ImGui::DragFloat("Height Scale Factor", &m_HeightScale, 0.01f, 0.0f, 15.0f))
+    if (ImGui::DragFloat("Elevation", &m_TerrainElevation, 0.01f, 0.0f, 15.0f))
     {
-        m_TerrainMesh->SetHeightScaleFactor(m_HeightScale);
+        m_TerrainMesh->SetElevation(m_TerrainElevation);
     }
     if (ImGui::DragFloat("Distance", &m_VertexDistance, 0.001f, 0.01f, 2.0f))
     {

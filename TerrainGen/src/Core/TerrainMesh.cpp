@@ -23,6 +23,8 @@ TerrainMesh::TerrainMesh(uint32_t width, uint32_t height)
 
     m_GrassTexture = Enxus::CreateRef<Enxus::TextureMesh2D>("TerrainGen/assets/images/grass-albedo.png",
                                                             Enxus::TextureType::DIFFUSE);
+    m_SnowTexture = Enxus::CreateRef<Enxus::TextureMesh2D>("TerrainGen/assets/images/snow-albedo.png",
+                                                           Enxus::TextureType::DIFFUSE);
 
     CreateTerrain();
 }
@@ -49,12 +51,12 @@ void TerrainMesh::SetVertexDistance(float distance)
     m_VertexBufferObject->SetData(&m_Vertices[0], m_Vertices.size() * sizeof(TerrainVertex));
 }
 
-void TerrainMesh::SetHeightScaleFactor(float heightScale)
+void TerrainMesh::SetElevation(float elevation)
 {
-    if (m_HeightScale == heightScale)
+    if (m_Elevation == elevation)
         return;
 
-    m_HeightScale = heightScale;
+    m_Elevation = elevation;
     if (m_NoiseMap.empty())
         return;
 
@@ -63,7 +65,7 @@ void TerrainMesh::SetHeightScaleFactor(float heightScale)
         for (uint32_t j = 0; j < m_Width; j++)
         {
             uint32_t vertexIndex = i * m_Width + j;
-            float newYPos = m_NoiseMap[vertexIndex] * m_HeightScale;
+            float newYPos = m_NoiseMap[vertexIndex] * m_Elevation;
             m_Vertices[vertexIndex].Position.y = newYPos;
         }
     }
@@ -81,7 +83,7 @@ void TerrainMesh::SetNoiseMap(const std::vector<float> &noiseMap)
         for (uint32_t j = 0; j < m_Width; j++)
         {
             uint32_t vertexIndex = i * m_Width + j;
-            float newYPos = m_NoiseMap[vertexIndex] * m_HeightScale;
+            float newYPos = m_NoiseMap[vertexIndex] * m_Elevation;
             m_Vertices[vertexIndex].Position.y = newYPos;
         }
     }

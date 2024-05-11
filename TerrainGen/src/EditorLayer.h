@@ -32,8 +32,8 @@ private:
     // Scene options
     bool m_IsWireframe = false;
 
-    float m_HeightScale = 1.5f;
     float m_VertexDistance = 0.05f;
+    float m_TerrainElevation = 1.5f;
 
     uint32_t m_TerrainWidth;
     uint32_t m_TerrainHeight;
