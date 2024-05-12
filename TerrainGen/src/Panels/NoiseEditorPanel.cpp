@@ -64,7 +64,7 @@ void NoiseEditorPanel::OnImGuiRender()
                 m_Fnl.SetSeed(m_GeneralNoise.Seed);
                 m_NoiseUpdateFlag = true;
             }
-            if (ImGui::DragFloat("Frequency", &m_GeneralNoise.Frequency, 0.0002f))
+            if (ImGui::DragFloat("Frequency", &m_GeneralNoise.Frequency, 0.0001f))
             {
                 m_Fnl.SetFrequency(m_GeneralNoise.Frequency);
                 m_NoiseUpdateFlag = true;
