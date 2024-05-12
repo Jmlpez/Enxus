@@ -21,10 +21,10 @@ TerrainMesh::TerrainMesh(uint32_t width, uint32_t height)
 
     m_VertexArrayObject = Enxus::CreateRef<Enxus::VertexArray>();
 
-    m_GrassTexture = Enxus::CreateRef<Enxus::TextureMesh2D>("TerrainGen/assets/images/grass-albedo.png",
-                                                            Enxus::TextureType::DIFFUSE);
-    m_SnowTexture = Enxus::CreateRef<Enxus::TextureMesh2D>("TerrainGen/assets/images/snow-albedo.png",
-                                                           Enxus::TextureType::DIFFUSE);
+    // m_GrassTexture = Enxus::CreateRef<Enxus::TextureMesh2D>("TerrainGen/assets/images/grass-albedo.png",
+    //                                                         Enxus::TextureType::DIFFUSE);
+    // m_SnowTexture = Enxus::CreateRef<Enxus::TextureMesh2D>("TerrainGen/assets/images/snow-albedo.png",
+    //                                                        Enxus::TextureType::DIFFUSE);
 
     CreateTerrain();
 }
@@ -87,7 +87,7 @@ void TerrainMesh::SetWidth(uint32_t width)
     m_Width = width;
 
     m_Vertices.clear();
-    //    m_Indices.clear();
+
     m_VertexBufferObject.reset();
     m_IndexBufferObject.reset();
 
@@ -98,7 +98,6 @@ void TerrainMesh::SetHeight(uint32_t height)
     m_Height = height;
 
     m_Vertices.clear();
-    //    m_Indices.clear();
     m_VertexBufferObject.reset();
     m_IndexBufferObject.reset();
 
@@ -127,6 +126,10 @@ void TerrainMesh::CreateTerrain()
 
 void TerrainMesh::CalculateNoiseMap()
 {
+    // first valid value
+    float minHeight = Evaluate(m_NoiseMap[0]) * m_Elevation;
+    float maxHeight = minHeight;
+
     for (uint32_t i = 0; i < m_Height; i++)
     {
         for (uint32_t j = 0; j < m_Width; j++)
@@ -134,8 +137,13 @@ void TerrainMesh::CalculateNoiseMap()
             uint32_t vertexIndex = i * m_Width + j;
             float newYPos = Evaluate(m_NoiseMap[vertexIndex]) * m_Elevation;
             m_Vertices[vertexIndex].Position.y = newYPos;
+
+            minHeight = minHeight > newYPos ? newYPos : minHeight;
+            maxHeight = maxHeight < newYPos ? newYPos : maxHeight;
         }
     }
+    m_MinHeight = minHeight;
+    m_MaxHeight = maxHeight;
     m_VertexBufferObject->SetData(&m_Vertices[0], m_Vertices.size() * sizeof(TerrainVertex));
 }
 
@@ -160,10 +168,7 @@ void TerrainMesh::CreateVertices()
             texCoord.x = (float)j / (float)m_Width;
             texCoord.y = (float)i / (float)m_Height;
 
-            vertices.emplace_back(
-                TerrainVertex(
-                    position,
-                    texCoord));
+            vertices.emplace_back(position, texCoord);
         }
     }
     m_Vertices = std::move(vertices);
@@ -197,13 +202,13 @@ float TerrainMesh::Evaluate(float t)
     {
     case AnimationCurve::Linear:
         return t;
-    case EaseInQuad:
+    case AnimationCurve::EaseInQuad:
         return Enxus::Math::easeInQuad(t);
-    case EaseInCubic:
+    case AnimationCurve::EaseInCubic:
         return Enxus::Math::easeInCubic(t);
-    case EaseInQuart:
+    case AnimationCurve::EaseInQuart:
         return Enxus::Math::easeInQuart(t);
-    case EaseInQuint:
+    case AnimationCurve::EaseInQuint:
         return Enxus::Math::easeInQuint(t);
     }
     std::cout << "[AnimationCurve Error] Unknown Animation Curve";

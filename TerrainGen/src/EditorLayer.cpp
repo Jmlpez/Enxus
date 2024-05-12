@@ -32,8 +32,15 @@ EditorLayer::EditorLayer()
     //----------------- TERRAIN -------------------//
 
     m_TerrainMesh = Enxus::CreateScope<TerrainMesh>(m_TerrainWidth, m_TerrainHeight);
+
+    m_BiomeColor[0] = glm::vec3(0.2f, 0.5f, 0.1f);
+    m_BiomeColor[1] = glm::vec3(0.5f, 0.2f, 0.1f);
+
     m_TerrainShader->Bind();
     m_TerrainShader->SetMat4("uModel", glm::mat4(1.0f));
+    m_TerrainShader->SetInt("uNumOfColors", 2);
+    // m_TerrainShader->SetFloat("uBiomeStartHeight[0]", m_BiomeStartHeight[0]);
+    // m_TerrainShader->SetFloat("uBiomeStartHeight[1]", m_BiomeStartHeight[1]);
 
     //----------------- Sky Box -------------------//
     m_SkyBox = Enxus::CreateRef<Enxus::SkyBox>();
@@ -62,12 +69,13 @@ void EditorLayer::OnAttach()
     fbspec.Width = 800;
     fbspec.Height = 600;
     m_Framebuffer = Enxus::CreateScope<Enxus::Framebuffer>(fbspec);
-    ImGui::SetWindowFocus("Viewport");
 
     m_NoiseEditorPanel = Enxus::CreateScope<NoiseEditorPanel>();
     m_NoiseEditorPanel->SetNoiseWidth(m_TerrainWidth);
     m_NoiseEditorPanel->SetNoiseHeight(m_TerrainHeight);
     m_TerrainMesh->SetNoiseMap(m_NoiseEditorPanel->GetNoiseMap());
+
+    ImGui::SetWindowFocus("Viewport");
 }
 
 void EditorLayer::OnUpdate(Enxus::Timestep ts)
@@ -108,11 +116,21 @@ void EditorLayer::OnUpdate(Enxus::Timestep ts)
             m_TerrainMesh->GetVertexArray()->Bind();
             m_TerrainMesh->GetIndexBuffer()->Bind();
             m_TerrainShader->Bind();
-            m_TerrainShader->SetInt("uGrass", 0);
-            m_TerrainMesh->GetGrassTexture()->Bind();
+            m_TerrainShader->SetFloat("uMinHeight", m_TerrainMesh->GetMinHeight());
+            m_TerrainShader->SetFloat("uMaxHeight", m_TerrainMesh->GetMaxHeight());
 
-            m_TerrainShader->SetInt("uSnow", 1);
-            m_TerrainMesh->GetSnowTexture()->Bind(1);
+            m_TerrainShader->SetFloat("uBiomeStartHeight[0]", m_BiomeStartHeight[0]);
+            m_TerrainShader->SetFloat("uBiomeBlends[0]", m_BiomeBlends[0]);
+            m_TerrainShader->SetVec3("uBiomeColors[0]", m_BiomeColor[0]);
+
+            m_TerrainShader->SetFloat("uBiomeStartHeight[1]", m_BiomeStartHeight[1]);
+            m_TerrainShader->SetFloat("uBiomeBlends[1]", m_BiomeBlends[1]);
+            m_TerrainShader->SetVec3("uBiomeColors[1]", m_BiomeColor[1]);
+            //  m_TerrainShader->SetInt("uGrass", 0);
+            //  m_TerrainMesh->GetGrassTexture()->Bind();
+
+            // m_TerrainShader->SetInt("uSnow", 1);
+            // m_TerrainMesh->GetSnowTexture()->Bind(1);
 
             const uint32_t numOfStrips = m_TerrainMesh->GetHeight() - 1;
             const uint32_t numOfVertPerStrip = m_TerrainMesh->GetWidth() * 2;
@@ -267,8 +285,10 @@ void EditorLayer::TerrainMenuUI()
 
     // Menu
     ImGui::Begin("Menu");
+
     // ImGui::Checkbox("Grid Floor", &m_ShowGridFloor);
-    ImGui::PushItemWidth(80);
+    ImGui::PushItemWidth(120);
+    // ImGui::Swap
     ImGui::Checkbox("Wireframe Mode", &m_IsWireframe);
     if (ImGui::DragFloat("Elevation", &m_TerrainElevation, 0.01f, 0.0f, 15.0f))
     {
@@ -278,22 +298,31 @@ void EditorLayer::TerrainMenuUI()
     {
         m_TerrainMesh->SetVertexDistance(m_VertexDistance);
     }
-    if (ImGui::DragInt("Terrain Width", (int *)&m_TerrainWidth, 1, 10, 500))
+    if (ImGui::SliderInt("Terrain Width", (int *)&m_TerrainWidth, 10, 500))
     {
         m_TerrainMesh->SetWidth(m_TerrainWidth);
         m_NoiseEditorPanel->SetNoiseWidth(m_TerrainWidth);
         m_TerrainMesh->SetNoiseMap(m_NoiseEditorPanel->GetNoiseMap());
     }
-    if (ImGui::DragInt("Terrain Height", (int *)&m_TerrainHeight, 1, 10, 500))
+    if (ImGui::SliderInt("Terrain Height", (int *)&m_TerrainHeight, 10, 500))
     {
         m_TerrainMesh->SetHeight(m_TerrainHeight);
         m_NoiseEditorPanel->SetNoiseHeight(m_TerrainHeight);
         m_TerrainMesh->SetNoiseMap(m_NoiseEditorPanel->GetNoiseMap());
     }
+
     if (ImGui::Combo("Elevation Curve", &m_TerrainElevationCurve, enumTerrainAnimationCurve, IM_ARRAYSIZE(enumTerrainAnimationCurve)))
     {
         m_TerrainMesh->SetHeightElevationCurve((AnimationCurve)m_TerrainElevationCurve);
     }
+
+    ImGui::ColorEdit3("Color1", glm::value_ptr(m_BiomeColor[0]));
+    ImGui::SliderFloat("First Start Height", &m_BiomeStartHeight[0], 0.0f, 1.0f);
+    ImGui::SliderFloat("Color1 Blend", &m_BiomeBlends[0], 0.0f, 1.0f);
+
+    ImGui::ColorEdit3("Color2", glm::value_ptr(m_BiomeColor[1]));
+    ImGui::SliderFloat("Second Start Height", &m_BiomeStartHeight[1], 0.0f, 1.0f);
+    ImGui::SliderFloat("Color2 Blend", &m_BiomeBlends[1], 0.0f, 1.0f);
 
     ImGui::PopItemWidth();
     ImGui::End();

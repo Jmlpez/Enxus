@@ -41,6 +41,9 @@ public:
     inline Enxus::Ref<Enxus::TextureMesh2D> GetGrassTexture() const { return m_GrassTexture; }
     inline Enxus::Ref<Enxus::TextureMesh2D> GetSnowTexture() const { return m_SnowTexture; }
 
+    inline float GetMinHeight() const { return m_MinHeight; }
+    inline float GetMaxHeight() const { return m_MaxHeight; }
+
     inline uint32_t GetWidth() const { return m_Width; }
     inline uint32_t GetHeight() const { return m_Height; }
 
@@ -51,9 +54,9 @@ private:
     void CreateTerrain();
     void CreateVertices();
     void CalculateNoiseMap();
+
     // Indices for Triangle Strip
     std::vector<unsigned int> CreateIndices();
-
     float Evaluate(float t);
 
 private:
@@ -61,6 +64,8 @@ private:
     // float m_VertexDistance = 0.0625f;
     float m_VertexDistance = 0.05f;
     float m_Elevation = 1.5f;
+    float m_MinHeight = 0.0f;
+    float m_MaxHeight = 1.0f;
 
     AnimationCurve m_ElevationCurve = AnimationCurve::EaseInQuad;
 
