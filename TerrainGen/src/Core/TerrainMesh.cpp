@@ -33,19 +33,29 @@ TerrainMesh::~TerrainMesh()
 {
 }
 
+void TerrainMesh::SetHeightElevationCurve(AnimationCurve curve)
+{
+    m_ElevationCurve = curve;
+    CalculateNoiseMap();
+}
+
 void TerrainMesh::SetVertexDistance(float distance)
 {
     if (distance == m_VertexDistance)
         return;
     m_VertexDistance = distance;
+
+    float topLeftX = (float)m_Width / -2.0f;
+    float topLeftZ = (float)m_Height / -2.0f;
+
     for (uint32_t i = 0; i < m_Height; i++)
     {
         for (uint32_t j = 0; j < m_Width; j++)
         {
             uint32_t vertexIndex = i * m_Width + j;
 
-            m_Vertices[vertexIndex].Position.x = (-(float)m_Width / 2.0f + i) * m_VertexDistance;  // to center int x-axis
-            m_Vertices[vertexIndex].Position.z = (-(float)m_Height / 2.0f + j) * m_VertexDistance; // to center int z-axis
+            m_Vertices[vertexIndex].Position.x = (topLeftX + j) * m_VertexDistance; // to center int x-axis
+            m_Vertices[vertexIndex].Position.z = (topLeftZ + i) * m_VertexDistance; // to center int z-axis
         }
     }
     m_VertexBufferObject->SetData(&m_Vertices[0], m_Vertices.size() * sizeof(TerrainVertex));
@@ -60,16 +70,7 @@ void TerrainMesh::SetElevation(float elevation)
     if (m_NoiseMap.empty())
         return;
 
-    for (uint32_t i = 0; i < m_Height; i++)
-    {
-        for (uint32_t j = 0; j < m_Width; j++)
-        {
-            uint32_t vertexIndex = i * m_Width + j;
-            float newYPos = m_NoiseMap[vertexIndex] * m_Elevation;
-            m_Vertices[vertexIndex].Position.y = newYPos;
-        }
-    }
-    m_VertexBufferObject->SetData(&m_Vertices[0], m_Vertices.size() * sizeof(TerrainVertex));
+    CalculateNoiseMap();
 }
 
 void TerrainMesh::SetNoiseMap(const std::vector<float> &noiseMap)
@@ -78,16 +79,7 @@ void TerrainMesh::SetNoiseMap(const std::vector<float> &noiseMap)
     // ASSERT(noiseMap.size() != m_Width * m_Height);
     // asserts are slow so keep it with the macros !
     m_NoiseMap = std::move(noiseMap);
-    for (uint32_t i = 0; i < m_Height; i++)
-    {
-        for (uint32_t j = 0; j < m_Width; j++)
-        {
-            uint32_t vertexIndex = i * m_Width + j;
-            float newYPos = m_NoiseMap[vertexIndex] * m_Elevation;
-            m_Vertices[vertexIndex].Position.y = newYPos;
-        }
-    }
-    m_VertexBufferObject->SetData(&m_Vertices[0], m_Vertices.size() * sizeof(TerrainVertex));
+    CalculateNoiseMap();
 }
 
 void TerrainMesh::SetWidth(uint32_t width)
@@ -133,23 +125,40 @@ void TerrainMesh::CreateTerrain()
     m_IndexBufferObject = Enxus::CreateRef<Enxus::IndexBuffer>(&indices[0], indices.size());
 }
 
+void TerrainMesh::CalculateNoiseMap()
+{
+    for (uint32_t i = 0; i < m_Height; i++)
+    {
+        for (uint32_t j = 0; j < m_Width; j++)
+        {
+            uint32_t vertexIndex = i * m_Width + j;
+            float newYPos = Evaluate(m_NoiseMap[vertexIndex]) * m_Elevation;
+            m_Vertices[vertexIndex].Position.y = newYPos;
+        }
+    }
+    m_VertexBufferObject->SetData(&m_Vertices[0], m_Vertices.size() * sizeof(TerrainVertex));
+}
+
 void TerrainMesh::CreateVertices()
 {
     std::vector<TerrainVertex> vertices;
     vertices.reserve(m_Width * m_Height);
+
+    float topLeftX = (float)m_Width / -2.0f;
+    float topLeftZ = (float)m_Height / -2.0f;
 
     for (uint32_t i = 0; i < m_Height; i++)
     {
         for (uint32_t j = 0; j < m_Width; j++)
         {
             glm::vec3 position;
-            position.x = (-(float)m_Width / 2.0f + i) * m_VertexDistance;  // to center int x-axis
-            position.y = 0.0f;                                             // flat plane
-            position.z = (-(float)m_Height / 2.0f + j) * m_VertexDistance; // to center int z-axis
+            position.x = (topLeftX + j) * m_VertexDistance; // to center int x-axis
+            position.y = 0.0f;                              // flat plane
+            position.z = (topLeftZ + i) * m_VertexDistance; // to center int z-axis
 
             glm::vec2 texCoord;
-            texCoord.x = (1.0f / (float)m_Width) * j;
-            texCoord.y = (1.0f / (float)m_Height) * i;
+            texCoord.x = (float)j / (float)m_Width;
+            texCoord.y = (float)i / (float)m_Height;
 
             vertices.emplace_back(
                 TerrainVertex(
@@ -180,4 +189,25 @@ std::vector<unsigned int> TerrainMesh::CreateIndices()
         }
     }
     return indices;
+}
+
+float TerrainMesh::Evaluate(float t)
+{
+    switch (m_ElevationCurve)
+    {
+    case AnimationCurve::Linear:
+        return t;
+    case EaseInQuad:
+        return Enxus::Math::easeInQuad(t);
+    case EaseInCubic:
+        return Enxus::Math::easeInCubic(t);
+    case EaseInQuart:
+        return Enxus::Math::easeInQuart(t);
+    case EaseInQuint:
+        return Enxus::Math::easeInQuint(t);
+    }
+    std::cout << "[AnimationCurve Error] Unknown Animation Curve";
+    ASSERT(false);
+    // to avoid warning
+    return AnimationCurve::Linear;
 }

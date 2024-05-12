@@ -35,6 +35,9 @@ private:
     float m_VertexDistance = 0.05f;
     float m_TerrainElevation = 1.5f;
 
+    // the first AnimationCurve Enum elemnent: Linear
+    int m_TerrainElevationCurve = 0;
+
     uint32_t m_TerrainWidth;
     uint32_t m_TerrainHeight;
 

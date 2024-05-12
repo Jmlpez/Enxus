@@ -15,6 +15,15 @@ struct TerrainVertex
         : Position(position), TexCoord(texCoord) {}
 };
 
+enum AnimationCurve
+{
+    Linear = 0,
+    EaseInQuad,
+    EaseInCubic,
+    EaseInQuart,
+    EaseInQuint,
+};
+
 class TerrainMesh
 {
 public:
@@ -23,6 +32,7 @@ public:
     ~TerrainMesh();
 
     void SetNoiseMap(const std::vector<float> &noiseMap);
+    void SetHeightElevationCurve(AnimationCurve curve);
     void SetElevation(float elevation);
     void SetVertexDistance(float distance);
     void SetWidth(uint32_t width);
@@ -40,14 +50,19 @@ public:
 private:
     void CreateTerrain();
     void CreateVertices();
+    void CalculateNoiseMap();
     // Indices for Triangle Strip
     std::vector<unsigned int> CreateIndices();
+
+    float Evaluate(float t);
 
 private:
     uint32_t m_Width, m_Height;
     // float m_VertexDistance = 0.0625f;
     float m_VertexDistance = 0.05f;
     float m_Elevation = 1.5f;
+
+    AnimationCurve m_ElevationCurve = AnimationCurve::EaseInQuad;
 
     std::vector<float> m_NoiseMap;
 

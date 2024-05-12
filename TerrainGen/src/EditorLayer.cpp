@@ -263,6 +263,8 @@ void EditorLayer::OnImGuiRender()
 void EditorLayer::TerrainMenuUI()
 {
 
+    static const char *enumTerrainAnimationCurve[] = {"Linear", "EaseInQuad", "EaseInCubic", "EaseInQuart", "EaseInQuint"};
+
     // Menu
     ImGui::Begin("Menu");
     // ImGui::Checkbox("Grid Floor", &m_ShowGridFloor);
@@ -288,6 +290,11 @@ void EditorLayer::TerrainMenuUI()
         m_NoiseEditorPanel->SetNoiseHeight(m_TerrainHeight);
         m_TerrainMesh->SetNoiseMap(m_NoiseEditorPanel->GetNoiseMap());
     }
+    if (ImGui::Combo("Elevation Curve", &m_TerrainElevationCurve, enumTerrainAnimationCurve, IM_ARRAYSIZE(enumTerrainAnimationCurve)))
+    {
+        m_TerrainMesh->SetHeightElevationCurve((AnimationCurve)m_TerrainElevationCurve);
+    }
+
     ImGui::PopItemWidth();
     ImGui::End();
 }
