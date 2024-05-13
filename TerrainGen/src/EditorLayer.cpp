@@ -15,7 +15,7 @@ EditorLayer::EditorLayer()
     unsigned int width = window.GetWidth();
     unsigned int height = window.GetHeight();
 
-    m_CameraController = Enxus::CreateScope<Enxus::FreeCameraController>((float)width / (float)height);
+    m_CameraController = Enxus::CreateScope<Enxus::FreeCameraController>((float)width / (float)height, 0.1f, 100.0f);
 
     //----------------- SHADER -------------------//
     m_Shader = Enxus::CreateRef<Enxus::Shader>("TerrainGen/assets/shaders/model/box.vert", "TerrainGen/assets/shaders/model/box.frag");

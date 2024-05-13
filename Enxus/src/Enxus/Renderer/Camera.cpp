@@ -62,4 +62,20 @@ namespace Enxus
         RecalculateView();
     }
 
+    void Camera::SetFOV(float fov)
+    {
+        m_FOV = fov;
+        RecalculateProjection();
+    }
+    void Camera::SetNearPlane(float nearPlane)
+    {
+        m_NearPlane = nearPlane;
+        RecalculateProjection();
+    }
+    void Camera::SetFarPlane(float farPlane)
+    {
+        m_FarPlane = farPlane;
+        RecalculateProjection();
+    }
+
 }

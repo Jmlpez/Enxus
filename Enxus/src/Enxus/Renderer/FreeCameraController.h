@@ -14,6 +14,7 @@ namespace Enxus
 
     public:
         FreeCameraController(float aspectRatio);
+        FreeCameraController(float aspectRatio, float nearPlane, float farPlane);
         ~FreeCameraController(){};
 
         Camera &GetCamera() { return m_Camera; }

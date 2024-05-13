@@ -39,6 +39,10 @@ namespace Enxus
         inline float GetNearPlane() { return m_NearPlane; }
         inline float GetFarPlane() { return m_FarPlane; }
 
+        void SetFOV(float fov);
+        void SetNearPlane(float nearPlane);
+        void SetFarPlane(float farPlane);
+
     private:
         void RecalculateView();
         void RecalculateProjection();

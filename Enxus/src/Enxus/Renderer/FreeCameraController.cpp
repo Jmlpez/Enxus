@@ -16,6 +16,13 @@ namespace Enxus
         m_Camera.SetUp(m_CameraUp);
         m_Camera.SetFront(m_CameraFront);
     };
+    FreeCameraController::FreeCameraController(float aspectRatio, float nearPlane, float farPlane)
+        : m_Camera(45.0f, aspectRatio, nearPlane, farPlane)
+    {
+        m_Camera.SetPos(m_CameraPos);
+        m_Camera.SetUp(m_CameraUp);
+        m_Camera.SetFront(m_CameraFront);
+    };
 
     void FreeCameraController::ResetCameraLocation()
     {
