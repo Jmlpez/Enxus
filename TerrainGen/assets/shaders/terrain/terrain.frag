@@ -3,7 +3,6 @@
 out vec4 FragColor;
 
 in VS_OUT {
-    float vHeight;
     vec3 vVertexPos;
     vec2 vTexCoord;
     vec3 vNormal;
@@ -24,7 +23,7 @@ const float EPSILON = 1e-4;
 const int MAX_NUM_OF_COLORS = 8;
 uniform int uNumOfColors;
 
-// vHeight > biomeStartHeight --> apply biomeColor
+// vVertexPos.y > biomeStartHeight --> apply biomeColor
 uniform float uBiomeStartHeight[MAX_NUM_OF_COLORS];
 uniform float uBiomeBlends[MAX_NUM_OF_COLORS];
 uniform vec3 uBiomeColors[MAX_NUM_OF_COLORS];
@@ -34,8 +33,9 @@ uniform float uMaxHeight;
 
 uniform float uTexScale;
 
-uniform sampler2D uGrass;
 //uniform sampler2D uSnow;
+uniform sampler2D uTerrainTextures[2];
+//uniform sampler2D uGrass;
 
 uniform vec3 uCameraPos;
 
@@ -43,15 +43,15 @@ float inverseLerp(float a, float b, float value);
 
 void main() {
 
-    float heightPercent = inverseLerp(uMinHeight, uMaxHeight, fs_in.vHeight);
+    float heightPercent = inverseLerp(uMinHeight, uMaxHeight, fs_in.vVertexPos.y);
     // initially as gray
     vec3 color = vec3(heightPercent);
 
     for(int i = 0; i < uNumOfColors; i++) {
         // blending the colors
         float drawStrength = inverseLerp(-uBiomeBlends[i] / 2 - EPSILON, uBiomeBlends[i] / 2, heightPercent - uBiomeStartHeight[i]);
+
         //color = color * (1 - drawStrength) + uBiomeColors[i] * drawStrength;
-        // lerp
         color = mix(color, uBiomeColors[i], drawStrength);
     }
 
@@ -59,20 +59,20 @@ void main() {
     vec3 viewDir = normalize(uCameraPos - fs_in.vFragPos);
 
     vec3 lighting = CalcDirLight(uDirLight, normal, viewDir);
-    //vec3 result = color;
+    vec3 result = color * lighting;
 
-    //FragColor = vec4(result, 1.0);
+    FragColor = vec4(result, 1.0);
 
-    vec3 scaledWorldPos = fs_in.vVertexPos / uTexScale;
+    // vec3 scaledWorldPos = fs_in.vVertexPos / uTexScale;
 
-    vec3 blendAxes = abs(fs_in.vNormal);
-    blendAxes /= blendAxes.x + blendAxes.y + blendAxes.z;
+    // vec3 blendAxes = abs(fs_in.vNormal);
+    // blendAxes /= blendAxes.x + blendAxes.y + blendAxes.z;
 
-    vec4 xProjection = texture2D(uGrass, scaledWorldPos.yz) * blendAxes.x;
-    vec4 yProjection = texture2D(uGrass, scaledWorldPos.xz) * blendAxes.y;
-    vec4 zProjection = texture2D(uGrass, scaledWorldPos.xy) * blendAxes.z;
+    // vec4 xProjection = texture2D(uTerrainTextures[0], scaledWorldPos.yz) * blendAxes.x;
+    // vec4 yProjection = texture2D(uTerrainTextures[0], scaledWorldPos.xz) * blendAxes.y;
+    // vec4 zProjection = texture2D(uTerrainTextures[0], scaledWorldPos.xy) * blendAxes.z;
 
-    FragColor = (xProjection + yProjection + zProjection) * vec4(lighting, 1);
+    // FragColor = (xProjection + yProjection + zProjection) * vec4(lighting, 1);
 }
 
 float inverseLerp(float a, float b, float value) {

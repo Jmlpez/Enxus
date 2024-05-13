@@ -9,7 +9,6 @@ uniform mat4 uView;
 uniform mat4 uProj;
 
 out VS_OUT {
-    float vHeight;
     vec3 vVertexPos;
     vec2 vTexCoord;
     vec3 vNormal;
@@ -19,7 +18,6 @@ out VS_OUT {
 void main() {
 
     gl_Position = uProj * uView * uModel * vec4(aPos, 1.0);
-    vs_out.vHeight = aPos.y;
     vs_out.vVertexPos = aPos;
     vs_out.vTexCoord = aTexCoord;
 
