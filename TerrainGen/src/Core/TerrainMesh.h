@@ -7,12 +7,13 @@ struct TerrainVertex
 {
     glm::vec3 Position;
     glm::vec2 TexCoord;
+    glm::vec3 Normal;
 
     TerrainVertex(glm::vec3 position)
-        : Position(position), TexCoord(0, 0) {}
+        : Position(position), TexCoord(0), Normal(0) {}
 
-    TerrainVertex(glm::vec3 position, glm::vec2 texCoord)
-        : Position(position), TexCoord(texCoord) {}
+    TerrainVertex(glm::vec3 position, glm::vec2 texCoord, glm::vec3 normal)
+        : Position(position), TexCoord(texCoord), Normal(normal) {}
 };
 
 enum AnimationCurve
@@ -27,7 +28,7 @@ enum AnimationCurve
 class TerrainMesh
 {
 public:
-    TerrainMesh();
+    TerrainMesh() = delete;
     TerrainMesh(uint32_t width, uint32_t height);
     ~TerrainMesh();
 
@@ -53,10 +54,12 @@ public:
 private:
     void CreateTerrain();
     void CreateVertices();
+    void CalculateNormals();
     void CalculateNoiseMap();
-
     // Indices for Triangle Strip
     std::vector<unsigned int> CreateIndices();
+
+    glm::vec3 GetNormalFromIndices(unsigned int indexA, unsigned int indexB, unsigned int indexC, bool flipDir);
     float Evaluate(float t);
 
 private:
@@ -72,6 +75,7 @@ private:
     std::vector<float> m_NoiseMap;
 
     std::vector<TerrainVertex> m_Vertices;
+    std::vector<unsigned int> m_Indices;
 
     Enxus::Ref<Enxus::TextureMesh2D> m_GrassTexture, m_SnowTexture;
 
