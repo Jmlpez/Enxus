@@ -34,17 +34,20 @@ private:
 
     float m_VertexDistance = 0.05f;
     float m_TerrainElevation = 1.5f;
+    float m_TextureScale = 1.0f;
 
     // the first AnimationCurve Enum elemnent: Linear
     int m_TerrainElevationCurve = 0;
 
     // Color testing
     glm::vec3 m_BiomeColor[2];
-    float m_BiomeStartHeight[2] = {0.3f, 0.7f};
+    float m_BiomeStartHeight[2] = {0.0f, 0.7f};
     float m_BiomeBlends[2] = {0.5f, 0.5f};
 
     uint32_t m_TerrainWidth;
     uint32_t m_TerrainHeight;
+
+    glm::vec3 m_LightDirection;
 
     // Terrain Mesh
     Enxus::Scope<TerrainMesh> m_TerrainMesh;
