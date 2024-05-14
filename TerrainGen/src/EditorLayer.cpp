@@ -47,8 +47,15 @@ EditorLayer::EditorLayer()
     m_TerrainShader->SetFloat3("uDirLight.diffuse", 1.0f, 1.0f, 1.0f);
     m_TerrainShader->SetFloat3("uDirLight.specular", 1.0f, 1.0f, 1.0f);
 
-    // m_TerrainShader->SetFloat("uBiomeStartHeight[0]", m_BiomeStartHeight[0]);
-    // m_TerrainShader->SetFloat("uBiomeStartHeight[1]", m_BiomeStartHeight[1]);
+    //----------------- TERRAIN TEXTURES -------------------//
+    static const std::string texturesPaths[2] = {
+        "TerrainGen/assets/images/materials-debug/grass.png",
+        "TerrainGen/assets/images/materials-debug/snow.png",
+    };
+    for (int i = 0; i < 2; i++)
+    {
+        m_TexturesList[i] = Enxus::CreateRef<Enxus::TextureMesh2D>(texturesPaths[i], Enxus::TextureType::DIFFUSE);
+    }
 
     //----------------- Sky Box -------------------//
     m_SkyBox = Enxus::CreateRef<Enxus::SkyBox>();
@@ -96,11 +103,6 @@ void EditorLayer::OnUpdate(Enxus::Timestep ts)
 
     HandleViewportResize();
 
-    m_Shader->Bind();
-    m_Shader->SetMat4("uView", m_CameraController->GetCamera().GetViewMatrix());
-    m_Shader->SetMat4("uProj", m_CameraController->GetCamera().GetProjectionMatrix());
-    m_Shader->Unbind();
-
     m_TerrainShader->Bind();
     m_TerrainShader->SetMat4("uView", m_CameraController->GetCamera().GetViewMatrix());
     m_TerrainShader->SetMat4("uProj", m_CameraController->GetCamera().GetProjectionMatrix());
@@ -116,15 +118,14 @@ void EditorLayer::OnUpdate(Enxus::Timestep ts)
         m_Framebuffer->Bind();
         Enxus::Renderer::ClearColor(0.13f, 0.13f, 0.14f, 1.0f);
         Enxus::Renderer::Clear();
-
         // Draw Terrain
         {
-            Enxus::Renderer::DrawModel(m_Box, m_Shader);
+            // Enxus::Renderer::DrawModel(m_Box, m_Shader);
 
             m_TerrainMesh->GetVertexArray()->Bind();
             m_TerrainMesh->GetIndexBuffer()->Bind();
             m_TerrainShader->Bind();
-            m_TerrainMesh->GetGrassTexture()->Bind(0);
+            // m_TerrainMesh->GetGrassTexture()->Bind(0);
             m_TerrainShader->SetVec3("uCameraPos", m_CameraController->GetCamera().GetPos());
             m_TerrainShader->SetVec3("uDirLight.direction", m_LightDirection);
             m_TerrainShader->SetFloat("uMinHeight", m_TerrainMesh->GetMinHeight());
@@ -134,8 +135,14 @@ void EditorLayer::OnUpdate(Enxus::Timestep ts)
 
             for (int i = 0; i < m_NumOfBiomeLayers; i++)
             {
+                // Bind Textures
+                m_TerrainShader->SetFloat("uTexturesScale[" + std::to_string(i) + "]", m_BiomeLayers[i].TextureScale);
+                m_TerrainShader->SetInt("uTerrainTextures[" + std::to_string(i) + "]", i);
+                m_TexturesList[i]->Bind(i);
+
                 m_TerrainShader->SetFloat("uBiomeStartHeight[" + std::to_string(i) + "]", m_BiomeLayers[i].StartHeight);
-                m_TerrainShader->SetFloat("uBiomeBlends[" + std::to_string(i) + "]", m_BiomeLayers[i].BlendStrenght);
+                m_TerrainShader->SetFloat("uBiomeBlends[" + std::to_string(i) + "]", m_BiomeLayers[i].BlendStrength);
+                m_TerrainShader->SetFloat("uBiomeColorStrength[" + std::to_string(i) + "]", m_BiomeLayers[i].ColorStrength);
                 m_TerrainShader->SetVec3("uBiomeColors[" + std::to_string(i) + "]", m_BiomeLayers[i].Color);
             }
 
@@ -303,7 +310,7 @@ void EditorLayer::TerrainMenuUI()
 
     static const char *enumTerrainAnimationCurve[] = {"Linear", "EaseInQuad", "EaseInCubic", "EaseInQuart", "EaseInQuint"};
 
-    ImGui::ShowDemoWindow();
+    // ImGui::ShowDemoWindow();
 
     // Menu
     ImGui::Begin("Menu");
@@ -351,8 +358,10 @@ void EditorLayer::TerrainMenuUI()
         std::string uiName = "Layer " + index;
         ImGui::SeparatorText(uiName.c_str());
         ImGui::ColorEdit3(("Color - " + index).c_str(), glm::value_ptr(m_BiomeLayers[i].Color));
-        ImGui::SliderFloat(("StartHeight - " + index).c_str(), &m_BiomeLayers[i].StartHeight, 0.0f, 1.0f);
-        ImGui::SliderFloat(("BlendStrenght - " + index).c_str(), &m_BiomeLayers[i].BlendStrenght, 0.0f, 1.0f);
+        ImGui::SliderFloat(("Color Strength - " + index).c_str(), &m_BiomeLayers[i].ColorStrength, 0.0f, 1.0f);
+        ImGui::SliderFloat(("Start Height - " + index).c_str(), &m_BiomeLayers[i].StartHeight, 0.0f, 1.0f);
+        ImGui::SliderFloat(("Blend Strength - " + index).c_str(), &m_BiomeLayers[i].BlendStrength, 0.0f, 1.0f);
+        ImGui::DragFloat(("Texture Scale - " + index).c_str(), &m_BiomeLayers[i].TextureScale, 0.1f);
 
         // ImGui::ColorEdit3("Color2", glm::value_ptr(m_BiomeColor[1]));
         // ImGui::SliderFloat("Second Start Height", &m_BiomeStartHeight[1], 0.0f, 1.0f);

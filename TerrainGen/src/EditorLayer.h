@@ -55,13 +55,15 @@ private:
     {
         Enxus::Ref<Enxus::TextureMesh2D> Texture;
         glm::vec3 Color = glm::vec3(1.0f);
-        float ColorStrenght = 0.5f;
+        float ColorStrength = 0.0f;
         float StartHeight = 0.0f;
-        float BlendStrenght = 0.5f;
+        float BlendStrength = 0.5f;
         float TextureScale = 1.0f;
     };
 
     std::array<BiomeLayersData, 8> m_BiomeLayers;
+
+    std::array<Enxus::Ref<Enxus::TextureMesh2D>, 2> m_TexturesList;
 
     // Terrain Mesh
     Enxus::Scope<TerrainMesh> m_TerrainMesh;

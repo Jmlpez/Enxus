@@ -314,7 +314,7 @@ void NoiseEditorPanel::UpdateNoiseMap(bool newMap)
                 noise = std::clamp(noise - smoothValue, 0.0f, 1.0f);
             }
 
-            m_NoiseMapArray.emplace_back(std::clamp(noise, 0.0f, 1.0f));
+            m_NoiseMapArray.emplace_back(noise);
         }
     }
 }
