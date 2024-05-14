@@ -161,6 +161,7 @@ void TerrainMesh::SetVertexDistance(float distance)
             m_Vertices[vertexIndex].Position.z = (topLeftZ + i) * m_VertexDistance; // to center int z-axis
         }
     }
+    CalculateNormals();
     m_VertexBufferObject->SetData(&m_Vertices[0], m_Vertices.size() * sizeof(TerrainVertex));
 }
 
