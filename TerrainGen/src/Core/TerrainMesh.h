@@ -39,9 +39,6 @@ public:
     void SetWidth(uint32_t width);
     void SetHeight(uint32_t height);
 
-    inline Enxus::Ref<Enxus::TextureMesh2D> GetGrassTexture() const { return m_GrassTexture; }
-    inline Enxus::Ref<Enxus::TextureMesh2D> GetSnowTexture() const { return m_SnowTexture; }
-
     inline float GetMinHeight() const { return m_MinHeight; }
     inline float GetMaxHeight() const { return m_MaxHeight; }
 
@@ -76,8 +73,6 @@ private:
 
     std::vector<TerrainVertex> m_Vertices;
     std::vector<unsigned int> m_Indices;
-
-    Enxus::Ref<Enxus::TextureMesh2D> m_GrassTexture, m_SnowTexture;
 
     Enxus::Ref<Enxus::VertexArray> m_VertexArrayObject;
     Enxus::Ref<Enxus::VertexBuffer> m_VertexBufferObject;

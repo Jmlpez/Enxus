@@ -1,6 +1,6 @@
 #include "TerrainMesh.h"
 
-const uint32_t TerrainMesh::s_MaxTerrainSize = 1000;
+const uint32_t TerrainMesh::s_MaxTerrainSize = 500;
 
 TerrainMesh::TerrainMesh(uint32_t width, uint32_t height)
     : m_Width(width), m_Height(height)
@@ -13,11 +13,6 @@ TerrainMesh::TerrainMesh(uint32_t width, uint32_t height)
     m_Height = std::min(m_Width, s_MaxTerrainSize);
 
     m_VertexArrayObject = Enxus::CreateRef<Enxus::VertexArray>();
-
-    m_GrassTexture = Enxus::CreateRef<Enxus::TextureMesh2D>("TerrainGen/assets/images/grass-albedo.png",
-                                                            Enxus::TextureType::DIFFUSE);
-    // m_SnowTexture = Enxus::CreateRef<Enxus::TextureMesh2D>("TerrainGen/assets/images/snow-albedo.png",
-    //                                                        Enxus::TextureType::DIFFUSE);
 
     CreateTerrain();
 }

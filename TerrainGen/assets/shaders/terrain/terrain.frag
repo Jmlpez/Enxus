@@ -28,6 +28,7 @@ uniform float uBiomeStartHeight[MAX_NUM_OF_COLORS];
 uniform float uBiomeBlends[MAX_NUM_OF_COLORS];
 uniform float uBiomeColorStrength[MAX_NUM_OF_COLORS];
 uniform vec3 uBiomeColors[MAX_NUM_OF_COLORS];
+uniform bool uBiomeTextureUsed[MAX_NUM_OF_COLORS];
 
 uniform float uMinHeight;
 uniform float uMaxHeight;
@@ -56,8 +57,12 @@ void main() {
         // blending the colors
         float drawStrength = InverseLerp(-uBiomeBlends[i] / 2 - EPSILON, uBiomeBlends[i] / 2, heightPercent - uBiomeStartHeight[i]);
 
+        vec4 textureColor = vec4(0);
+
         vec3 baseColor = uBiomeColors[i] * uBiomeColorStrength[i];
-        vec4 textureColor = Triplanar(fs_in.vVertexPos, uTexturesScale[i], blendAxes, i) * (1 - uBiomeColorStrength[i]);
+        if(uBiomeTextureUsed[i]) {
+            textureColor = Triplanar(fs_in.vVertexPos, uTexturesScale[i], blendAxes, i) * (1 - uBiomeColorStrength[i]);
+        }
 
         vec3 color = textureColor.xyz + baseColor;
 

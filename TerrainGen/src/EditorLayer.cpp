@@ -48,11 +48,17 @@ EditorLayer::EditorLayer()
     m_TerrainShader->SetFloat3("uDirLight.specular", 1.0f, 1.0f, 1.0f);
 
     //----------------- TERRAIN TEXTURES -------------------//
-    static const std::string texturesPaths[2] = {
+    static const std::string texturesPaths[7] = {
+        "TerrainGen/assets/images/materials-debug/water.png",
         "TerrainGen/assets/images/materials-debug/grass.png",
+        "TerrainGen/assets/images/materials-debug/rocks1.png",
+        "TerrainGen/assets/images/materials-debug/rocks2.png",
+        "TerrainGen/assets/images/materials-debug/sandy-grass.png",
+        "TerrainGen/assets/images/materials-debug/stony-ground.png",
         "TerrainGen/assets/images/materials-debug/snow.png",
     };
-    for (int i = 0; i < 2; i++)
+
+    for (int i = 0; i < 7; i++)
     {
         m_TexturesList[i] = Enxus::CreateRef<Enxus::TextureMesh2D>(texturesPaths[i], Enxus::TextureType::DIFFUSE);
     }
@@ -135,29 +141,26 @@ void EditorLayer::OnUpdate(Enxus::Timestep ts)
 
             for (int i = 0; i < m_NumOfBiomeLayers; i++)
             {
+                bool textureUsed = false;
                 // Bind Textures
-                m_TerrainShader->SetFloat("uTexturesScale[" + std::to_string(i) + "]", m_BiomeLayers[i].TextureScale);
-                m_TerrainShader->SetInt("uTerrainTextures[" + std::to_string(i) + "]", i);
-                m_TexturesList[i]->Bind(i);
+                if (m_BiomeLayers[i].Texture)
+                {
+                    m_TerrainShader->SetFloat("uTexturesScale[" + std::to_string(i) + "]", m_BiomeLayers[i].TextureScale);
+                    m_TerrainShader->SetInt("uTerrainTextures[" + std::to_string(i) + "]", i);
+
+                    m_BiomeLayers[i].Texture->Bind(i);
+                    textureUsed = true;
+                }
+                m_TerrainShader->SetBool("uBiomeTextureUsed[" + std::to_string(i) + "]", textureUsed);
 
                 m_TerrainShader->SetFloat("uBiomeStartHeight[" + std::to_string(i) + "]", m_BiomeLayers[i].StartHeight);
                 m_TerrainShader->SetFloat("uBiomeBlends[" + std::to_string(i) + "]", m_BiomeLayers[i].BlendStrength);
                 m_TerrainShader->SetFloat("uBiomeColorStrength[" + std::to_string(i) + "]", m_BiomeLayers[i].ColorStrength);
                 m_TerrainShader->SetVec3("uBiomeColors[" + std::to_string(i) + "]", m_BiomeLayers[i].Color);
             }
+            // pass the index of the textures used
 
-            // m_TerrainShader->SetFloat("uBiomeStartHeight[0]", m_BiomeStartHeight[0]);
-            // m_TerrainShader->SetFloat("uBiomeBlends[0]", m_BiomeBlends[0]);
-            // m_TerrainShader->SetVec3("uBiomeColors[0]", m_BiomeColor[0]);
-
-            // m_TerrainShader->SetFloat("uBiomeStartHeight[1]", m_BiomeStartHeight[1]);
-            // m_TerrainShader->SetFloat("uBiomeBlends[1]", m_BiomeBlends[1]);
-            // m_TerrainShader->SetVec3("uBiomeColors[1]", m_BiomeColor[1]);
-
-            // m_TerrainShader->SetFloat("uTexScale", m_TextureScale);
-
-            // m_TerrainShader->SetInt("uSnow", 1);
-            // m_TerrainMesh->GetSnowTexture()->Bind(1);
+            // m_TerrainShader->SetInt()
 
             const uint32_t numOfStrips = m_TerrainMesh->GetHeight() - 1;
             const uint32_t numOfVertPerStrip = m_TerrainMesh->GetWidth() * 2;
@@ -309,8 +312,9 @@ void EditorLayer::TerrainMenuUI()
 {
 
     static const char *enumTerrainAnimationCurve[] = {"Linear", "EaseInQuad", "EaseInCubic", "EaseInQuart", "EaseInQuint"};
+    static const char *enumTerrainTextures[] = {"None", "Water", "Grass", "Rocks1", "Rocks2", "Sandy Grass", "Stony Ground", "Snow"};
 
-    // ImGui::ShowDemoWindow();
+    //// ImGui::ShowDemoWindow();
 
     // Menu
     ImGui::Begin("Menu");
@@ -363,13 +367,28 @@ void EditorLayer::TerrainMenuUI()
         ImGui::SliderFloat(("Blend Strength - " + index).c_str(), &m_BiomeLayers[i].BlendStrength, 0.0f, 1.0f);
         ImGui::DragFloat(("Texture Scale - " + index).c_str(), &m_BiomeLayers[i].TextureScale, 0.1f);
 
+        if (ImGui::Combo(("Texture - " + index).c_str(), &m_BiomeLayers[i].TextureIndex, enumTerrainTextures, IM_ARRAYSIZE(enumTerrainTextures)))
+        {
+            // if its the NONE texture, just release the reference
+            if (m_BiomeLayers[i].TextureIndex == 0)
+            {
+                m_BiomeLayers[i].Texture.reset();
+            }
+            else
+            {
+                m_BiomeLayers[i].Texture = m_TexturesList[m_BiomeLayers[i].TextureIndex - 1];
+            }
+        }
+
         // ImGui::ColorEdit3("Color2", glm::value_ptr(m_BiomeColor[1]));
         // ImGui::SliderFloat("Second Start Height", &m_BiomeStartHeight[1], 0.0f, 1.0f);
         // ImGui::SliderFloat("Color2 Blend", &m_BiomeBlends[1], 0.0f, 1.0f);
     }
+    ImGui::Dummy(ImVec2(0.0f, 15.0f));
 
     ImGui::PopItemWidth();
     ImGui::End();
+    // ImGui::ShowDemoWindow();
 }
 
 void EditorLayer::HandleViewportResize()

@@ -59,11 +59,12 @@ private:
         float StartHeight = 0.0f;
         float BlendStrength = 0.5f;
         float TextureScale = 1.0f;
+        int TextureIndex = 0;
     };
 
     std::array<BiomeLayersData, 8> m_BiomeLayers;
 
-    std::array<Enxus::Ref<Enxus::TextureMesh2D>, 2> m_TexturesList;
+    std::array<Enxus::Ref<Enxus::TextureMesh2D>, 7> m_TexturesList;
 
     // Terrain Mesh
     Enxus::Scope<TerrainMesh> m_TerrainMesh;
