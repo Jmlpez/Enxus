@@ -2,10 +2,7 @@
 #define EDITOR_LAYER_H
 
 #include "Enxus.h"
-#include "Grid.h"
-#include "HeightMapTerrain.h"
 #include "TerrainMesh.h"
-#include "NoiseMapGenerator.h"
 #include "NoiseEditorPanel.h"
 
 class EditorLayer : public Enxus::Layer
