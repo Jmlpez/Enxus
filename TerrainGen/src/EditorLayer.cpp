@@ -3,6 +3,7 @@
 #include "TerrainDimensionPanel.h"
 #include "SceneCompositionPanel.h"
 #include "TerrainBiomePanel.h"
+#include "TerrainScene.h"
 #include "imgui/imgui.h"
 #include "imgui/imgui_internal.h"
 
@@ -17,74 +18,6 @@ EditorLayer::EditorLayer()
     unsigned int height = window.GetHeight();
 
     m_CameraController = Enxus::CreateScope<Enxus::FreeCameraController>((float)width / (float)height, 0.1f, 100.0f);
-
-    // TerrainScene::Init();
-
-    // TerrainScene::OnUpdate();
-
-    //----------------- SHADER -------------------//
-    // m_Shader = Enxus::CreateRef<Enxus::Shader>("TerrainGen/assets/shaders/model/box.vert", "TerrainGen/assets/shaders/model/box.frag");
-    // m_TerrainShader = Enxus::CreateRef<Enxus::Shader>("TerrainGen/assets/shaders/terrain/terrain.vert", "TerrainGen/assets/shaders/terrain/terrain.frag");
-
-    //----------------- BOX MODEL -------------------//
-
-    // m_Box = Enxus::CreateRef<Enxus::Model>("TerrainGen/assets/models/box/box.obj");
-
-    // glm::mat4 model = glm::mat4(1.0f);
-    // m_Shader->Bind();
-    // m_Shader->SetMat4("uModel", model);
-
-    //----------------- TERRAIN -------------------//
-
-    // m_TerrainMesh = Enxus::CreateScope<TerrainMesh>(m_TerrainWidth, m_TerrainHeight);
-
-    // m_LightDirection = glm::vec3(-0.2f, -1.0f, -0.3f);
-
-    // m_TerrainShader->Bind();
-    // glm::mat4 terrainModel = glm::mat4(1.0f);
-    // m_TerrainShader->SetMat4("uModel", terrainModel);
-    // m_TerrainShader->SetInt("uNumOfColors", m_NumOfBiomeLayers);
-    // m_TerrainShader->SetInt("uTerrainTextures[0]", 0);
-
-    // m_TerrainMesh->GetGrassTexture()->Bind();
-    // m_TerrainShader->SetVec3("uDirLight.direction", m_LightDirection);
-    // m_TerrainShader->SetFloat3("uDirLight.ambient", 0.1f, 0.1f, 0.1f);
-    // m_TerrainShader->SetFloat3("uDirLight.diffuse", 1.0f, 1.0f, 1.0f);
-    // m_TerrainShader->SetFloat3("uDirLight.specular", 1.0f, 1.0f, 1.0f);
-
-    // //----------------- TERRAIN TEXTURES -------------------//
-    // static const std::string texturesPaths[7] = {
-    //     "TerrainGen/assets/images/materials-debug/water.png",
-    //     "TerrainGen/assets/images/materials-debug/grass.png",
-    //     "TerrainGen/assets/images/materials-debug/rocks1.png",
-    //     "TerrainGen/assets/images/materials-debug/rocks2.png",
-    //     "TerrainGen/assets/images/materials-debug/sandy-grass.png",
-    //     "TerrainGen/assets/images/materials-debug/stony-ground.png",
-    //     "TerrainGen/assets/images/materials-debug/snow.png",
-    // };
-
-    // for (int i = 0; i < 7; i++)
-    // {
-    //     m_TexturesList[i] = Enxus::CreateRef<Enxus::TextureMesh2D>(texturesPaths[i], Enxus::TextureType::DIFFUSE);
-    // }
-
-    // //----------------- Sky Box -------------------//
-    // m_SkyBox = Enxus::CreateRef<Enxus::SkyBox>();
-
-    // m_SkyBox->SetCubeMapFaces(
-    //     {"TerrainGen/assets/images/skybox/right.tga",
-    //      "TerrainGen/assets/images/skybox/left.tga",
-    //      "TerrainGen/assets/images/skybox/top.tga",
-    //      "TerrainGen/assets/images/skybox/bottom.tga",
-    //      "TerrainGen/assets/images/skybox/back.tga",
-    //      "TerrainGen/assets/images/skybox/front.tga"});
-
-    // m_SkyBoxShader = Enxus::CreateRef<Enxus::Shader>(
-    //     "TerrainGen/assets/shaders/skybox/skybox.vert",
-    //     "TerrainGen/assets/shaders/skybox/skybox.frag");
-
-    m_Scene = Enxus::CreateScope<TerrainScene>();
-    m_Scene->Init();
 }
 
 EditorLayer::~EditorLayer()
@@ -99,9 +32,10 @@ void EditorLayer::OnAttach()
     fbspec.Height = 600;
     m_Framebuffer = Enxus::CreateScope<Enxus::Framebuffer>(fbspec);
 
-    // m_TerrainDimensionPanel = Enxus::CreateScope<TerrainDimensionPanel>();
-    // Terrain Panels initialization
+    // Terrain Scene initialization
+    TerrainScene::Init();
 
+    // Terrain Panels initialization
     TerrainDimensionPanel::Init();
     TerrainBiomePanel::Init();
     SceneCompositionPanel::Init();
@@ -111,10 +45,10 @@ void EditorLayer::OnAttach()
     m_NoiseEditorPanel->SetNoiseHeight(250);
 
     // Initial values
-    m_Scene->UpdateTerrainNoiseMap(m_NoiseEditorPanel->GetNoiseMap());
-    m_Scene->UpdateSceneComposition(SceneCompositionPanel::GetPanelProps());
-    m_Scene->UpdateTerrainDimensions(TerrainDimensionPanel::GetPanelProps());
-    m_Scene->UpdateTerrainBiome(TerrainBiomePanel::GetPanelProps());
+    TerrainScene::UpdateTerrainNoiseMap(m_NoiseEditorPanel->GetNoiseMap());
+    TerrainScene::UpdateSceneComposition(SceneCompositionPanel::GetPanelProps());
+    TerrainScene::UpdateTerrainDimensions(TerrainDimensionPanel::GetPanelProps());
+    TerrainScene::UpdateTerrainBiome(TerrainBiomePanel::GetPanelProps());
 
     ImGui::SetWindowFocus("Viewport");
 }
@@ -130,7 +64,7 @@ void EditorLayer::OnUpdate(Enxus::Timestep ts)
     }
     HandleViewportResize();
 
-    m_Scene->SubmitCamera(m_CameraController->GetCamera());
+    TerrainScene::SubmitCamera(m_CameraController->GetCamera());
 
     {
         // Rendering
@@ -138,7 +72,7 @@ void EditorLayer::OnUpdate(Enxus::Timestep ts)
         Enxus::Renderer::ClearColor(0.13f, 0.13f, 0.14f, 1.0f);
         Enxus::Renderer::Clear();
 
-        m_Scene->OnUpdate();
+        TerrainScene::OnUpdate();
 
         m_Framebuffer->Unbind();
     }
@@ -195,10 +129,6 @@ void EditorLayer::OnImGuiRender()
     {
         if (ImGui::BeginMenu("File"))
         {
-            // Disabling fullscreen would allow the window to be moved to the front of other windows,
-            // which we can't undo at the moment without finer window depth/z control.
-            // ImGui::MenuItem("Fullscreen", NULL, &opt_fullscreen_persistant);
-
             if (ImGui::MenuItem("Exit"))
                 Enxus::Application::Get().Close();
             ImGui::EndMenu();
@@ -210,7 +140,7 @@ void EditorLayer::OnImGuiRender()
     TerrainMenuUI();
 
     {
-        // Scene
+        // Viewport
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0}); // remove the window padding
 
         ImGui::Begin("Viewport");
@@ -240,11 +170,11 @@ void EditorLayer::OnImGuiRender()
         ImGui::Text("App average (%.1f FPS)", 1.0f / Enxus::Application::Get().GetTimestep());
         ImGui::End();
     }
+    // The Noise is updated separately
     m_NoiseEditorPanel->OnImGuiRender();
     if (m_NoiseEditorPanel->HasUpdated())
     {
-        // m_TerrainMesh->SetNoiseMap(m_NoiseEditorPanel->GetNoiseMap());
-        m_Scene->UpdateTerrainNoiseMap(m_NoiseEditorPanel->GetNoiseMap());
+        TerrainScene::UpdateTerrainNoiseMap(m_NoiseEditorPanel->GetNoiseMap());
     }
 
     ImGui::End();
@@ -253,46 +183,35 @@ void EditorLayer::OnImGuiRender()
 void EditorLayer::TerrainMenuUI()
 {
 
-    // static const char *enumTerrainAnimationCurve[] = {"Linear", "EaseInQuad", "EaseInCubic", "EaseInQuart", "EaseInQuint"};
-
-    //// ImGui::ShowDemoWindow();
-
     // Menu
-    ImGui::Begin("Menu");
+    ImGui::Begin("Terrain Menu");
 
     ImGui::BeginTabBar("Terrain Menu TabBar");
 
-    // int numberOfButtons = 4; // Assuming this is the input value from 1 to 8
-
-    // ImGui::Checkbox("Grid Floor", &m_ShowGridFloor);
-    ImGui::PushItemWidth(120);
-
     TerrainDimensionPanel::OnImGuiRender();
     auto dimensionProps = TerrainDimensionPanel::GetPanelProps();
+    TerrainScene::UpdateTerrainDimensions(dimensionProps);
 
-    m_Scene->UpdateTerrainDimensions(dimensionProps);
     if ((uint32_t)dimensionProps.Width != m_NoiseEditorPanel->GetNoiseWidth())
     {
         m_NoiseEditorPanel->SetNoiseWidth(dimensionProps.Width);
-        m_Scene->UpdateTerrainNoiseMap(m_NoiseEditorPanel->GetNoiseMap());
+        TerrainScene::UpdateTerrainNoiseMap(m_NoiseEditorPanel->GetNoiseMap());
     }
     if ((uint32_t)dimensionProps.Height != m_NoiseEditorPanel->GetNoiseHeight())
     {
         m_NoiseEditorPanel->SetNoiseHeight(dimensionProps.Height);
-        m_Scene->UpdateTerrainNoiseMap(m_NoiseEditorPanel->GetNoiseMap());
+        TerrainScene::UpdateTerrainNoiseMap(m_NoiseEditorPanel->GetNoiseMap());
     }
 
     TerrainBiomePanel::OnImGuiRender();
-    m_Scene->UpdateTerrainBiome(TerrainBiomePanel::GetPanelProps());
+    TerrainScene::UpdateTerrainBiome(TerrainBiomePanel::GetPanelProps());
 
     SceneCompositionPanel::OnImGuiRender();
-    m_Scene->UpdateSceneComposition(SceneCompositionPanel::GetPanelProps());
+    TerrainScene::UpdateSceneComposition(SceneCompositionPanel::GetPanelProps());
 
-    ImGui::PopItemWidth();
     ImGui::EndTabBar();
 
     ImGui::End();
-    // ImGui::ShowDemoWindow();
 }
 
 void EditorLayer::HandleViewportResize()

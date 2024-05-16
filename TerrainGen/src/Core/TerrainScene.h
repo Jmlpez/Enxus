@@ -10,41 +10,17 @@
 class TerrainScene
 {
 public:
-    TerrainScene();
-    ~TerrainScene();
+    static void Init();
+    static void ShutDown();
+    static void OnUpdate();
 
-    void Init();
-    void OnUpdate();
+    static void UpdateTerrainNoiseMap(const std::vector<float> &noiseMap);
 
-    void UpdateTerrainNoiseMap(const std::vector<float> &noiseMap);
+    static void UpdateTerrainDimensions(const TerrainDimensionPanelProps &props);
+    static void UpdateTerrainBiome(const TerrainBiomePanelProps &props);
+    static void UpdateSceneComposition(const SceneCompositionPanelProps &props);
 
-    void UpdateTerrainDimensions(const TerrainDimensionPanelProps &props);
-    void UpdateTerrainBiome(const TerrainBiomePanelProps &props);
-    void UpdateSceneComposition(const SceneCompositionPanelProps &props);
-
-    void SubmitCamera(const Enxus::Camera &camera);
-
-private:
-    Enxus::Scope<TerrainMesh> m_TerrainMesh;
-
-    SceneCompositionPanelProps m_SceneCompositionData;
-    TerrainBiomePanelProps m_TerrainBiomeData;
-
-    // SkyBox
-    Enxus::Ref<Enxus::SkyBox> m_SkyBox;
-    Enxus::Ref<Enxus::Shader> m_SkyBoxShader;
-
-    // Shaders
-    Enxus::Ref<Enxus::Shader> m_TerrainShader;
-
-    std::array<Enxus::Ref<Enxus::TextureMesh2D>, 7> m_TexturesList;
-
-    struct CameraData
-    {
-        glm::mat4 ViewMatrix;
-        glm::mat4 ProjectionMatrix;
-        glm::vec3 Position;
-    } m_CameraData;
+    static void SubmitCamera(const Enxus::Camera &camera);
 };
 
 #endif // TerrainScene.h

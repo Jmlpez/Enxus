@@ -2,8 +2,6 @@
 #define EDITOR_LAYER_H
 
 #include "Enxus.h"
-#include "TerrainMesh.h"
-#include "TerrainScene.h"
 #include "NoiseEditorPanel.h"
 
 class EditorLayer : public Enxus::Layer
@@ -27,38 +25,9 @@ private:
     bool m_IsViewportFocused = false;
     bool m_IsViewportHovered = false;
 
-    // Scene options
-    // bool m_IsWireframe = false;
-
-    // float m_VertexDistance = 0.05f;
-    // float m_TerrainElevation = 1.5f;
-    // float m_TextureScale = 1.0f;
-
-    // the first AnimationCurve Enum elemnent: Linear
-    // int m_TerrainElevationCurve = (int)AnimationCurve::Linear;
-
-    // uint32_t m_TerrainWidth;
-    // uint32_t m_TerrainHeight;
-
-    // glm::vec3 m_LightDirection;
-
-        Enxus::Scope<TerrainScene> m_Scene;
-
-    // Terrain Mesh
-    // Enxus::Scope<TerrainMesh> m_TerrainMesh;
-
-    // SkyBox
-    // Enxus::Ref<Enxus::SkyBox> m_SkyBox;
-    // Enxus::Ref<Enxus::Shader> m_SkyBoxShader;
-
-    // Panels
+    // Noise Panel
     Enxus::Scope<NoiseEditorPanel> m_NoiseEditorPanel;
-    // Enxus::Scope<TerrainDimensionPanel> m_TerrainDimensionPanel;
-    //  Models
-    // Enxus::Ref<Enxus::Model> m_Box;
-    // Shaders
-    // Enxus::Ref<Enxus::Shader> m_Shader, m_TerrainShader;
-    // Camera
+
     Enxus::Scope<Enxus::FreeCameraController> m_CameraController;
     // Framebuffers
     Enxus::Scope<Enxus::Framebuffer> m_Framebuffer;

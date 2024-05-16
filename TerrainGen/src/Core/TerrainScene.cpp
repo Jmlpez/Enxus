@@ -1,18 +1,36 @@
 #include "TerrainScene.h"
 
-TerrainScene::TerrainScene()
+struct TerrainSceneData
 {
-}
+    Enxus::Ref<TerrainMesh> Terrain;
 
-TerrainScene::~TerrainScene()
-{
-}
+    SceneCompositionPanelProps SceneCompositionData;
+    TerrainBiomePanelProps TerrainBiomeData;
+
+    // SkyBox
+    Enxus::Ref<Enxus::SkyBox> SkyBox;
+    Enxus::Ref<Enxus::Shader> SkyBoxShader;
+
+    // Shaders
+    Enxus::Ref<Enxus::Shader> TerrainShader;
+
+    std::array<Enxus::Ref<Enxus::TextureMesh2D>, 7> TexturesList;
+
+    struct CameraData
+    {
+        glm::mat4 ViewMatrix;
+        glm::mat4 ProjectionMatrix;
+        glm::vec3 Position;
+    } CameraData;
+};
+
+static TerrainSceneData s_Data;
 
 void TerrainScene::SubmitCamera(const Enxus::Camera &camera)
 {
-    m_CameraData.ViewMatrix = camera.GetViewMatrix();
-    m_CameraData.ProjectionMatrix = camera.GetProjectionMatrix();
-    m_CameraData.Position = camera.GetPos();
+    s_Data.CameraData.ViewMatrix = camera.GetViewMatrix();
+    s_Data.CameraData.ProjectionMatrix = camera.GetProjectionMatrix();
+    s_Data.CameraData.Position = camera.GetPos();
 }
 
 void TerrainScene::Init()
@@ -30,31 +48,28 @@ void TerrainScene::Init()
 
     for (int i = 0; i < 7; i++)
     {
-        m_TexturesList[i] = Enxus::CreateRef<Enxus::TextureMesh2D>(texturesPaths[i], Enxus::TextureType::DIFFUSE);
+        s_Data.TexturesList[i] = Enxus::CreateRef<Enxus::TextureMesh2D>(texturesPaths[i], Enxus::TextureType::DIFFUSE);
     }
 
-    m_TerrainShader = Enxus::CreateRef<Enxus::Shader>("TerrainGen/assets/shaders/terrain/terrain.vert",
-                                                      "TerrainGen/assets/shaders/terrain/terrain.frag");
+    s_Data.TerrainShader = Enxus::CreateRef<Enxus::Shader>("TerrainGen/assets/shaders/terrain/terrain.vert",
+                                                           "TerrainGen/assets/shaders/terrain/terrain.frag");
 
     // Default terrain
-    m_TerrainMesh = Enxus::CreateScope<TerrainMesh>(250, 250);
+    s_Data.Terrain = Enxus::CreateRef<TerrainMesh>(250, 250);
 
-    // m_SceneCompositionData.LightDirection = glm::vec3(-0.2f, -1.0f, -0.3f);
-    // m_SceneCompositionData.IsWireframe = false;
-
-    m_TerrainShader->Bind();
+    s_Data.TerrainShader->Bind();
     glm::mat4 terrainModel = glm::mat4(1.0f);
-    m_TerrainShader->SetMat4("uModel", terrainModel);
+    s_Data.TerrainShader->SetMat4("uModel", terrainModel);
 
-    m_TerrainShader->SetVec3("uDirLight.direction", m_SceneCompositionData.LightDirection);
-    m_TerrainShader->SetFloat3("uDirLight.ambient", 0.1f, 0.1f, 0.1f);
-    m_TerrainShader->SetFloat3("uDirLight.diffuse", 1.0f, 1.0f, 1.0f);
-    m_TerrainShader->SetFloat3("uDirLight.specular", 1.0f, 1.0f, 1.0f);
+    s_Data.TerrainShader->SetVec3("uDirLight.direction", s_Data.SceneCompositionData.LightDirection);
+    s_Data.TerrainShader->SetFloat3("uDirLight.ambient", 0.1f, 0.1f, 0.1f);
+    s_Data.TerrainShader->SetFloat3("uDirLight.diffuse", 1.0f, 1.0f, 1.0f);
+    s_Data.TerrainShader->SetFloat3("uDirLight.specular", 1.0f, 1.0f, 1.0f);
 
     //----------------- Sky Box -------------------//
-    m_SkyBox = Enxus::CreateRef<Enxus::SkyBox>();
+    s_Data.SkyBox = Enxus::CreateRef<Enxus::SkyBox>();
 
-    m_SkyBox->SetCubeMapFaces(
+    s_Data.SkyBox->SetCubeMapFaces(
         {"TerrainGen/assets/images/skybox/right.tga",
          "TerrainGen/assets/images/skybox/left.tga",
          "TerrainGen/assets/images/skybox/top.tga",
@@ -62,62 +77,63 @@ void TerrainScene::Init()
          "TerrainGen/assets/images/skybox/back.tga",
          "TerrainGen/assets/images/skybox/front.tga"});
 
-    m_SkyBoxShader = Enxus::CreateRef<Enxus::Shader>(
+    s_Data.SkyBoxShader = Enxus::CreateRef<Enxus::Shader>(
         "TerrainGen/assets/shaders/skybox/skybox.vert",
         "TerrainGen/assets/shaders/skybox/skybox.frag");
+}
+
+void TerrainScene::ShutDown()
+{
 }
 
 void TerrainScene::OnUpdate()
 {
 
-    if (m_SceneCompositionData.IsWireframe)
+    if (s_Data.SceneCompositionData.IsWireframe)
         Enxus::Renderer::SetPolygonMode(Enxus::PolygonMode::LINE);
     else
         Enxus::Renderer::SetPolygonMode(Enxus::PolygonMode::FILL);
 
     {
-        m_TerrainShader->Bind();
+        s_Data.TerrainShader->Bind();
 
-        m_TerrainShader->SetMat4("uView", m_CameraData.ViewMatrix);
-        m_TerrainShader->SetMat4("uProj", m_CameraData.ProjectionMatrix);
+        s_Data.TerrainShader->SetMat4("uView", s_Data.CameraData.ViewMatrix);
+        s_Data.TerrainShader->SetMat4("uProj", s_Data.CameraData.ProjectionMatrix);
 
-        // m_TerrainMesh->GetGrassTexture()->Bind(0);
-        m_TerrainShader->SetVec3("uCameraPos", m_CameraData.Position);
-        m_TerrainShader->SetVec3("uDirLight.direction", m_SceneCompositionData.LightDirection);
-        m_TerrainShader->SetFloat("uMinHeight", m_TerrainMesh->GetMinHeight());
-        m_TerrainShader->SetFloat("uMaxHeight", m_TerrainMesh->GetMaxHeight());
+        s_Data.TerrainShader->SetVec3("uCameraPos", s_Data.CameraData.Position);
+        s_Data.TerrainShader->SetVec3("uDirLight.direction", s_Data.SceneCompositionData.LightDirection);
+        s_Data.TerrainShader->SetFloat("uMinHeight", s_Data.Terrain->GetMinHeight());
+        s_Data.TerrainShader->SetFloat("uMaxHeight", s_Data.Terrain->GetMaxHeight());
 
-        m_TerrainShader->SetInt("uNumOfColors", m_TerrainBiomeData.NumOfBiomeLayers);
+        s_Data.TerrainShader->SetInt("uNumOfColors", s_Data.TerrainBiomeData.NumOfBiomeLayers);
 
-        for (int i = 0; i < m_TerrainBiomeData.NumOfBiomeLayers; i++)
+        for (int i = 0; i < s_Data.TerrainBiomeData.NumOfBiomeLayers; i++)
         {
             bool textureUsed = false;
             // Bind Textures
-            if (m_TerrainBiomeData.BiomeLayers[i].TextureIndex != 0)
+            if (s_Data.TerrainBiomeData.BiomeLayers[i].TextureIndex != 0)
             {
-                m_TerrainShader->SetFloat("uTexturesScale[" + std::to_string(i) + "]", m_TerrainBiomeData.BiomeLayers[i].TextureScale);
-                m_TerrainShader->SetInt("uTerrainTextures[" + std::to_string(i) + "]", i);
+                s_Data.TerrainShader->SetFloat("uTexturesScale[" + std::to_string(i) + "]", s_Data.TerrainBiomeData.BiomeLayers[i].TextureScale);
+                s_Data.TerrainShader->SetInt("uTerrainTextures[" + std::to_string(i) + "]", i);
 
-                // m_TerrainBiomeData.BiomeLayers[i].Texture->Bind(i);
-                m_TexturesList[m_TerrainBiomeData.BiomeLayers[i].TextureIndex - 1]->Bind(i);
+                s_Data.TexturesList[s_Data.TerrainBiomeData.BiomeLayers[i].TextureIndex - 1]->Bind(i);
 
                 textureUsed = true;
             }
-            m_TerrainShader->SetBool("uBiomeTextureUsed[" + std::to_string(i) + "]", textureUsed);
+            s_Data.TerrainShader->SetBool("uBiomeTextureUsed[" + std::to_string(i) + "]", textureUsed);
 
-            m_TerrainShader->SetFloat("uBiomeStartHeight[" + std::to_string(i) + "]", m_TerrainBiomeData.BiomeLayers[i].StartHeight);
-            m_TerrainShader->SetFloat("uBiomeBlends[" + std::to_string(i) + "]", m_TerrainBiomeData.BiomeLayers[i].BlendStrength);
-            m_TerrainShader->SetFloat("uBiomeColorStrength[" + std::to_string(i) + "]", m_TerrainBiomeData.BiomeLayers[i].ColorStrength);
-            m_TerrainShader->SetVec3("uBiomeColors[" + std::to_string(i) + "]", m_TerrainBiomeData.BiomeLayers[i].Color);
+            s_Data.TerrainShader->SetFloat("uBiomeStartHeight[" + std::to_string(i) + "]", s_Data.TerrainBiomeData.BiomeLayers[i].StartHeight);
+            s_Data.TerrainShader->SetFloat("uBiomeBlends[" + std::to_string(i) + "]", s_Data.TerrainBiomeData.BiomeLayers[i].BlendStrength);
+            s_Data.TerrainShader->SetFloat("uBiomeColorStrength[" + std::to_string(i) + "]", s_Data.TerrainBiomeData.BiomeLayers[i].ColorStrength);
+            s_Data.TerrainShader->SetVec3("uBiomeColors[" + std::to_string(i) + "]", s_Data.TerrainBiomeData.BiomeLayers[i].Color);
         }
         // pass the index of the textures used
 
-        // m_TerrainShader->SetInt()
-        m_TerrainMesh->GetVertexArray()->Bind();
-        m_TerrainMesh->GetIndexBuffer()->Bind();
+        s_Data.Terrain->GetVertexArray()->Bind();
+        s_Data.Terrain->GetIndexBuffer()->Bind();
 
-        const uint32_t numOfStrips = m_TerrainMesh->GetHeight() - 1;
-        const uint32_t numOfVertPerStrip = m_TerrainMesh->GetWidth() * 2;
+        const uint32_t numOfStrips = s_Data.Terrain->GetHeight() - 1;
+        const uint32_t numOfVertPerStrip = s_Data.Terrain->GetWidth() * 2;
         for (unsigned int strip = 0; strip < numOfStrips; strip++)
         {
             size_t stripOffset = strip * numOfVertPerStrip * sizeof(unsigned int);
@@ -131,16 +147,16 @@ void TerrainScene::OnUpdate()
         GLCall(glDepthMask(GL_FALSE));
         GLCall(glDepthFunc(GL_LEQUAL));
 
-        glm::mat4 viewMatrix = glm::mat4(glm::mat3(m_CameraData.ViewMatrix));
+        glm::mat4 viewMatrix = glm::mat4(glm::mat3(s_Data.CameraData.ViewMatrix));
 
-        m_SkyBoxShader->Bind();
-        m_SkyBoxShader->SetMat4("uView", viewMatrix);
-        m_SkyBoxShader->SetMat4("uProj", m_CameraData.ProjectionMatrix);
+        s_Data.SkyBoxShader->Bind();
+        s_Data.SkyBoxShader->SetMat4("uView", viewMatrix);
+        s_Data.SkyBoxShader->SetMat4("uProj", s_Data.CameraData.ProjectionMatrix);
 
-        m_SkyBoxShader->SetInt("uSkyBoxTexture", 0);
-        m_SkyBox->Bind();
+        s_Data.SkyBoxShader->SetInt("uSkyBoxTexture", 0);
+        s_Data.SkyBox->Bind();
 
-        m_SkyBox->GetVertexArray()->Bind();
+        s_Data.SkyBox->GetVertexArray()->Bind();
 
         GLCall(glDrawArrays(GL_TRIANGLES, 0, 36));
 
@@ -151,45 +167,40 @@ void TerrainScene::OnUpdate()
 
 void TerrainScene::UpdateTerrainNoiseMap(const std::vector<float> &noiseMap)
 {
-    m_TerrainMesh->SetNoiseMap(noiseMap);
+    s_Data.Terrain->SetNoiseMap(noiseMap);
 }
 
 void TerrainScene::UpdateTerrainDimensions(const TerrainDimensionPanelProps &props)
 {
     // update the terrain according to the new panel props...
-    if ((uint32_t)props.Width != m_TerrainMesh->GetWidth())
+    if ((uint32_t)props.Width != s_Data.Terrain->GetWidth())
     {
-        m_TerrainMesh->SetWidth(props.Width);
+        s_Data.Terrain->SetWidth(props.Width);
     }
-    if ((uint32_t)props.Height != m_TerrainMesh->GetHeight())
+    if ((uint32_t)props.Height != s_Data.Terrain->GetHeight())
     {
-        m_TerrainMesh->SetHeight(props.Height);
+        s_Data.Terrain->SetHeight(props.Height);
     }
-    if (props.Elevation != m_TerrainMesh->GetElevation())
+    if (props.Elevation != s_Data.Terrain->GetElevation())
     {
-        m_TerrainMesh->SetElevation(props.Elevation);
+        s_Data.Terrain->SetElevation(props.Elevation);
     }
-    if (props.VertexScale != m_TerrainMesh->GetVertexDistance())
+    if (props.VertexScale != s_Data.Terrain->GetVertexDistance())
     {
-        m_TerrainMesh->SetVertexDistance(props.VertexScale);
+        s_Data.Terrain->SetVertexDistance(props.VertexScale);
     }
-    if (props.ElevationCurve != (int)m_TerrainMesh->GetHeightElevationCurve())
+    if (props.ElevationCurve != (int)s_Data.Terrain->GetHeightElevationCurve())
     {
-        m_TerrainMesh->SetHeightElevationCurve((AnimationCurve)props.ElevationCurve);
+        s_Data.Terrain->SetHeightElevationCurve((AnimationCurve)props.ElevationCurve);
     }
 }
 
 void TerrainScene::UpdateTerrainBiome(const TerrainBiomePanelProps &props)
 {
-    m_TerrainBiomeData = props;
+    s_Data.TerrainBiomeData = props;
 }
 
 void TerrainScene::UpdateSceneComposition(const SceneCompositionPanelProps &props)
 {
-    m_SceneCompositionData = props;
-    // m_SceneCompositionData.IsWireframe = props.IsWireframe;
-    // if (props.LightDirection != m_SceneCompositionData.LightDirection)
-    // {
-    //     m_SceneCompositionData.LightDirection = props.LightDirection;
-    // }
+    s_Data.SceneCompositionData = props;
 }
