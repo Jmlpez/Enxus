@@ -39,6 +39,10 @@ public:
     void SetWidth(uint32_t width);
     void SetHeight(uint32_t height);
 
+    inline float GetElevation() const { return m_Elevation; }
+    inline float GetVertexDistance() const { return m_VertexDistance; }
+    inline AnimationCurve GetHeightElevationCurve() const { return m_ElevationCurve; }
+
     inline float GetMinHeight() const { return m_MinHeight; }
     inline float GetMaxHeight() const { return m_MaxHeight; }
 

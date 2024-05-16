@@ -162,6 +162,8 @@ void TerrainMesh::SetVertexDistance(float distance)
 
 void TerrainMesh::CalculateNoiseMap()
 {
+    if (m_NoiseMap.empty())
+        return;
     // first valid value
     float minHeight = Evaluate(m_NoiseMap[0]) * m_Elevation;
     float maxHeight = minHeight;

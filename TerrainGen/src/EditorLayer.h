@@ -3,6 +3,7 @@
 
 #include "Enxus.h"
 #include "TerrainMesh.h"
+#include "TerrainScene.h"
 #include "NoiseEditorPanel.h"
 
 class EditorLayer : public Enxus::Layer
@@ -29,24 +30,19 @@ private:
     // Scene options
     bool m_IsWireframe = false;
 
-    float m_VertexDistance = 0.05f;
-    float m_TerrainElevation = 1.5f;
-    float m_TextureScale = 1.0f;
+    // float m_VertexDistance = 0.05f;
+    // float m_TerrainElevation = 1.5f;
+    // float m_TextureScale = 1.0f;
 
     // the first AnimationCurve Enum elemnent: Linear
-    int m_TerrainElevationCurve = (int)AnimationCurve::Linear;
+    // int m_TerrainElevationCurve = (int)AnimationCurve::Linear;
 
-    // Color testing
-    // glm::vec3 m_BiomeColor[2];
-    // float m_BiomeStartHeight[2] = {0.0f, 0.7f};
-    // float m_BiomeBlends[2] = {0.5f, 0.5f};
+    // uint32_t m_TerrainWidth;
+    // uint32_t m_TerrainHeight;
 
-    uint32_t m_TerrainWidth;
-    uint32_t m_TerrainHeight;
+    // glm::vec3 m_LightDirection;
 
-    glm::vec3 m_LightDirection;
-
-    int m_NumOfBiomeLayers = 1;
+    int m_NumOfBiomeLayers = 0;
 
     struct BiomeLayersData
     {
@@ -63,19 +59,22 @@ private:
 
     std::array<Enxus::Ref<Enxus::TextureMesh2D>, 7> m_TexturesList;
 
+    Enxus::Scope<TerrainScene> m_Scene;
+
     // Terrain Mesh
-    Enxus::Scope<TerrainMesh> m_TerrainMesh;
+    // Enxus::Scope<TerrainMesh> m_TerrainMesh;
 
     // SkyBox
-    Enxus::Ref<Enxus::SkyBox> m_SkyBox;
-    Enxus::Ref<Enxus::Shader> m_SkyBoxShader;
+    // Enxus::Ref<Enxus::SkyBox> m_SkyBox;
+    // Enxus::Ref<Enxus::Shader> m_SkyBoxShader;
 
     // Panels
     Enxus::Scope<NoiseEditorPanel> m_NoiseEditorPanel;
-    // Models
-    Enxus::Ref<Enxus::Model> m_Box;
+    // Enxus::Scope<TerrainDimensionPanel> m_TerrainDimensionPanel;
+    //  Models
+    // Enxus::Ref<Enxus::Model> m_Box;
     // Shaders
-    Enxus::Ref<Enxus::Shader> m_Shader, m_TerrainShader;
+    // Enxus::Ref<Enxus::Shader> m_Shader, m_TerrainShader;
     // Camera
     Enxus::Scope<Enxus::FreeCameraController> m_CameraController;
     // Framebuffers

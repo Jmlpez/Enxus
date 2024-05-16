@@ -63,7 +63,7 @@ all: $(OBJS)
 
 # Build Core
 $(BIN_DIR)/%.o: $(CORE_DIR)/%.cpp $(CORE_DIR)/%.h
-	$(CXX) $(CXXFLAGS) $(PCH_FLAGS) -c $< -o $@ $(ENXUS_INCLUDE_FLAGS)  $(VENDOR_FLAGS) $(OPENGL_FLAGS)
+	$(CXX) $(CXXFLAGS) $(PCH_FLAGS) -c $< -o $@ $(ENXUS_INCLUDE_FLAGS) $(TERRAIN_GEN_FLAGS) $(VENDOR_FLAGS) $(OPENGL_FLAGS)
 
 # Build Panels
 $(BIN_DIR)/%.o: $(PANELS_DIR)/%.cpp $(PANELS_DIR)/%.h

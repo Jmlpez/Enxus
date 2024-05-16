@@ -23,11 +23,15 @@ NoiseEditorPanel::NoiseEditorPanel()
 
 void NoiseEditorPanel::SetNoiseWidth(uint32_t width)
 {
+    if (width == m_GeneralNoise.Width)
+        return;
     m_GeneralNoise.Width = width;
     UpdateNoiseMap(true);
 }
 void NoiseEditorPanel::SetNoiseHeight(uint32_t height)
 {
+    if (height == m_GeneralNoise.Height)
+        return;
     m_GeneralNoise.Height = height;
     UpdateNoiseMap(true);
 }
@@ -105,7 +109,7 @@ void NoiseEditorPanel::OnImGuiRender()
                 m_Fnl.SetFractalLacunarity(m_FractalNoise.Lacunarity);
                 m_NoiseUpdateFlag = true;
             }
-            if (ImGui::DragFloat("Gain", &m_FractalNoise.Gain, 0.01f))
+            if (ImGui::DragFloat("Gain", &m_FractalNoise.Gain, 0.001f))
             {
                 m_Fnl.SetFractalGain(m_FractalNoise.Gain);
                 m_NoiseUpdateFlag = true;

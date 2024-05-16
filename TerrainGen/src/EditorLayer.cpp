@@ -1,13 +1,13 @@
 #include "pch.h"
 #include "EditorLayer.h"
+#include "TerrainDimensionPanel.h"
+#include "SceneCompositionPanel.h"
 #include "imgui/imgui.h"
 #include "imgui/imgui_internal.h"
 
 EditorLayer::EditorLayer()
     : Layer("Terrain Generator Editor Layer"),
-      m_ViewportSize(0.0f, 0.0f),
-      m_TerrainWidth(250),
-      m_TerrainHeight(250)
+      m_ViewportSize(0.0f, 0.0f)
 {
 
     //----------------- CAMERA -------------------//
@@ -17,35 +17,39 @@ EditorLayer::EditorLayer()
 
     m_CameraController = Enxus::CreateScope<Enxus::FreeCameraController>((float)width / (float)height, 0.1f, 100.0f);
 
+    // TerrainScene::Init();
+
+    // TerrainScene::OnUpdate();
+
     //----------------- SHADER -------------------//
-    m_Shader = Enxus::CreateRef<Enxus::Shader>("TerrainGen/assets/shaders/model/box.vert", "TerrainGen/assets/shaders/model/box.frag");
-    m_TerrainShader = Enxus::CreateRef<Enxus::Shader>("TerrainGen/assets/shaders/terrain/terrain.vert", "TerrainGen/assets/shaders/terrain/terrain.frag");
+    // m_Shader = Enxus::CreateRef<Enxus::Shader>("TerrainGen/assets/shaders/model/box.vert", "TerrainGen/assets/shaders/model/box.frag");
+    // m_TerrainShader = Enxus::CreateRef<Enxus::Shader>("TerrainGen/assets/shaders/terrain/terrain.vert", "TerrainGen/assets/shaders/terrain/terrain.frag");
 
     //----------------- BOX MODEL -------------------//
 
-    m_Box = Enxus::CreateRef<Enxus::Model>("TerrainGen/assets/models/box/box.obj");
+    // m_Box = Enxus::CreateRef<Enxus::Model>("TerrainGen/assets/models/box/box.obj");
 
-    glm::mat4 model = glm::mat4(1.0f);
-    m_Shader->Bind();
-    m_Shader->SetMat4("uModel", model);
+    // glm::mat4 model = glm::mat4(1.0f);
+    // m_Shader->Bind();
+    // m_Shader->SetMat4("uModel", model);
 
     //----------------- TERRAIN -------------------//
 
-    m_TerrainMesh = Enxus::CreateScope<TerrainMesh>(m_TerrainWidth, m_TerrainHeight);
+    // m_TerrainMesh = Enxus::CreateScope<TerrainMesh>(m_TerrainWidth, m_TerrainHeight);
 
-    m_LightDirection = glm::vec3(-0.2f, -1.0f, -0.3f);
+    // m_LightDirection = glm::vec3(-0.2f, -1.0f, -0.3f);
 
-    m_TerrainShader->Bind();
-    glm::mat4 terrainModel = glm::mat4(1.0f);
-    m_TerrainShader->SetMat4("uModel", terrainModel);
-    m_TerrainShader->SetInt("uNumOfColors", m_NumOfBiomeLayers);
+    // m_TerrainShader->Bind();
+    // glm::mat4 terrainModel = glm::mat4(1.0f);
+    // m_TerrainShader->SetMat4("uModel", terrainModel);
+    // m_TerrainShader->SetInt("uNumOfColors", m_NumOfBiomeLayers);
     // m_TerrainShader->SetInt("uTerrainTextures[0]", 0);
 
     // m_TerrainMesh->GetGrassTexture()->Bind();
-    m_TerrainShader->SetVec3("uDirLight.direction", m_LightDirection);
-    m_TerrainShader->SetFloat3("uDirLight.ambient", 0.1f, 0.1f, 0.1f);
-    m_TerrainShader->SetFloat3("uDirLight.diffuse", 1.0f, 1.0f, 1.0f);
-    m_TerrainShader->SetFloat3("uDirLight.specular", 1.0f, 1.0f, 1.0f);
+    // m_TerrainShader->SetVec3("uDirLight.direction", m_LightDirection);
+    // m_TerrainShader->SetFloat3("uDirLight.ambient", 0.1f, 0.1f, 0.1f);
+    // m_TerrainShader->SetFloat3("uDirLight.diffuse", 1.0f, 1.0f, 1.0f);
+    // m_TerrainShader->SetFloat3("uDirLight.specular", 1.0f, 1.0f, 1.0f);
 
     //----------------- TERRAIN TEXTURES -------------------//
     static const std::string texturesPaths[7] = {
@@ -63,20 +67,23 @@ EditorLayer::EditorLayer()
         m_TexturesList[i] = Enxus::CreateRef<Enxus::TextureMesh2D>(texturesPaths[i], Enxus::TextureType::DIFFUSE);
     }
 
-    //----------------- Sky Box -------------------//
-    m_SkyBox = Enxus::CreateRef<Enxus::SkyBox>();
+    // //----------------- Sky Box -------------------//
+    // m_SkyBox = Enxus::CreateRef<Enxus::SkyBox>();
 
-    m_SkyBox->SetCubeMapFaces(
-        {"TerrainGen/assets/images/skybox/right.tga",
-         "TerrainGen/assets/images/skybox/left.tga",
-         "TerrainGen/assets/images/skybox/top.tga",
-         "TerrainGen/assets/images/skybox/bottom.tga",
-         "TerrainGen/assets/images/skybox/back.tga",
-         "TerrainGen/assets/images/skybox/front.tga"});
+    // m_SkyBox->SetCubeMapFaces(
+    //     {"TerrainGen/assets/images/skybox/right.tga",
+    //      "TerrainGen/assets/images/skybox/left.tga",
+    //      "TerrainGen/assets/images/skybox/top.tga",
+    //      "TerrainGen/assets/images/skybox/bottom.tga",
+    //      "TerrainGen/assets/images/skybox/back.tga",
+    //      "TerrainGen/assets/images/skybox/front.tga"});
 
-    m_SkyBoxShader = Enxus::CreateRef<Enxus::Shader>(
-        "TerrainGen/assets/shaders/skybox/skybox.vert",
-        "TerrainGen/assets/shaders/skybox/skybox.frag");
+    // m_SkyBoxShader = Enxus::CreateRef<Enxus::Shader>(
+    //     "TerrainGen/assets/shaders/skybox/skybox.vert",
+    //     "TerrainGen/assets/shaders/skybox/skybox.frag");
+
+    m_Scene = Enxus::CreateScope<TerrainScene>();
+    m_Scene->Init();
 }
 
 EditorLayer::~EditorLayer()
@@ -91,10 +98,15 @@ void EditorLayer::OnAttach()
     fbspec.Height = 600;
     m_Framebuffer = Enxus::CreateScope<Enxus::Framebuffer>(fbspec);
 
+    // m_TerrainDimensionPanel = Enxus::CreateScope<TerrainDimensionPanel>();
+    TerrainDimensionPanel::Init();
+    SceneCompositionPanel::Init();
+
     m_NoiseEditorPanel = Enxus::CreateScope<NoiseEditorPanel>();
-    m_NoiseEditorPanel->SetNoiseWidth(m_TerrainWidth);
-    m_NoiseEditorPanel->SetNoiseHeight(m_TerrainHeight);
-    m_TerrainMesh->SetNoiseMap(m_NoiseEditorPanel->GetNoiseMap());
+    m_NoiseEditorPanel->SetNoiseWidth(250);
+    m_NoiseEditorPanel->SetNoiseHeight(250);
+    m_Scene->UpdateTerrainNoiseMap(m_NoiseEditorPanel->GetNoiseMap());
+    // m_TerrainMesh->SetNoiseMap(m_NoiseEditorPanel->GetNoiseMap());
 
     ImGui::SetWindowFocus("Viewport");
 }
@@ -105,94 +117,20 @@ void EditorLayer::OnUpdate(Enxus::Timestep ts)
         Enxus::Application::Get().Close();
 
     if (m_IsViewportFocused)
+    {
         m_CameraController->OnUpdate(ts);
-
+    }
     HandleViewportResize();
 
-    m_TerrainShader->Bind();
-    m_TerrainShader->SetMat4("uView", m_CameraController->GetCamera().GetViewMatrix());
-    m_TerrainShader->SetMat4("uProj", m_CameraController->GetCamera().GetProjectionMatrix());
-    m_TerrainShader->Unbind();
-
-    if (m_IsWireframe)
-        Enxus::Renderer::SetPolygonMode(Enxus::PolygonMode::LINE);
-    else
-        Enxus::Renderer::SetPolygonMode(Enxus::PolygonMode::FILL);
+    m_Scene->SubmitCamera(m_CameraController->GetCamera());
 
     {
         // Rendering
         m_Framebuffer->Bind();
         Enxus::Renderer::ClearColor(0.13f, 0.13f, 0.14f, 1.0f);
         Enxus::Renderer::Clear();
-        // Draw Terrain
-        {
-            // Enxus::Renderer::DrawModel(m_Box, m_Shader);
 
-            m_TerrainMesh->GetVertexArray()->Bind();
-            m_TerrainMesh->GetIndexBuffer()->Bind();
-            m_TerrainShader->Bind();
-            // m_TerrainMesh->GetGrassTexture()->Bind(0);
-            m_TerrainShader->SetVec3("uCameraPos", m_CameraController->GetCamera().GetPos());
-            m_TerrainShader->SetVec3("uDirLight.direction", m_LightDirection);
-            m_TerrainShader->SetFloat("uMinHeight", m_TerrainMesh->GetMinHeight());
-            m_TerrainShader->SetFloat("uMaxHeight", m_TerrainMesh->GetMaxHeight());
-
-            m_TerrainShader->SetInt("uNumOfColors", m_NumOfBiomeLayers);
-
-            for (int i = 0; i < m_NumOfBiomeLayers; i++)
-            {
-                bool textureUsed = false;
-                // Bind Textures
-                if (m_BiomeLayers[i].Texture)
-                {
-                    m_TerrainShader->SetFloat("uTexturesScale[" + std::to_string(i) + "]", m_BiomeLayers[i].TextureScale);
-                    m_TerrainShader->SetInt("uTerrainTextures[" + std::to_string(i) + "]", i);
-
-                    m_BiomeLayers[i].Texture->Bind(i);
-                    textureUsed = true;
-                }
-                m_TerrainShader->SetBool("uBiomeTextureUsed[" + std::to_string(i) + "]", textureUsed);
-
-                m_TerrainShader->SetFloat("uBiomeStartHeight[" + std::to_string(i) + "]", m_BiomeLayers[i].StartHeight);
-                m_TerrainShader->SetFloat("uBiomeBlends[" + std::to_string(i) + "]", m_BiomeLayers[i].BlendStrength);
-                m_TerrainShader->SetFloat("uBiomeColorStrength[" + std::to_string(i) + "]", m_BiomeLayers[i].ColorStrength);
-                m_TerrainShader->SetVec3("uBiomeColors[" + std::to_string(i) + "]", m_BiomeLayers[i].Color);
-            }
-            // pass the index of the textures used
-
-            // m_TerrainShader->SetInt()
-
-            const uint32_t numOfStrips = m_TerrainMesh->GetHeight() - 1;
-            const uint32_t numOfVertPerStrip = m_TerrainMesh->GetWidth() * 2;
-            for (unsigned int strip = 0; strip < numOfStrips; strip++)
-            {
-                size_t stripOffset = strip * numOfVertPerStrip * sizeof(unsigned int);
-                glDrawElements(GL_TRIANGLE_STRIP, numOfVertPerStrip, GL_UNSIGNED_INT, (void *)stripOffset);
-            }
-        }
-        // Draw Skybox at last
-        {
-            // always render the skybox with fill mode and not wireframe
-            Enxus::Renderer::SetPolygonMode(Enxus::PolygonMode::FILL);
-            GLCall(glDepthMask(GL_FALSE));
-            GLCall(glDepthFunc(GL_LEQUAL));
-
-            glm::mat4 viewMatrix = glm::mat4(glm::mat3(m_CameraController->GetCamera().GetViewMatrix()));
-
-            m_SkyBoxShader->Bind();
-            m_SkyBoxShader->SetMat4("uView", viewMatrix);
-            m_SkyBoxShader->SetMat4("uProj", m_CameraController->GetCamera().GetProjectionMatrix());
-
-            m_SkyBoxShader->SetInt("uSkyBoxTexture", 0);
-            m_SkyBox->Bind();
-
-            m_SkyBox->GetVertexArray()->Bind();
-
-            GLCall(glDrawArrays(GL_TRIANGLES, 0, 36));
-
-            GLCall(glDepthMask(GL_TRUE)); // Restoring state
-            GLCall(glDepthFunc(GL_LESS)); // Restoring state
-        }
+        m_Scene->OnUpdate();
 
         m_Framebuffer->Unbind();
     }
@@ -297,12 +235,8 @@ void EditorLayer::OnImGuiRender()
     m_NoiseEditorPanel->OnImGuiRender();
     if (m_NoiseEditorPanel->HasUpdated())
     {
-
-        ASSERT(
-            m_NoiseEditorPanel->GetNoiseWidth() == m_TerrainMesh->GetWidth() &&
-            m_NoiseEditorPanel->GetNoiseHeight() == m_TerrainMesh->GetHeight())
-
-        m_TerrainMesh->SetNoiseMap(m_NoiseEditorPanel->GetNoiseMap());
+        // m_TerrainMesh->SetNoiseMap(m_NoiseEditorPanel->GetNoiseMap());
+        m_Scene->UpdateTerrainNoiseMap(m_NoiseEditorPanel->GetNoiseMap());
     }
 
     ImGui::End();
@@ -311,7 +245,7 @@ void EditorLayer::OnImGuiRender()
 void EditorLayer::TerrainMenuUI()
 {
 
-    static const char *enumTerrainAnimationCurve[] = {"Linear", "EaseInQuad", "EaseInCubic", "EaseInQuart", "EaseInQuint"};
+    // static const char *enumTerrainAnimationCurve[] = {"Linear", "EaseInQuad", "EaseInCubic", "EaseInQuart", "EaseInQuint"};
     static const char *enumTerrainTextures[] = {"None", "Water", "Grass", "Rocks1", "Rocks2", "Sandy Grass", "Stony Ground", "Snow"};
 
     //// ImGui::ShowDemoWindow();
@@ -319,74 +253,66 @@ void EditorLayer::TerrainMenuUI()
     // Menu
     ImGui::Begin("Menu");
 
+    ImGui::BeginTabBar("Terrain Menu TabBar");
+
     // int numberOfButtons = 4; // Assuming this is the input value from 1 to 8
 
     // ImGui::Checkbox("Grid Floor", &m_ShowGridFloor);
     ImGui::PushItemWidth(120);
-    // ImGui::Swap
-    ImGui::Checkbox("Wireframe Mode", &m_IsWireframe);
-    ImGui::DragFloat3("Light Direction", glm::value_ptr(m_LightDirection), 0.1f);
-    if (ImGui::DragFloat("Elevation", &m_TerrainElevation, 0.01f, 0.0f))
+
+    TerrainDimensionPanel::OnImGuiRender();
+    auto dimensionProps = TerrainDimensionPanel::GetPanelProps();
+
+    m_Scene->UpdateTerrainDimensions(dimensionProps);
+    if ((uint32_t)dimensionProps.Width != m_NoiseEditorPanel->GetNoiseWidth())
     {
-        m_TerrainMesh->SetElevation(m_TerrainElevation);
+        m_NoiseEditorPanel->SetNoiseWidth(dimensionProps.Width);
+        m_Scene->UpdateTerrainNoiseMap(m_NoiseEditorPanel->GetNoiseMap());
     }
-    if (ImGui::DragFloat("Distance", &m_VertexDistance, 0.001f, 0.01f, 2.0f))
+    if ((uint32_t)dimensionProps.Height != m_NoiseEditorPanel->GetNoiseHeight())
     {
-        m_TerrainMesh->SetVertexDistance(m_VertexDistance);
-    }
-    if (ImGui::SliderInt("Terrain Width", (int *)&m_TerrainWidth, 50, 500))
-    {
-        m_TerrainMesh->SetWidth(m_TerrainWidth);
-        m_NoiseEditorPanel->SetNoiseWidth(m_TerrainWidth);
-        m_TerrainMesh->SetNoiseMap(m_NoiseEditorPanel->GetNoiseMap());
-    }
-    if (ImGui::SliderInt("Terrain Height", (int *)&m_TerrainHeight, 50, 500))
-    {
-        m_TerrainMesh->SetHeight(m_TerrainHeight);
-        m_NoiseEditorPanel->SetNoiseHeight(m_TerrainHeight);
-        m_TerrainMesh->SetNoiseMap(m_NoiseEditorPanel->GetNoiseMap());
+        m_NoiseEditorPanel->SetNoiseHeight(dimensionProps.Height);
+        m_Scene->UpdateTerrainNoiseMap(m_NoiseEditorPanel->GetNoiseMap());
     }
 
-    if (ImGui::Combo("Elevation Curve", &m_TerrainElevationCurve, enumTerrainAnimationCurve, IM_ARRAYSIZE(enumTerrainAnimationCurve)))
+    if (ImGui::BeginTabItem("Biome"))
     {
-        m_TerrainMesh->SetHeightElevationCurve((AnimationCurve)m_TerrainElevationCurve);
-    }
 
-    ImGui::DragFloat("Texture Scale", &m_TextureScale, 0.01f);
+        ImGui::SliderInt("Layers", &m_NumOfBiomeLayers, 1, 8);
 
-    ImGui::SliderInt("Layers", &m_NumOfBiomeLayers, 1, 8);
-
-    for (int i = 0; i < m_NumOfBiomeLayers; i++)
-    {
-        std::string index = std::to_string(i);
-        std::string uiName = "Layer " + index;
-        ImGui::SeparatorText(uiName.c_str());
-        ImGui::ColorEdit3(("Color - " + index).c_str(), glm::value_ptr(m_BiomeLayers[i].Color));
-        ImGui::SliderFloat(("Color Strength - " + index).c_str(), &m_BiomeLayers[i].ColorStrength, 0.0f, 1.0f);
-        ImGui::SliderFloat(("Start Height - " + index).c_str(), &m_BiomeLayers[i].StartHeight, 0.0f, 1.0f);
-        ImGui::SliderFloat(("Blend Strength - " + index).c_str(), &m_BiomeLayers[i].BlendStrength, 0.0f, 1.0f);
-        ImGui::DragFloat(("Texture Scale - " + index).c_str(), &m_BiomeLayers[i].TextureScale, 0.1f);
-
-        if (ImGui::Combo(("Texture - " + index).c_str(), &m_BiomeLayers[i].TextureIndex, enumTerrainTextures, IM_ARRAYSIZE(enumTerrainTextures)))
+        for (int i = 0; i < m_NumOfBiomeLayers; i++)
         {
-            // if its the NONE texture, just release the reference
-            if (m_BiomeLayers[i].TextureIndex == 0)
+            std::string index = std::to_string(i);
+            std::string uiName = "Layer " + index;
+            ImGui::SeparatorText(uiName.c_str());
+            ImGui::ColorEdit3(("Color - " + index).c_str(), glm::value_ptr(m_BiomeLayers[i].Color));
+            ImGui::SliderFloat(("Color Strength - " + index).c_str(), &m_BiomeLayers[i].ColorStrength, 0.0f, 1.0f);
+            ImGui::SliderFloat(("Start Height - " + index).c_str(), &m_BiomeLayers[i].StartHeight, 0.0f, 1.0f);
+            ImGui::SliderFloat(("Blend Strength - " + index).c_str(), &m_BiomeLayers[i].BlendStrength, 0.0f, 1.0f);
+            ImGui::DragFloat(("Texture Scale - " + index).c_str(), &m_BiomeLayers[i].TextureScale, 0.1f);
+
+            if (ImGui::Combo(("Texture - " + index).c_str(), &m_BiomeLayers[i].TextureIndex, enumTerrainTextures, IM_ARRAYSIZE(enumTerrainTextures)))
             {
-                m_BiomeLayers[i].Texture.reset();
-            }
-            else
-            {
-                m_BiomeLayers[i].Texture = m_TexturesList[m_BiomeLayers[i].TextureIndex - 1];
+                // if its the NONE texture, just release the reference
+                if (m_BiomeLayers[i].TextureIndex == 0)
+                {
+                    m_BiomeLayers[i].Texture.reset();
+                }
+                else
+                {
+                    m_BiomeLayers[i].Texture = m_TexturesList[m_BiomeLayers[i].TextureIndex - 1];
+                }
             }
         }
-
-        // ImGui::ColorEdit3("Color2", glm::value_ptr(m_BiomeColor[1]));
-        // ImGui::SliderFloat("Second Start Height", &m_BiomeStartHeight[1], 0.0f, 1.0f);
-        // ImGui::SliderFloat("Color2 Blend", &m_BiomeBlends[1], 0.0f, 1.0f);
+        ImGui::Dummy(ImVec2(0.0f, 15.0f));
+        ImGui::EndTabItem();
     }
-    ImGui::Dummy(ImVec2(0.0f, 15.0f));
+    SceneCompositionPanel::OnImGuiRender();
+    m_Scene->UpdateSceneComposition(SceneCompositionPanel::GetPanelProps());
 
     ImGui::PopItemWidth();
+    ImGui::EndTabBar();
+
     ImGui::End();
     // ImGui::ShowDemoWindow();
 }
