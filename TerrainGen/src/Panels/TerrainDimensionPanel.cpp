@@ -6,10 +6,10 @@ static TerrainDimensionPanelProps s_Props;
 
 void TerrainDimensionPanel::Init()
 {
-    s_Props.VertexScale = 0.05f;
+    s_Props.VertexScale = 1.0f;
     s_Props.Elevation = 1.5f;
-    s_Props.Width = 250;
-    s_Props.Height = 250;
+    s_Props.Width = 241;
+    s_Props.Height = 241;
 
     // AnimationCurve::Linear = 0
     s_Props.ElevationCurve = 0;

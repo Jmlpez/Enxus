@@ -45,15 +45,23 @@ void TerrainMesh::CreateTerrain()
 
 void TerrainMesh::CreateVertices()
 {
-    std::vector<TerrainVertex> vertices;
-    vertices.reserve(m_Width * m_Height);
 
     float topLeftX = (float)m_Width / -2.0f;
     float topLeftZ = (float)m_Height / -2.0f;
 
-    for (uint32_t i = 0; i < m_Height; i++)
+    int levelOfDetail = 3;
+    int meshSimplificationIncrement = levelOfDetail == 0 ? 1 : levelOfDetail * 2;
+    int verticesPerLine = ((m_Width - 1) / meshSimplificationIncrement) + 1;
+
+    std::cout << verticesPerLine << "  ** " << std::endl;
+    std::cout << meshSimplificationIncrement << "  ** " << std::endl;
+
+    std::vector<TerrainVertex> vertices;
+    vertices.reserve(verticesPerLine * verticesPerLine);
+
+    for (uint32_t i = 0; i < m_Height; i += meshSimplificationIncrement)
     {
-        for (uint32_t j = 0; j < m_Width; j++)
+        for (uint32_t j = 0; j < m_Width; j += meshSimplificationIncrement)
         {
             // Position
             glm::vec3 position;
@@ -78,17 +86,22 @@ void TerrainMesh::CreateVertices()
 
 std::vector<unsigned int> TerrainMesh::CreateIndices()
 {
-    std::vector<unsigned int> indices((m_Height - 1) * (m_Width * 2), 0);
+
+    int currWidth = (m_Width - 1) / 6 + 1;
+    int currHeight = (m_Height - 1) / 6 + 1;
+
+    std::vector<unsigned int> indices((currHeight - 1) * (currWidth * 2), 0);
 
     int index = 0;
+
     // Triangle strip indices
-    for (uint32_t i = 0; i < m_Height - 1; i++)
+    for (uint32_t i = 0; i < currHeight - 1; i++)
     {
-        int offset = m_Width * i;
-        for (uint32_t j = 0; j < m_Width; j++)
+        int offset = currWidth * i;
+        for (uint32_t j = 0; j < currWidth; j++)
         {
             indices[index] = offset + j;
-            indices[index + 1] = offset + j + m_Width;
+            indices[index + 1] = offset + j + currWidth;
             index += 2;
         }
     }
@@ -139,6 +152,7 @@ void TerrainMesh::SetHeightElevationCurve(AnimationCurve curve)
 
 void TerrainMesh::SetVertexDistance(float distance)
 {
+    return;
     if (distance == m_VertexDistance)
         return;
     m_VertexDistance = distance;
@@ -156,12 +170,13 @@ void TerrainMesh::SetVertexDistance(float distance)
             m_Vertices[vertexIndex].Position.z = (topLeftZ + i) * m_VertexDistance; // to center int z-axis
         }
     }
-    CalculateNormals();
+    // CalculateNormals();
     m_VertexBufferObject->SetData(&m_Vertices[0], m_Vertices.size() * sizeof(TerrainVertex));
 }
 
 void TerrainMesh::CalculateNoiseMap()
 {
+    return;
     if (m_NoiseMap.empty())
         return;
     // first valid value
@@ -184,7 +199,7 @@ void TerrainMesh::CalculateNoiseMap()
     m_MaxHeight = maxHeight;
 
     // Calculate normals before sending data to the gpu
-    CalculateNormals();
+    // CalculateNormals();
     m_VertexBufferObject->SetData(&m_Vertices[0], m_Vertices.size() * sizeof(TerrainVertex));
 }
 

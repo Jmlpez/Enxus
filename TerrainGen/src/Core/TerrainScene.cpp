@@ -55,8 +55,7 @@ void TerrainScene::Init()
                                                            "TerrainGen/assets/shaders/terrain/terrain.frag");
 
     // Default terrain
-    s_Data.Terrain = Enxus::CreateRef<TerrainMesh>(250, 250);
-
+    s_Data.Terrain = Enxus::CreateRef<TerrainMesh>(241, 241);
     s_Data.TerrainShader->Bind();
     glm::mat4 terrainModel = glm::mat4(1.0f);
     s_Data.TerrainShader->SetMat4("uModel", terrainModel);
@@ -132,8 +131,10 @@ void TerrainScene::OnUpdate()
         s_Data.Terrain->GetVertexArray()->Bind();
         s_Data.Terrain->GetIndexBuffer()->Bind();
 
-        const uint32_t numOfStrips = s_Data.Terrain->GetHeight() - 1;
-        const uint32_t numOfVertPerStrip = s_Data.Terrain->GetWidth() * 2;
+        int tempHeight = (s_Data.Terrain->GetHeight() - 1) / 6 + 1;
+        int tempWidth = (s_Data.Terrain->GetWidth() - 1) / 6 + 1;
+        const uint32_t numOfStrips = tempHeight - 1;
+        const uint32_t numOfVertPerStrip = tempWidth * 2;
         for (unsigned int strip = 0; strip < numOfStrips; strip++)
         {
             size_t stripOffset = strip * numOfVertPerStrip * sizeof(unsigned int);

@@ -6,8 +6,8 @@ const int NoiseEditorPanel::s_TextureGeneratedHeight = 400;
 
 NoiseEditorPanel::NoiseEditorPanel()
 {
-    m_GeneralNoise.Width = 250;
-    m_GeneralNoise.Height = 250;
+    m_GeneralNoise.Width = 241;
+    m_GeneralNoise.Height = 241;
 
     m_NoisePreviewData.Texture =
         Enxus::CreateScope<Enxus::Texture2D>(s_TextureGeneratedWidth,
