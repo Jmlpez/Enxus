@@ -2,6 +2,7 @@
 #include "EditorLayer.h"
 #include "TerrainDimensionPanel.h"
 #include "SceneCompositionPanel.h"
+#include "TerrainBiomePanel.h"
 #include "imgui/imgui.h"
 #include "imgui/imgui_internal.h"
 
@@ -51,21 +52,21 @@ EditorLayer::EditorLayer()
     // m_TerrainShader->SetFloat3("uDirLight.diffuse", 1.0f, 1.0f, 1.0f);
     // m_TerrainShader->SetFloat3("uDirLight.specular", 1.0f, 1.0f, 1.0f);
 
-    //----------------- TERRAIN TEXTURES -------------------//
-    static const std::string texturesPaths[7] = {
-        "TerrainGen/assets/images/materials-debug/water.png",
-        "TerrainGen/assets/images/materials-debug/grass.png",
-        "TerrainGen/assets/images/materials-debug/rocks1.png",
-        "TerrainGen/assets/images/materials-debug/rocks2.png",
-        "TerrainGen/assets/images/materials-debug/sandy-grass.png",
-        "TerrainGen/assets/images/materials-debug/stony-ground.png",
-        "TerrainGen/assets/images/materials-debug/snow.png",
-    };
+    // //----------------- TERRAIN TEXTURES -------------------//
+    // static const std::string texturesPaths[7] = {
+    //     "TerrainGen/assets/images/materials-debug/water.png",
+    //     "TerrainGen/assets/images/materials-debug/grass.png",
+    //     "TerrainGen/assets/images/materials-debug/rocks1.png",
+    //     "TerrainGen/assets/images/materials-debug/rocks2.png",
+    //     "TerrainGen/assets/images/materials-debug/sandy-grass.png",
+    //     "TerrainGen/assets/images/materials-debug/stony-ground.png",
+    //     "TerrainGen/assets/images/materials-debug/snow.png",
+    // };
 
-    for (int i = 0; i < 7; i++)
-    {
-        m_TexturesList[i] = Enxus::CreateRef<Enxus::TextureMesh2D>(texturesPaths[i], Enxus::TextureType::DIFFUSE);
-    }
+    // for (int i = 0; i < 7; i++)
+    // {
+    //     m_TexturesList[i] = Enxus::CreateRef<Enxus::TextureMesh2D>(texturesPaths[i], Enxus::TextureType::DIFFUSE);
+    // }
 
     // //----------------- Sky Box -------------------//
     // m_SkyBox = Enxus::CreateRef<Enxus::SkyBox>();
@@ -99,14 +100,21 @@ void EditorLayer::OnAttach()
     m_Framebuffer = Enxus::CreateScope<Enxus::Framebuffer>(fbspec);
 
     // m_TerrainDimensionPanel = Enxus::CreateScope<TerrainDimensionPanel>();
+    // Terrain Panels initialization
+
     TerrainDimensionPanel::Init();
+    TerrainBiomePanel::Init();
     SceneCompositionPanel::Init();
 
     m_NoiseEditorPanel = Enxus::CreateScope<NoiseEditorPanel>();
     m_NoiseEditorPanel->SetNoiseWidth(250);
     m_NoiseEditorPanel->SetNoiseHeight(250);
+
+    // Initial values
     m_Scene->UpdateTerrainNoiseMap(m_NoiseEditorPanel->GetNoiseMap());
-    // m_TerrainMesh->SetNoiseMap(m_NoiseEditorPanel->GetNoiseMap());
+    m_Scene->UpdateSceneComposition(SceneCompositionPanel::GetPanelProps());
+    m_Scene->UpdateTerrainDimensions(TerrainDimensionPanel::GetPanelProps());
+    m_Scene->UpdateTerrainBiome(TerrainBiomePanel::GetPanelProps());
 
     ImGui::SetWindowFocus("Viewport");
 }
@@ -246,7 +254,6 @@ void EditorLayer::TerrainMenuUI()
 {
 
     // static const char *enumTerrainAnimationCurve[] = {"Linear", "EaseInQuad", "EaseInCubic", "EaseInQuart", "EaseInQuint"};
-    static const char *enumTerrainTextures[] = {"None", "Water", "Grass", "Rocks1", "Rocks2", "Sandy Grass", "Stony Ground", "Snow"};
 
     //// ImGui::ShowDemoWindow();
 
@@ -275,38 +282,9 @@ void EditorLayer::TerrainMenuUI()
         m_Scene->UpdateTerrainNoiseMap(m_NoiseEditorPanel->GetNoiseMap());
     }
 
-    if (ImGui::BeginTabItem("Biome"))
-    {
+    TerrainBiomePanel::OnImGuiRender();
+    m_Scene->UpdateTerrainBiome(TerrainBiomePanel::GetPanelProps());
 
-        ImGui::SliderInt("Layers", &m_NumOfBiomeLayers, 1, 8);
-
-        for (int i = 0; i < m_NumOfBiomeLayers; i++)
-        {
-            std::string index = std::to_string(i);
-            std::string uiName = "Layer " + index;
-            ImGui::SeparatorText(uiName.c_str());
-            ImGui::ColorEdit3(("Color - " + index).c_str(), glm::value_ptr(m_BiomeLayers[i].Color));
-            ImGui::SliderFloat(("Color Strength - " + index).c_str(), &m_BiomeLayers[i].ColorStrength, 0.0f, 1.0f);
-            ImGui::SliderFloat(("Start Height - " + index).c_str(), &m_BiomeLayers[i].StartHeight, 0.0f, 1.0f);
-            ImGui::SliderFloat(("Blend Strength - " + index).c_str(), &m_BiomeLayers[i].BlendStrength, 0.0f, 1.0f);
-            ImGui::DragFloat(("Texture Scale - " + index).c_str(), &m_BiomeLayers[i].TextureScale, 0.1f);
-
-            if (ImGui::Combo(("Texture - " + index).c_str(), &m_BiomeLayers[i].TextureIndex, enumTerrainTextures, IM_ARRAYSIZE(enumTerrainTextures)))
-            {
-                // if its the NONE texture, just release the reference
-                if (m_BiomeLayers[i].TextureIndex == 0)
-                {
-                    m_BiomeLayers[i].Texture.reset();
-                }
-                else
-                {
-                    m_BiomeLayers[i].Texture = m_TexturesList[m_BiomeLayers[i].TextureIndex - 1];
-                }
-            }
-        }
-        ImGui::Dummy(ImVec2(0.0f, 15.0f));
-        ImGui::EndTabItem();
-    }
     SceneCompositionPanel::OnImGuiRender();
     m_Scene->UpdateSceneComposition(SceneCompositionPanel::GetPanelProps());
 

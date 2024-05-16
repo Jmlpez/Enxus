@@ -3,6 +3,7 @@
 
 #include "Enxus.h"
 #include "TerrainDimensionPanel.h"
+#include "TerrainBiomePanel.h"
 #include "SceneCompositionPanel.h"
 #include "TerrainMesh.h"
 
@@ -15,15 +16,19 @@ public:
     void Init();
     void OnUpdate();
 
-    void UpdateTerrainNoiseMap(const std::vector<float> noiseMap);
-    void UpdateTerrainDimensions(TerrainDimensionPanelProps &props);
+    void UpdateTerrainNoiseMap(const std::vector<float> &noiseMap);
+
+    void UpdateTerrainDimensions(const TerrainDimensionPanelProps &props);
+    void UpdateTerrainBiome(const TerrainBiomePanelProps &props);
     void UpdateSceneComposition(const SceneCompositionPanelProps &props);
+
     void SubmitCamera(const Enxus::Camera &camera);
 
 private:
     Enxus::Scope<TerrainMesh> m_TerrainMesh;
 
     SceneCompositionPanelProps m_SceneCompositionData;
+    TerrainBiomePanelProps m_TerrainBiomeData;
 
     // SkyBox
     Enxus::Ref<Enxus::SkyBox> m_SkyBox;
@@ -31,6 +36,8 @@ private:
 
     // Shaders
     Enxus::Ref<Enxus::Shader> m_TerrainShader;
+
+    std::array<Enxus::Ref<Enxus::TextureMesh2D>, 7> m_TexturesList;
 
     struct CameraData
     {

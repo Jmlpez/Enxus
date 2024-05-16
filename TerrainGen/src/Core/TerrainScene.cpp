@@ -17,14 +17,30 @@ void TerrainScene::SubmitCamera(const Enxus::Camera &camera)
 
 void TerrainScene::Init()
 {
+    //----------------- TERRAIN TEXTURES -------------------//
+    static const std::string texturesPaths[7] = {
+        "TerrainGen/assets/images/materials-debug/water.png",
+        "TerrainGen/assets/images/materials-debug/grass.png",
+        "TerrainGen/assets/images/materials-debug/rocks1.png",
+        "TerrainGen/assets/images/materials-debug/rocks2.png",
+        "TerrainGen/assets/images/materials-debug/sandy-grass.png",
+        "TerrainGen/assets/images/materials-debug/stony-ground.png",
+        "TerrainGen/assets/images/materials-debug/snow.png",
+    };
+
+    for (int i = 0; i < 7; i++)
+    {
+        m_TexturesList[i] = Enxus::CreateRef<Enxus::TextureMesh2D>(texturesPaths[i], Enxus::TextureType::DIFFUSE);
+    }
+
     m_TerrainShader = Enxus::CreateRef<Enxus::Shader>("TerrainGen/assets/shaders/terrain/terrain.vert",
                                                       "TerrainGen/assets/shaders/terrain/terrain.frag");
 
     // Default terrain
     m_TerrainMesh = Enxus::CreateScope<TerrainMesh>(250, 250);
 
-    m_SceneCompositionData.LightDirection = glm::vec3(-0.2f, -1.0f, -0.3f);
-    m_SceneCompositionData.IsWireframe = false;
+    // m_SceneCompositionData.LightDirection = glm::vec3(-0.2f, -1.0f, -0.3f);
+    // m_SceneCompositionData.IsWireframe = false;
 
     m_TerrainShader->Bind();
     glm::mat4 terrainModel = glm::mat4(1.0f);
@@ -60,8 +76,6 @@ void TerrainScene::OnUpdate()
         Enxus::Renderer::SetPolygonMode(Enxus::PolygonMode::FILL);
 
     {
-        // Enxus::Renderer::DrawModel(m_Box, m_Shader);
-
         m_TerrainShader->Bind();
 
         m_TerrainShader->SetMat4("uView", m_CameraData.ViewMatrix);
@@ -73,27 +87,29 @@ void TerrainScene::OnUpdate()
         m_TerrainShader->SetFloat("uMinHeight", m_TerrainMesh->GetMinHeight());
         m_TerrainShader->SetFloat("uMaxHeight", m_TerrainMesh->GetMaxHeight());
 
-        m_TerrainShader->SetInt("uNumOfColors", 0);
+        m_TerrainShader->SetInt("uNumOfColors", m_TerrainBiomeData.NumOfBiomeLayers);
 
-        // for (int i = 0; i < m_NumOfBiomeLayers; i++)
-        // {
-        //     bool textureUsed = false;
-        //     // Bind Textures
-        //     if (m_BiomeLayers[i].Texture)
-        //     {
-        //         m_TerrainShader->SetFloat("uTexturesScale[" + std::to_string(i) + "]", m_BiomeLayers[i].TextureScale);
-        //         m_TerrainShader->SetInt("uTerrainTextures[" + std::to_string(i) + "]", i);
+        for (int i = 0; i < m_TerrainBiomeData.NumOfBiomeLayers; i++)
+        {
+            bool textureUsed = false;
+            // Bind Textures
+            if (m_TerrainBiomeData.BiomeLayers[i].TextureIndex != 0)
+            {
+                m_TerrainShader->SetFloat("uTexturesScale[" + std::to_string(i) + "]", m_TerrainBiomeData.BiomeLayers[i].TextureScale);
+                m_TerrainShader->SetInt("uTerrainTextures[" + std::to_string(i) + "]", i);
 
-        //         m_BiomeLayers[i].Texture->Bind(i);
-        //         textureUsed = true;
-        //     }
-        //     m_TerrainShader->SetBool("uBiomeTextureUsed[" + std::to_string(i) + "]", textureUsed);
+                // m_TerrainBiomeData.BiomeLayers[i].Texture->Bind(i);
+                m_TexturesList[m_TerrainBiomeData.BiomeLayers[i].TextureIndex - 1]->Bind(i);
 
-        //     m_TerrainShader->SetFloat("uBiomeStartHeight[" + std::to_string(i) + "]", m_BiomeLayers[i].StartHeight);
-        //     m_TerrainShader->SetFloat("uBiomeBlends[" + std::to_string(i) + "]", m_BiomeLayers[i].BlendStrength);
-        //     m_TerrainShader->SetFloat("uBiomeColorStrength[" + std::to_string(i) + "]", m_BiomeLayers[i].ColorStrength);
-        //     m_TerrainShader->SetVec3("uBiomeColors[" + std::to_string(i) + "]", m_BiomeLayers[i].Color);
-        // }
+                textureUsed = true;
+            }
+            m_TerrainShader->SetBool("uBiomeTextureUsed[" + std::to_string(i) + "]", textureUsed);
+
+            m_TerrainShader->SetFloat("uBiomeStartHeight[" + std::to_string(i) + "]", m_TerrainBiomeData.BiomeLayers[i].StartHeight);
+            m_TerrainShader->SetFloat("uBiomeBlends[" + std::to_string(i) + "]", m_TerrainBiomeData.BiomeLayers[i].BlendStrength);
+            m_TerrainShader->SetFloat("uBiomeColorStrength[" + std::to_string(i) + "]", m_TerrainBiomeData.BiomeLayers[i].ColorStrength);
+            m_TerrainShader->SetVec3("uBiomeColors[" + std::to_string(i) + "]", m_TerrainBiomeData.BiomeLayers[i].Color);
+        }
         // pass the index of the textures used
 
         // m_TerrainShader->SetInt()
@@ -133,12 +149,12 @@ void TerrainScene::OnUpdate()
     }
 }
 
-void TerrainScene::UpdateTerrainNoiseMap(const std::vector<float> noiseMap)
+void TerrainScene::UpdateTerrainNoiseMap(const std::vector<float> &noiseMap)
 {
     m_TerrainMesh->SetNoiseMap(noiseMap);
 }
 
-void TerrainScene::UpdateTerrainDimensions(TerrainDimensionPanelProps &props)
+void TerrainScene::UpdateTerrainDimensions(const TerrainDimensionPanelProps &props)
 {
     // update the terrain according to the new panel props...
     if ((uint32_t)props.Width != m_TerrainMesh->GetWidth())
@@ -163,11 +179,17 @@ void TerrainScene::UpdateTerrainDimensions(TerrainDimensionPanelProps &props)
     }
 }
 
+void TerrainScene::UpdateTerrainBiome(const TerrainBiomePanelProps &props)
+{
+    m_TerrainBiomeData = props;
+}
+
 void TerrainScene::UpdateSceneComposition(const SceneCompositionPanelProps &props)
 {
-    m_SceneCompositionData.IsWireframe = props.IsWireframe;
-    if (props.LightDirection != m_SceneCompositionData.LightDirection)
-    {
-        m_SceneCompositionData.LightDirection = props.LightDirection;
-    }
+    m_SceneCompositionData = props;
+    // m_SceneCompositionData.IsWireframe = props.IsWireframe;
+    // if (props.LightDirection != m_SceneCompositionData.LightDirection)
+    // {
+    //     m_SceneCompositionData.LightDirection = props.LightDirection;
+    // }
 }

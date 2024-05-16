@@ -28,7 +28,7 @@ private:
     bool m_IsViewportHovered = false;
 
     // Scene options
-    bool m_IsWireframe = false;
+    // bool m_IsWireframe = false;
 
     // float m_VertexDistance = 0.05f;
     // float m_TerrainElevation = 1.5f;
@@ -42,24 +42,7 @@ private:
 
     // glm::vec3 m_LightDirection;
 
-    int m_NumOfBiomeLayers = 0;
-
-    struct BiomeLayersData
-    {
-        Enxus::Ref<Enxus::TextureMesh2D> Texture;
-        glm::vec3 Color = glm::vec3(1.0f);
-        float ColorStrength = 0.0f;
-        float StartHeight = 0.0f;
-        float BlendStrength = 0.5f;
-        float TextureScale = 1.0f;
-        int TextureIndex = 0;
-    };
-
-    std::array<BiomeLayersData, 8> m_BiomeLayers;
-
-    std::array<Enxus::Ref<Enxus::TextureMesh2D>, 7> m_TexturesList;
-
-    Enxus::Scope<TerrainScene> m_Scene;
+        Enxus::Scope<TerrainScene> m_Scene;
 
     // Terrain Mesh
     // Enxus::Scope<TerrainMesh> m_TerrainMesh;

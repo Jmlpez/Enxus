@@ -23,14 +23,14 @@ NoiseEditorPanel::NoiseEditorPanel()
 
 void NoiseEditorPanel::SetNoiseWidth(uint32_t width)
 {
-    if (width == m_GeneralNoise.Width)
+    if ((int)width == m_GeneralNoise.Width)
         return;
     m_GeneralNoise.Width = width;
     UpdateNoiseMap(true);
 }
 void NoiseEditorPanel::SetNoiseHeight(uint32_t height)
 {
-    if (height == m_GeneralNoise.Height)
+    if ((int)height == m_GeneralNoise.Height)
         return;
     m_GeneralNoise.Height = height;
     UpdateNoiseMap(true);
