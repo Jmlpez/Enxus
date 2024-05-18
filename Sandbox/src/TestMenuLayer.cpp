@@ -9,6 +9,7 @@
 #include "TestSkyBox.h"
 #include "TestMovingVertex.h"
 #include "TestTriangleStrip.h"
+#include "TestCircle.h"
 #include "imgui/imgui.h"
 
 TestMenuLayer::TestMenuLayer()
@@ -46,9 +47,10 @@ void TestMenuLayer::OnAttach()
     RegisterTest<OpenGLTest::TestSkyBox>("SkyBox");
     RegisterTest<OpenGLTest::TestMovingVertex>("Mesh vertices updating");
     RegisterTest<OpenGLTest::TestTriangleStrip>("Triangle Strip");
+    RegisterTest<OpenGLTest::TestCircle>("Test Circle");
 
     // start in the skybox test
-    m_CurrentTest = new OpenGLTest::TestTriangleStrip();
+    m_CurrentTest = new OpenGLTest::TestCircle();
 }
 
 void TestMenuLayer::OnUpdate(Enxus::Timestep ts)

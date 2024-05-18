@@ -35,6 +35,7 @@ namespace Enxus
         inline glm::vec3 GetFront() const { return m_Front; }
 
         // get Camera Attributes
+        inline float GetAspectRatio(){return m_AspectRatio;}
         inline float GetFOV() { return m_FOV; }
         inline float GetNearPlane() { return m_NearPlane; }
         inline float GetFarPlane() { return m_FarPlane; }
