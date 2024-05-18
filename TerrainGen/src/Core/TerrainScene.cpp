@@ -131,8 +131,9 @@ void TerrainScene::OnUpdate()
         s_Data.Terrain->GetVertexArray()->Bind();
         s_Data.Terrain->GetIndexBuffer()->Bind();
 
-        int tempHeight = (s_Data.Terrain->GetHeight() - 1) / 6 + 1;
-        int tempWidth = (s_Data.Terrain->GetWidth() - 1) / 6 + 1;
+        int meshSimplificationIncrement = s_Data.Terrain->GetLevelOfDetail() == 0 ? 1 : s_Data.Terrain->GetLevelOfDetail() * 2;
+        int tempHeight = (s_Data.Terrain->GetHeight() - 1) / meshSimplificationIncrement + 1;
+        int tempWidth = (s_Data.Terrain->GetWidth() - 1) / meshSimplificationIncrement + 1;
         const uint32_t numOfStrips = tempHeight - 1;
         const uint32_t numOfVertPerStrip = tempWidth * 2;
         for (unsigned int strip = 0; strip < numOfStrips; strip++)
@@ -181,6 +182,10 @@ void TerrainScene::UpdateTerrainDimensions(const TerrainDimensionPanelProps &pro
     if ((uint32_t)props.Height != s_Data.Terrain->GetHeight())
     {
         s_Data.Terrain->SetHeight(props.Height);
+    }
+    if (props.LevelOfDetail != s_Data.Terrain->GetLevelOfDetail())
+    {
+        s_Data.Terrain->SetLevelOfDetail(props.LevelOfDetail);
     }
     if (props.Elevation != s_Data.Terrain->GetElevation())
     {

@@ -36,8 +36,11 @@ public:
     void SetHeightElevationCurve(AnimationCurve curve);
     void SetElevation(float elevation);
     void SetVertexDistance(float distance);
+    void SetLevelOfDetail(int levelOfDetail);
     void SetWidth(uint32_t width);
     void SetHeight(uint32_t height);
+
+    inline int GetLevelOfDetail() const { return m_LevelOfDetail; }
 
     inline float GetElevation() const { return m_Elevation; }
     inline float GetVertexDistance() const { return m_VertexDistance; }
@@ -64,12 +67,15 @@ private:
     float Evaluate(float t);
 
 private:
+    // int GetNewSizeFromLOD()
+
+private:
     uint32_t m_Width, m_Height;
-    // float m_VertexDistance = 0.0625f;
     float m_VertexDistance = 0.05f;
     float m_Elevation = 1.5f;
     float m_MinHeight = 0.0f;
     float m_MaxHeight = 1.0f;
+    int m_LevelOfDetail;
 
     AnimationCurve m_ElevationCurve = AnimationCurve::EaseInQuad;
 

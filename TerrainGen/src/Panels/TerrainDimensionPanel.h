@@ -8,6 +8,7 @@ struct TerrainDimensionPanelProps
     int Width;
     int Height;
     int ElevationCurve;
+    int LevelOfDetail;
 };
 
 class TerrainDimensionPanel

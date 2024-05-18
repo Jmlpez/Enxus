@@ -12,6 +12,8 @@ TerrainMesh::TerrainMesh(uint32_t width, uint32_t height)
     m_Width = std::min(m_Height, s_MaxTerrainSize);
     m_Height = std::min(m_Width, s_MaxTerrainSize);
 
+    m_LevelOfDetail = 0;
+
     m_VertexArrayObject = Enxus::CreateRef<Enxus::VertexArray>();
 
     CreateTerrain();
@@ -49,15 +51,12 @@ void TerrainMesh::CreateVertices()
     float topLeftX = (float)m_Width / -2.0f;
     float topLeftZ = (float)m_Height / -2.0f;
 
-    int levelOfDetail = 3;
-    int meshSimplificationIncrement = levelOfDetail == 0 ? 1 : levelOfDetail * 2;
-    int verticesPerLine = ((m_Width - 1) / meshSimplificationIncrement) + 1;
-
-    std::cout << verticesPerLine << "  ** " << std::endl;
-    std::cout << meshSimplificationIncrement << "  ** " << std::endl;
+    int meshSimplificationIncrement = m_LevelOfDetail == 0 ? 1 : m_LevelOfDetail * 2;
+    int newWidth = ((m_Width - 1) / meshSimplificationIncrement) + 1;
+    int newHeight = ((m_Height - 1) / meshSimplificationIncrement) + 1;
 
     std::vector<TerrainVertex> vertices;
-    vertices.reserve(verticesPerLine * verticesPerLine);
+    vertices.reserve(newHeight * newWidth);
 
     for (uint32_t i = 0; i < m_Height; i += meshSimplificationIncrement)
     {
@@ -86,22 +85,22 @@ void TerrainMesh::CreateVertices()
 
 std::vector<unsigned int> TerrainMesh::CreateIndices()
 {
+    int meshSimplificationIncrement = m_LevelOfDetail == 0 ? 1 : m_LevelOfDetail * 2;
+    int newWidth = ((m_Width - 1) / meshSimplificationIncrement) + 1;
+    int newHeight = ((m_Height - 1) / meshSimplificationIncrement) + 1;
 
-    int currWidth = (m_Width - 1) / 6 + 1;
-    int currHeight = (m_Height - 1) / 6 + 1;
-
-    std::vector<unsigned int> indices((currHeight - 1) * (currWidth * 2), 0);
+    std::vector<unsigned int> indices((newHeight - 1) * (newWidth * 2), 0);
 
     int index = 0;
 
     // Triangle strip indices
-    for (uint32_t i = 0; i < currHeight - 1; i++)
+    for (uint32_t i = 0; i < newHeight - 1; i++)
     {
-        int offset = currWidth * i;
-        for (uint32_t j = 0; j < currWidth; j++)
+        int offset = newWidth * i;
+        for (uint32_t j = 0; j < newWidth; j++)
         {
             indices[index] = offset + j;
-            indices[index + 1] = offset + j + currWidth;
+            indices[index + 1] = offset + j + newWidth;
             index += 2;
         }
     }
@@ -110,15 +109,18 @@ std::vector<unsigned int> TerrainMesh::CreateIndices()
 
 void TerrainMesh::CalculateNormals()
 {
-
     // Reset  TerrainVertex normals to 0
     for (auto &vertex : m_Vertices)
         vertex.Normal = glm::vec3(0);
 
-    uint32_t numOfStrips = m_Height - 1;
+    int meshSimplificationIncrement = m_LevelOfDetail == 0 ? 1 : m_LevelOfDetail * 2;
+    int newWidth = ((m_Width - 1) / meshSimplificationIncrement) + 1;
+    int newHeight = ((m_Height - 1) / meshSimplificationIncrement) + 1;
+
+    uint32_t numOfStrips = newHeight - 1;
     for (uint32_t strip = 0; strip < numOfStrips; strip++)
     {
-        uint32_t numOfVertexPerStrip = m_Width * 2;
+        uint32_t numOfVertexPerStrip = newWidth * 2;
         uint32_t indexOffset = strip * numOfVertexPerStrip;
         bool flipDir = false;
         for (uint32_t i = 2; i < numOfVertexPerStrip; i++)
@@ -152,7 +154,6 @@ void TerrainMesh::SetHeightElevationCurve(AnimationCurve curve)
 
 void TerrainMesh::SetVertexDistance(float distance)
 {
-    return;
     if (distance == m_VertexDistance)
         return;
     m_VertexDistance = distance;
@@ -160,35 +161,43 @@ void TerrainMesh::SetVertexDistance(float distance)
     float topLeftX = (float)m_Width / -2.0f;
     float topLeftZ = (float)m_Height / -2.0f;
 
-    for (uint32_t i = 0; i < m_Height; i++)
-    {
-        for (uint32_t j = 0; j < m_Width; j++)
-        {
-            uint32_t vertexIndex = i * m_Width + j;
+    int meshSimplificationIncrement = m_LevelOfDetail == 0 ? 1 : m_LevelOfDetail * 2;
+    int newWidth = ((m_Width - 1) / meshSimplificationIncrement) + 1;
+    int newHeight = ((m_Height - 1) / meshSimplificationIncrement) + 1;
 
+    for (uint32_t i = 0, vertexIndex = 0; i < m_Height; i += meshSimplificationIncrement)
+    {
+        for (uint32_t j = 0; j < m_Width; j += meshSimplificationIncrement)
+        {
             m_Vertices[vertexIndex].Position.x = (topLeftX + j) * m_VertexDistance; // to center int x-axis
             m_Vertices[vertexIndex].Position.z = (topLeftZ + i) * m_VertexDistance; // to center int z-axis
+            vertexIndex++;
         }
     }
-    // CalculateNormals();
+    CalculateNormals();
     m_VertexBufferObject->SetData(&m_Vertices[0], m_Vertices.size() * sizeof(TerrainVertex));
 }
 
 void TerrainMesh::CalculateNoiseMap()
 {
-    return;
+
     if (m_NoiseMap.empty())
         return;
     // first valid value
     float minHeight = Evaluate(m_NoiseMap[0]) * m_Elevation;
     float maxHeight = minHeight;
 
-    for (uint32_t i = 0; i < m_Height; i++)
+    int meshSimplificationIncrement = m_LevelOfDetail == 0 ? 1 : m_LevelOfDetail * 2;
+    int newWidth = ((m_Width - 1) / meshSimplificationIncrement) + 1;
+    int newHeight = ((m_Height - 1) / meshSimplificationIncrement) + 1;
+
+    for (uint32_t i = 0; i < newHeight; i++)
     {
-        for (uint32_t j = 0; j < m_Width; j++)
+        for (uint32_t j = 0; j < newWidth; j++)
         {
-            uint32_t vertexIndex = i * m_Width + j;
-            float newYPos = Evaluate(m_NoiseMap[vertexIndex]) * m_Elevation;
+            uint32_t vertexIndex = (i * newWidth + j);
+            uint32_t noiseIndex = (i * m_Width + j) * meshSimplificationIncrement;
+            float newYPos = Evaluate(m_NoiseMap[noiseIndex]) * m_Elevation;
             m_Vertices[vertexIndex].Position.y = newYPos;
 
             minHeight = minHeight > newYPos ? newYPos : minHeight;
@@ -199,7 +208,7 @@ void TerrainMesh::CalculateNoiseMap()
     m_MaxHeight = maxHeight;
 
     // Calculate normals before sending data to the gpu
-    // CalculateNormals();
+    CalculateNormals();
     m_VertexBufferObject->SetData(&m_Vertices[0], m_Vertices.size() * sizeof(TerrainVertex));
 }
 
@@ -246,6 +255,19 @@ void TerrainMesh::SetHeight(uint32_t height)
     m_IndexBufferObject.reset();
 
     CreateTerrain();
+}
+
+void TerrainMesh::SetLevelOfDetail(int levelOfDetail)
+{
+    m_LevelOfDetail = levelOfDetail;
+
+    m_Vertices.clear();
+    m_Indices.clear();
+    m_VertexBufferObject.reset();
+    m_IndexBufferObject.reset();
+
+    CreateTerrain();
+    CalculateNoiseMap();
 }
 
 glm::vec3 TerrainMesh::GetNormalFromIndices(unsigned int indexA, unsigned int indexB, unsigned int indexC, bool flipDir)
