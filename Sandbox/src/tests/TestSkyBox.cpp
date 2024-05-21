@@ -53,11 +53,15 @@ namespace OpenGLTest
             1.0f, -1.0f, 1.0f    /* Face */
         };
         m_SkyBoxVAO = Enxus::CreateRef<Enxus::VertexArray>();
-        m_SkyBoxVBO = Enxus::CreateRef<Enxus::VertexBuffer>(skyboxVertices, sizeof(skyboxVertices));
 
-        Enxus::VertexBufferLayout layout;
-        layout.Push(3, GL_FLOAT); // position (x, y, z)
-        m_SkyBoxVAO->AddBuffer(m_SkyBoxVBO, layout);
+        Enxus::BufferLayout layout = {
+            {Enxus::ShaderDataType::Float3, "aPos"},
+        };
+
+        Enxus::Ref<Enxus::VertexBuffer> vertexBuffer = Enxus::CreateRef<Enxus::VertexBuffer>(skyboxVertices, sizeof(skyboxVertices));
+        vertexBuffer->SetLayout(layout);
+
+        m_SkyBoxVAO->AddVertexBuffer(vertexBuffer);
 
         //----------------- LOAD SKYBOX -------------------//
 

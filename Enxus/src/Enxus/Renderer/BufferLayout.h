@@ -8,7 +8,7 @@ namespace Enxus
 {
     enum class ShaderDataType
     {
-        None,
+        None = 0,
         Float,
         Float2,
         Float3,
@@ -48,6 +48,9 @@ namespace Enxus
             return 16;
         case ShaderDataType::Bool:
             return 1;
+            // to avoid switch warning
+        case ShaderDataType::None:
+            break;
         }
         std::cout << "[ShaderDataType Error] : Unknow ShaderDataType" << std::endl;
         ASSERT(false);
@@ -91,6 +94,9 @@ namespace Enxus
                 return 4;
             case ShaderDataType::Bool:
                 return 1;
+            // to avoid switch warning
+            case ShaderDataType::None:
+                break;
             }
             std::cout << "[ShaderDataType Error] : Unknow ShaderDataType" << std::endl;
             ASSERT(false);
@@ -101,6 +107,7 @@ namespace Enxus
     class BufferLayout
     {
     public:
+        BufferLayout(){};
         BufferLayout(std::initializer_list<BufferElement> elements) : m_Elements(elements), m_Stride(0)
         {
             CalculateOffsetAndStride();

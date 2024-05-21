@@ -44,6 +44,13 @@ namespace Enxus
 
     void VertexArray::AddVertexBuffer(const Ref<VertexBuffer> &vertexBuffer)
     {
+
+        if (vertexBuffer->GetLayout().GetElements().empty())
+        {
+            std::cout << "[VertexArray Error]: The Vertex Buffer has no layout set" << std::endl;
+            ASSERT(false);
+        }
+
         GLCall(glBindVertexArray(m_RendererId));
         vertexBuffer->Bind();
 
@@ -90,6 +97,13 @@ namespace Enxus
                 m_VertexAttribIndex++;
                 break;
             }
+            case ShaderDataType::Mat3:
+            case ShaderDataType::Mat4:
+                break;
+            // to avoid switch warning
+            case ShaderDataType::None:
+            case ShaderDataType::Bool:
+                break;
             }
         }
         m_VertexBuffers.push_back(vertexBuffer);

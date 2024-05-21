@@ -4,66 +4,159 @@ namespace OpenGLTest
 {
     TestMultipleLightSources::TestMultipleLightSources()
     {
-        float cubeVertices[] =
+        float cubeVertexPositions[] =
             {
                 // FACE
-                -0.5f, -0.5f, -0.5f, /*V*/ 0.0f, 0.0f, /*Tex*/ 0.0f, 0.0f, -1.0f, /* Normal */
-                0.5f, -0.5f, -0.5f, /*V*/ 1.0f, 0.0f, /*Tex*/ 0.0f, 0.0f, -1.0f,  /* Normal */
-                0.5f, 0.5f, -0.5f, /*V*/ 1.0f, 1.0f, /*Tex*/ 0.0f, 0.0f, -1.0f,   /* Normal */
-                0.5f, 0.5f, -0.5f, /*V*/ 1.0f, 1.0f, /*Tex*/ 0.0f, 0.0f, -1.0f,   /* Normal */
-                -0.5f, 0.5f, -0.5f, /*V*/ 0.0f, 1.0f, /*Tex*/ 0.0f, 0.0f, -1.0f,  /* Normal */
-                -0.5f, -0.5f, -0.5f, /*V*/ 0.0f, 0.0f, /*Tex*/ 0.0f, 0.0f, -1.0f, /* Normal */
+                -0.5f, -0.5f, -0.5f, /*V*/
+                0.5f, -0.5f, -0.5f,  /*V*/
+                0.5f, 0.5f, -0.5f,   /*V*/
+                0.5f, 0.5f, -0.5f,   /*V*/
+                -0.5f, 0.5f, -0.5f,  /*V*/
+                -0.5f, -0.5f, -0.5f, /*V*/
                 // FACE
-                -0.5f, -0.5f, 0.5f, /*V*/ 0.0f, 0.0f, /*Tex*/ 0.0f, 0.0f, 1.0f, /* Normal */
-                0.5f, -0.5f, 0.5f, /*V*/ 1.0f, 0.0f, /*Tex*/ 0.0f, 0.0f, 1.0f,  /* Normal */
-                0.5f, 0.5f, 0.5f, /*V*/ 1.0f, 1.0f, /*Tex*/ 0.0f, 0.0f, 1.0f,   /* Normal */
-                0.5f, 0.5f, 0.5f, /*V*/ 1.0f, 1.0f, /*Tex*/ 0.0f, 0.0f, 1.0f,   /* Normal */
-                -0.5f, 0.5f, 0.5f, /*V*/ 0.0f, 1.0f, /*Tex*/ 0.0f, 0.0f, 1.0f,  /* Normal */
-                -0.5f, -0.5f, 0.5f, /*V*/ 0.0f, 0.0f, /*Tex*/ 0.0f, 0.0f, 1.0f, /* Normal */
+                -0.5f, -0.5f, 0.5f, /*V*/
+                0.5f, -0.5f, 0.5f,  /*V*/
+                0.5f, 0.5f, 0.5f,   /*V*/
+                0.5f, 0.5f, 0.5f,   /*V*/
+                -0.5f, 0.5f, 0.5f,  /*V*/
+                -0.5f, -0.5f, 0.5f, /*V*/
                 // FACE
-                -0.5f, 0.5f, 0.5f, /*V*/ 1.0f, 0.0f, /*Tex*/ -1.0f, 0.0f, 0.0f,   /* Normal */
-                -0.5f, 0.5f, -0.5f, /*V*/ 1.0f, 1.0f, /*Tex*/ -1.0f, 0.0f, 0.0f,  /* Normal */
-                -0.5f, -0.5f, -0.5f, /*V*/ 0.0f, 1.0f, /*Tex*/ -1.0f, 0.0f, 0.0f, /* Normal */
-                -0.5f, -0.5f, -0.5f, /*V*/ 0.0f, 1.0f, /*Tex*/ -1.0f, 0.0f, 0.0f, /* Normal */
-                -0.5f, -0.5f, 0.5f, /*V*/ 0.0f, 0.0f, /*Tex*/ -1.0f, 0.0f, 0.0f,  /* Normal */
-                -0.5f, 0.5f, 0.5f, /*V*/ 1.0f, 0.0f, /*Tex*/ -1.0f, 0.0f, 0.0f,   /* Normal */
+                -0.5f, 0.5f, 0.5f,   /*V*/
+                -0.5f, 0.5f, -0.5f,  /*V*/
+                -0.5f, -0.5f, -0.5f, /*V*/
+                -0.5f, -0.5f, -0.5f, /*V*/
+                -0.5f, -0.5f, 0.5f,  /*V*/
+                -0.5f, 0.5f, 0.5f,   /*V*/
                 // FACE
-                0.5f, 0.5f, 0.5f, /*V*/ 1.0f, 0.0f, /*Tex*/ 1.0f, 0.0f, 0.0f,   /* Normal */
-                0.5f, 0.5f, -0.5f, /*V*/ 1.0f, 1.0f, /*Tex*/ 1.0f, 0.0f, 0.0f,  /* Normal */
-                0.5f, -0.5f, -0.5f, /*V*/ 0.0f, 1.0f, /*Tex*/ 1.0f, 0.0f, 0.0f, /* Normal */
-                0.5f, -0.5f, -0.5f, /*V*/ 0.0f, 1.0f, /*Tex*/ 1.0f, 0.0f, 0.0f, /* Normal */
-                0.5f, -0.5f, 0.5f, /*V*/ 0.0f, 0.0f, /*Tex*/ 1.0f, 0.0f, 0.0f,  /* Normal */
-                0.5f, 0.5f, 0.5f, /*V*/ 1.0f, 0.0f, /*Tex*/ 1.0f, 0.0f, 0.0f,   /* Normal */
+                0.5f, 0.5f, 0.5f,   /*V*/
+                0.5f, 0.5f, -0.5f,  /*V*/
+                0.5f, -0.5f, -0.5f, /*V*/
+                0.5f, -0.5f, -0.5f, /*V*/
+                0.5f, -0.5f, 0.5f,  /*V*/
+                0.5f, 0.5f, 0.5f,   /*V*/
                 // FACE
-                -0.5f, -0.5f, -0.5f, /*V*/ 0.0f, 1.0f, /*Tex*/ 0.0f, -1.0f, 0.0f, /* Normal */
-                0.5f, -0.5f, -0.5f, /*V*/ 1.0f, 1.0f, /*Tex*/ 0.0f, -1.0f, 0.0f,  /* Normal */
-                0.5f, -0.5f, 0.5f, /*V*/ 1.0f, 0.0f, /*Tex*/ 0.0f, -1.0f, 0.0f,   /* Normal */
-                0.5f, -0.5f, 0.5f, /*V*/ 1.0f, 0.0f, /*Tex*/ 0.0f, -1.0f, 0.0f,   /* Normal */
-                -0.5f, -0.5f, 0.5f, /*V*/ 0.0f, 0.0f, /*Tex*/ 0.0f, -1.0f, 0.0f,  /* Normal */
-                -0.5f, -0.5f, -0.5f, /*V*/ 0.0f, 1.0f, /*Tex*/ 0.0f, -1.0f, 0.0f, /* Normal */
+                -0.5f, -0.5f, -0.5f, /*V*/
+                0.5f, -0.5f, -0.5f,  /*V*/
+                0.5f, -0.5f, 0.5f,   /*V*/
+                0.5f, -0.5f, 0.5f,   /*V*/
+                -0.5f, -0.5f, 0.5f,  /*V*/
+                -0.5f, -0.5f, -0.5f, /*V*/
                 // FACE
-                -0.5f, 0.5f, -0.5f, /*V*/ 0.0f, 1.0f, /*Tex*/ 0.0f, 1.0f, 0.0f, /* Normal */
-                0.5f, 0.5f, -0.5f, /*V*/ 1.0f, 1.0f, /*Tex*/ 0.0f, 1.0f, 0.0f,  /* Normal */
-                0.5f, 0.5f, 0.5f, /*V*/ 1.0f, 0.0f, /*Tex*/ 0.0f, 1.0f, 0.0f,   /* Normal */
-                0.5f, 0.5f, 0.5f, /*V*/ 1.0f, 0.0f, /*Tex*/ 0.0f, 1.0f, 0.0f,   /* Normal */
-                -0.5f, 0.5f, 0.5f, /*V*/ 0.0f, 0.0f, /*Tex*/ 0.0f, 1.0f, 0.0f,  /* Normal */
-                -0.5f, 0.5f, -0.5f, /*V*/ 0.0f, 1.0f, /*Tex*/ 0.0f, 1.0f, 0.0f, /* Normal */
+                -0.5f, 0.5f, -0.5f, /*V*/
+                0.5f, 0.5f, -0.5f,  /*V*/
+                0.5f, 0.5f, 0.5f,   /*V*/
+                0.5f, 0.5f, 0.5f,   /*V*/
+                -0.5f, 0.5f, 0.5f,  /*V*/
+                -0.5f, 0.5f, -0.5f,
+                /*V*/
             };
-        // cameraController = new FreeCameraController(mainCamera);
+        float cubeTexCoords[] = {
+            0.0f, 0.0f, /*Tex Coords*/
+            1.0f, 0.0f, /*Tex Coords*/
+            1.0f, 1.0f, /*Tex Coords*/
+            1.0f, 1.0f, /*Tex Coords*/
+            0.0f, 1.0f, /*Tex Coords*/
+            0.0f, 0.0f, /*Tex Coords*/
+            0.0f, 0.0f, /*Tex Coords*/
+            1.0f, 0.0f, /*Tex Coords*/
+            1.0f, 1.0f, /*Tex Coords*/
+            1.0f, 1.0f, /*Tex Coords*/
+            0.0f, 1.0f, /*Tex Coords*/
+            0.0f, 0.0f, /*Tex Coords*/
+            1.0f, 0.0f, /*Tex Coords*/
+            1.0f, 1.0f, /*Tex Coords*/
+            0.0f, 1.0f, /*Tex Coords*/
+            0.0f, 1.0f, /*Tex Coords*/
+            0.0f, 0.0f, /*Tex Coords*/
+            1.0f, 0.0f, /*Tex Coords*/
+            1.0f, 0.0f, /*Tex Coords*/
+            1.0f, 1.0f, /*Tex Coords*/
+            0.0f, 1.0f, /*Tex Coords*/
+            0.0f, 1.0f, /*Tex Coords*/
+            0.0f, 0.0f, /*Tex Coords*/
+            1.0f, 0.0f, /*Tex Coords*/
+            0.0f, 1.0f, /*Tex Coords*/
+            1.0f, 1.0f, /*Tex Coords*/
+            1.0f, 0.0f, /*Tex Coords*/
+            1.0f, 0.0f, /*Tex Coords*/
+            0.0f, 0.0f, /*Tex Coords*/
+            0.0f, 1.0f, /*Tex Coords*/
+            0.0f, 1.0f, /*Tex Coords*/
+            1.0f, 1.0f, /*Tex Coords*/
+            1.0f, 0.0f, /*Tex Coords*/
+            1.0f, 0.0f, /*Tex Coords*/
+            0.0f, 0.0f, /*Tex Coords*/
+            0.0f, 1.0f, /*Tex Coords*/
+        };
+        float cubeNormals[] = {
+            0.0f, 0.0f, -1.0f, /* Normal */
+            0.0f, 0.0f, -1.0f, /* Normal */
+            0.0f, 0.0f, -1.0f, /* Normal */
+            0.0f, 0.0f, -1.0f, /* Normal */
+            0.0f, 0.0f, -1.0f, /* Normal */
+            0.0f, 0.0f, -1.0f, /* Normal */
+            0.0f, 0.0f, 1.0f,  /* Normal */
+            0.0f, 0.0f, 1.0f,  /* Normal */
+            0.0f, 0.0f, 1.0f,  /* Normal */
+            0.0f, 0.0f, 1.0f,  /* Normal */
+            0.0f, 0.0f, 1.0f,  /* Normal */
+            0.0f, 0.0f, 1.0f,  /* Normal */
+            -1.0f, 0.0f, 0.0f, /* Normal */
+            -1.0f, 0.0f, 0.0f, /* Normal */
+            -1.0f, 0.0f, 0.0f, /* Normal */
+            -1.0f, 0.0f, 0.0f, /* Normal */
+            -1.0f, 0.0f, 0.0f, /* Normal */
+            -1.0f, 0.0f, 0.0f, /* Normal */
+            1.0f, 0.0f, 0.0f,  /* Normal */
+            1.0f, 0.0f, 0.0f,  /* Normal */
+            1.0f, 0.0f, 0.0f,  /* Normal */
+            1.0f, 0.0f, 0.0f,  /* Normal */
+            1.0f, 0.0f, 0.0f,  /* Normal */
+            1.0f, 0.0f, 0.0f,  /* Normal */
+            0.0f, -1.0f, 0.0f, /* Normal */
+            0.0f, -1.0f, 0.0f, /* Normal */
+            0.0f, -1.0f, 0.0f, /* Normal */
+            0.0f, -1.0f, 0.0f, /* Normal */
+            0.0f, -1.0f, 0.0f, /* Normal */
+            0.0f, -1.0f, 0.0f, /* Normal */
+            0.0f, 1.0f, 0.0f,  /* Normal */
+            0.0f, 1.0f, 0.0f,  /* Normal */
+            0.0f, 1.0f, 0.0f,  /* Normal */
+            0.0f, 1.0f, 0.0f,  /* Normal */
+            0.0f, 1.0f, 0.0f,  /* Normal */
+            0.0f, 1.0f, 0.0f,  /* Normal */
+        };
         objVAO = Enxus::CreateRef<Enxus::VertexArray>();
         lightSourceVAO = Enxus::CreateRef<Enxus::VertexArray>();
-        // lightVBO is not needed because we already have it from the current object (is also a cube)
-        // std::cout << "Hi in line "
-        objVBO = Enxus::CreateRef<Enxus::VertexBuffer>(cubeVertices, sizeof(cubeVertices));
-        Enxus::VertexBufferLayout objLayout, lightSourceLayout;
-        objLayout.Push(3, GL_FLOAT); // position
-        objLayout.Push(2, GL_FLOAT); // texture coordinates
-        objLayout.Push(3, GL_FLOAT); // normal vector
 
-        objVAO->AddBuffer(objVBO, objLayout);
+        Enxus::Ref<Enxus::VertexBuffer> boxVertexPositionBuffer = Enxus::CreateRef<Enxus::VertexBuffer>(cubeVertexPositions, sizeof(cubeVertexPositions));
+        Enxus::Ref<Enxus::VertexBuffer> boxTexCoordsBuffer = Enxus::CreateRef<Enxus::VertexBuffer>(cubeTexCoords, sizeof(cubeTexCoords));
+        Enxus::Ref<Enxus::VertexBuffer> boxNormalsBuffer = Enxus::CreateRef<Enxus::VertexBuffer>(cubeNormals, sizeof(cubeNormals));
 
-        lightSourceLayout.Push(3, GL_FLOAT);
-        lightSourceVAO->AddBuffer(objVBO, objLayout);
+        Enxus::BufferLayout boxVertexPositionLayout = {
+            {Enxus::ShaderDataType::Float3, "aPos"},
+        };
+        Enxus::BufferLayout boxTexCoordsLayout = {
+            {Enxus::ShaderDataType::Float2, "aTexCoord"},
+        };
+        Enxus::BufferLayout boxNormalsLayout = {
+            {Enxus::ShaderDataType::Float3, "aNormal"},
+        };
+        boxVertexPositionBuffer->SetLayout(boxVertexPositionLayout);
+        boxTexCoordsBuffer->SetLayout(boxTexCoordsLayout);
+        boxNormalsBuffer->SetLayout(boxNormalsLayout);
+
+        objVAO->AddVertexBuffer(boxVertexPositionBuffer);
+        objVAO->AddVertexBuffer(boxTexCoordsBuffer);
+        objVAO->AddVertexBuffer(boxNormalsBuffer);
+
+        Enxus::Ref<Enxus::VertexBuffer> ligthSourceVertexBuffer = Enxus::CreateRef<Enxus::VertexBuffer>(cubeVertexPositions, sizeof(cubeVertexPositions));
+        Enxus::BufferLayout lightSourceLayout = {
+            {Enxus::ShaderDataType::Float3, "aPos"},
+        };
+
+        ligthSourceVertexBuffer->SetLayout(lightSourceLayout);
+        lightSourceVAO->AddVertexBuffer(ligthSourceVertexBuffer);
 
         // //----------------- TEXTURES -------------------//
 
@@ -147,7 +240,7 @@ namespace OpenGLTest
         // //----------------- UNBIND EVERYTHING -------------------//
         objShader->Unbind();
         objVAO->Unbind();
-        objVBO->Unbind();
+        // objVBO->Unbind();
         lightSourceShader->Unbind();
         lightSourceVAO->Unbind();
     }
@@ -199,7 +292,6 @@ namespace OpenGLTest
             lightSourceVAO->Bind();
             for (int i = 0; i < 4; i++)
             {
-
                 glm::mat4 lightSourceModel = glm::mat4(1.0f);
                 lightSourceModel = glm::translate(lightSourceModel, pointLightPositions[i]);
                 lightSourceModel = glm::scale(lightSourceModel, glm::vec3(0.2f));

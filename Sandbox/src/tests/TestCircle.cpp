@@ -16,11 +16,15 @@ namespace OpenGLTest
         };
 
         m_VAO = Enxus::CreateRef<Enxus::VertexArray>();
-        m_VBO = Enxus::CreateRef<Enxus::VertexBuffer>(vertices, sizeof(vertices));
 
-        Enxus::VertexBufferLayout layout;
-        layout.Push(2, GL_FLOAT);
-        m_VAO->AddBuffer(m_VBO, layout);
+        Enxus::BufferLayout layout = {
+            {Enxus::ShaderDataType::Float2, "aPos"},
+        };
+
+        Enxus::Ref<Enxus::VertexBuffer> vertexBuffer = Enxus::CreateRef<Enxus::VertexBuffer>(vertices, sizeof(vertices));
+        vertexBuffer->SetLayout(layout);
+
+        m_VAO->AddVertexBuffer(vertexBuffer);
 
         m_CircleShader = Enxus::CreateRef<Enxus::Shader>("Sandbox/res/shaders/circle/circle.vert", "Sandbox/res/shaders/circle/circle.frag");
 

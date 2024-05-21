@@ -53,12 +53,15 @@ namespace Enxus
             1.0f, -1.0f, 1.0f    /* Face */
         };
         m_SkyBoxVAO = CreateRef<VertexArray>();
-        m_SkyBoxVBO = CreateRef<VertexBuffer>(skyboxVertices, sizeof(skyboxVertices));
 
-        VertexBufferLayout layout;
-        layout.Push(3, GL_FLOAT); // position (x, y, z)
+        // position (x, y, z)
+        BufferLayout layout = {
+            {ShaderDataType::Float3, "aPos"},
+        };
 
-        m_SkyBoxVAO->AddBuffer(m_SkyBoxVBO, layout);
+        Ref<VertexBuffer> vertexBuffer = CreateRef<VertexBuffer>(skyboxVertices, sizeof(skyboxVertices));
+        vertexBuffer->SetLayout(layout);
+        m_SkyBoxVAO->AddVertexBuffer(vertexBuffer);
     }
 
     SkyBox::~SkyBox()
