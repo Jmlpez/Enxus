@@ -73,7 +73,7 @@ namespace Enxus
         stbi_image_free(m_LocalBuffer);
     }
 
-    void TextureMesh2D::Bind(unsigned int slot) const
+    void TextureMesh2D::Bind(uint32_t slot) const
     {
         GLCall(glActiveTexture(GL_TEXTURE0 + slot));
         GLCall(glBindTexture(GL_TEXTURE_2D, m_RendererId));

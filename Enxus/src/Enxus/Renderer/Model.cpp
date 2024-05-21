@@ -66,7 +66,7 @@ namespace Enxus
     Ref<Mesh> Model::ProcessMesh(aiMesh *mesh, const aiScene *scene)
     {
         std::vector<VertexData> vertices = ProcessVertices(mesh);
-        std::vector<unsigned int> indices = ProcessIndices(mesh);
+        std::vector<uint32_t> indices = ProcessIndices(mesh);
         std::vector<Ref<TextureMesh2D>> texturesRef = ProcessTextures(mesh, scene);
 
         return CreateRef<Mesh>(vertices, indices, texturesRef);
@@ -111,10 +111,10 @@ namespace Enxus
         return vertices;
     }
 
-    std::vector<unsigned int> Model::ProcessIndices(aiMesh *mesh)
+    std::vector<uint32_t> Model::ProcessIndices(aiMesh *mesh)
     {
 
-        std::vector<unsigned int> indices;
+        std::vector<uint32_t> indices;
         for (unsigned int i = 0; i < mesh->mNumFaces; i++)
         {
             aiFace &face = mesh->mFaces[i];

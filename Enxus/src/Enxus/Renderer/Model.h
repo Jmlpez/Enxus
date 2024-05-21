@@ -26,7 +26,7 @@ namespace Enxus
         std::vector<Ref<TextureMesh2D>> LoadMaterialTextures(aiMaterial *mat, aiTextureType type);
 
         std::vector<VertexData> ProcessVertices(aiMesh *mesh);
-        std::vector<unsigned int> ProcessIndices(aiMesh *mesh);
+        std::vector<uint32_t> ProcessIndices(aiMesh *mesh);
         std::vector<Ref<TextureMesh2D>> ProcessTextures(aiMesh *mesh, const aiScene *scene);
 
         static TextureType GetTextureType(aiTextureType type);

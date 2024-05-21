@@ -34,7 +34,7 @@ namespace Enxus
         m_Proj = glm::perspective(glm::radians(m_FOV), m_AspectRatio, m_NearPlane, m_FarPlane);
     }
 
-    void Camera::SetViewportSize(unsigned int vpWidth, unsigned int vpHeight)
+    void Camera::SetViewportSize(uint32_t vpWidth, uint32_t vpHeight)
     {
         // if nothing change just return
         if (m_VpWidth == vpWidth && m_VpHeight == vpHeight)

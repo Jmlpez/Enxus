@@ -10,8 +10,8 @@ namespace Enxus
     enum class PolygonMode
     {
         POINT, // Draw vertex positions points
-        LINE, // Draw the line joining the vertices
-        FILL, // Fill the entire shape 
+        LINE,  // Draw the line joining the vertices
+        FILL,  // Fill the entire shape
     };
 
     class Renderer
@@ -20,7 +20,7 @@ namespace Enxus
         Renderer(){};
         ~Renderer(){};
         static void Init();
-        static void SetViewport(unsigned int x, unsigned int y, unsigned int width, unsigned int height);
+        static void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height);
         static void SetPolygonMode(PolygonMode mode);
         static void Draw(const Ref<VertexArray> &vao, const Ref<IndexBuffer> &ibo, const Ref<Shader> &shader);
         static void DrawMesh(const Ref<Mesh> &mesh, const Ref<Shader> &shader);
@@ -29,8 +29,8 @@ namespace Enxus
         static void Clear();
 
     private:
-        static void DrawVertices(unsigned int numOfVertices);
-        static void DrawIndices(unsigned int numOfIndices);
+        static void DrawVertices(uint32_t numOfVertices);
+        static void DrawIndices(uint32_t numOfIndices);
     };
 }
 #endif

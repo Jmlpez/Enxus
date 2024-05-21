@@ -143,7 +143,7 @@ namespace Enxus
         dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(FreeCameraController::OnWindowResized));
         dispatcher.Dispatch<MouseScrolledEvent>(BIND_EVENT_FN(FreeCameraController::OnMouseScrolled));
     }
-    void FreeCameraController::OnResize(unsigned int width, unsigned int height)
+    void FreeCameraController::OnResize(uint32_t width, uint32_t height)
     {
         m_Camera.SetViewportSize(width, height);
     }

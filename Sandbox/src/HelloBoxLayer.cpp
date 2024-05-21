@@ -13,8 +13,8 @@ HelloBoxLayer::HelloBoxLayer()
         {glm::vec3(-0.5f, 0.0f, -0.5f), glm::vec2(0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f)}, // bottom left
         {glm::vec3(-0.5f, 0.0f, 0.5f), glm::vec2(0.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f)},  // top left
     };
-    std::vector<unsigned int> indices{0, 1, 3,
-                                      1, 2, 3};
+    std::vector<uint32_t> indices{0, 1, 3,
+                                  1, 2, 3};
 
     std::vector<Enxus::TextureMesh2DData> textures{
         {"Sandbox/res/images/container.jpg", Enxus::TextureType::DIFFUSE},

@@ -19,7 +19,7 @@ namespace Enxus
         Renderer::SetPolygonMode(PolygonMode::FILL);
     }
 
-    void Renderer::SetViewport(unsigned int x, unsigned int y, unsigned int width, unsigned int height)
+    void Renderer::SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
     {
         GLCall(glViewport(x, y, width, height));
     }
@@ -56,13 +56,13 @@ namespace Enxus
     void Renderer::Draw(const Ref<VertexArray> &vao, const Ref<IndexBuffer> &ibo, const Ref<Shader> &shader)
     {
         vao->Bind();
-        ibo->Bind();
+        // ibo->Bind();
         shader->Bind();
 
-        Renderer::DrawIndices(ibo->GetCount());
+        Renderer::DrawIndices(vao->GetIndexBuffer()->GetCount());
 
         vao->Unbind();
-        ibo->Unbind();
+        // ibo->Unbind();
         shader->Unbind();
     }
 
@@ -102,7 +102,7 @@ namespace Enxus
         mesh->GetVertexArray()->Bind();
         if (mesh->HasIndices())
         {
-            Renderer::DrawIndices(mesh->GetIndexBuffer()->GetCount());
+            Renderer::DrawIndices(mesh->GetVertexArray()->GetIndexBuffer()->GetCount());
         }
         else
         {
@@ -121,11 +121,11 @@ namespace Enxus
             DrawMesh(mesh, shader);
         }
     }
-    inline void Renderer::DrawVertices(unsigned int numOfVertices)
+    inline void Renderer::DrawVertices(uint32_t numOfVertices)
     {
         GLCall(glDrawArrays(GL_TRIANGLES, 0, numOfVertices));
     }
-    inline void Renderer::DrawIndices(unsigned int numOfIndices)
+    inline void Renderer::DrawIndices(uint32_t numOfIndices)
     {
         GLCall(glDrawElements(GL_TRIANGLES, numOfIndices, GL_UNSIGNED_INT, nullptr));
     }

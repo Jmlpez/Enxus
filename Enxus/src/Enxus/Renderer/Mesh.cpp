@@ -14,7 +14,7 @@ namespace Enxus
 
     Mesh::Mesh(
         std::vector<VertexData> vertices,
-        std::vector<unsigned int> indices,
+        std::vector<uint32_t> indices,
         std::vector<TextureMesh2DData> textures)
         : m_Vertices(vertices), m_Indices(indices), m_MeshTexturesData(textures)
     {
@@ -24,7 +24,7 @@ namespace Enxus
 
     Mesh::Mesh(
         std::vector<VertexData> vertices,
-        std::vector<unsigned int> indices,
+        std::vector<uint32_t> indices,
         std::vector<Ref<TextureMesh2D>> texturesRef)
         : m_Vertices(vertices), m_Indices(indices), m_Textures(texturesRef)
     {
@@ -40,10 +40,10 @@ namespace Enxus
     void Mesh::CreateBuffers()
     {
         m_VertexArrayObject = CreateRef<VertexArray>();
-        m_VertexBufferObject = CreateRef<VertexBuffer>(&m_Vertices[0], (unsigned int)m_Vertices.size() * sizeof(VertexData));
+        // m_VertexBufferObject = CreateRef<VertexBuffer>(&m_Vertices[0], (unsigned int)m_Vertices.size() * sizeof(VertexData));
 
-        if (m_Indices.size() > 0) // if the mesh has indices
-            m_IndexBufferObject = CreateRef<IndexBuffer>(&m_Indices[0], (unsigned int)m_Indices.size());
+        // if (m_Indices.size() > 0) // if the mesh has indices
+        //    m_IndexBufferObject = CreateRef<IndexBuffer>(&m_Indices[0], (unsigned int)m_Indices.size());
 
         /*
         VERTEX DEFAULT LAYOUT:
@@ -51,20 +51,21 @@ namespace Enxus
         - TexCoords (2 floats) s, t
         - Normal (3 floats)    x, y, z
         */
-        VertexBufferLayout layout;
-        layout.Push(3, GL_FLOAT);
-        layout.Push(2, GL_FLOAT);
-        layout.Push(3, GL_FLOAT);
+        BufferLayout layout = {
+            {ShaderDataType::Float3, "aPos"},
+            {ShaderDataType::Float2, "aTexCoord"},
+            {ShaderDataType::Float3, "aNormal"},
+        };
 
-        m_VertexArrayObject->AddBuffer(m_VertexBufferObject, layout);
-        /*
-        IGNORE:
-        Assuming a struct call MeshTexture defined as:
-        struct MeshTexture{
-            std::string path;
-            TEXTURE_TYPE
+        Ref<VertexBuffer> vertexBuffer = CreateRef<VertexBuffer>(&m_Vertices[0], (uint32_t)m_Vertices.size() * sizeof(VertexData));
+        vertexBuffer->SetLayout(layout);
+        m_VertexArrayObject->AddVertexBuffer(vertexBuffer);
+
+        if (m_Indices.size() > 0)
+        {
+            Ref<IndexBuffer> indexBuffer = CreateRef<IndexBuffer>(&m_Indices[0], (uint32_t)m_Indices.size());
+            m_VertexArrayObject->SetIndexBuffer(indexBuffer);
         }
-        */
     }
 
     void Mesh::CreateTextures()

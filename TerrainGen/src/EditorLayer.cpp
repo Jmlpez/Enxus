@@ -14,8 +14,8 @@ EditorLayer::EditorLayer()
 
     //----------------- CAMERA -------------------//
     auto &window = Enxus::Application::Get().GetWindow();
-    unsigned int width = window.GetWidth();
-    unsigned int height = window.GetHeight();
+    uint32_t width = window.GetWidth();
+    uint32_t height = window.GetHeight();
 
     m_CameraController = Enxus::CreateScope<Enxus::FreeCameraController>((float)width / (float)height, 0.1f, 100.0f);
 }

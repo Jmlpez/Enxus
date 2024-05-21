@@ -121,9 +121,9 @@ namespace Enxus
         return shaderCode;
     }
 
-    unsigned int Shader::CompileShader(unsigned int type, const std::string &source)
+    uint32_t Shader::CompileShader(uint32_t type, const std::string &source)
     {
-        unsigned int shaderId;
+        uint32_t shaderId;
         GLCall(shaderId = glCreateShader(type));
         const char *src = source.c_str();
         GLCall(glShaderSource(shaderId, 1, &src, nullptr));
@@ -146,12 +146,12 @@ namespace Enxus
         return shaderId;
     }
 
-    unsigned int Shader::CreateShader(const std::string &vertexShaderSource, const std::string &fragmentShaderSource)
+    uint32_t Shader::CreateShader(const std::string &vertexShaderSource, const std::string &fragmentShaderSource)
     {
-        unsigned int shaderProgram = glCreateProgram();
+        uint32_t shaderProgram = glCreateProgram();
 
-        unsigned int vs = CompileShader(GL_VERTEX_SHADER, vertexShaderSource);
-        unsigned int fs = CompileShader(GL_FRAGMENT_SHADER, fragmentShaderSource);
+        uint32_t vs = CompileShader(GL_VERTEX_SHADER, vertexShaderSource);
+        uint32_t fs = CompileShader(GL_FRAGMENT_SHADER, fragmentShaderSource);
 
         GLCall(glAttachShader(shaderProgram, vs));
         GLCall(glAttachShader(shaderProgram, fs));

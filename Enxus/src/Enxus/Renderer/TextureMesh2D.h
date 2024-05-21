@@ -31,13 +31,13 @@ namespace Enxus
         TextureMesh2D(const std::string &texturePath, TextureType type = TextureType::DIFFUSE);
         ~TextureMesh2D();
 
-        unsigned int GetRendererId() const { return m_RendererId; }
+        uint32_t GetRendererId() const { return m_RendererId; }
 
-        void Bind(unsigned int slot = 0) const;
+        void Bind(uint32_t slot = 0) const;
         void Unbind() const;
 
         const std::string &GetPath() const { return m_TextureData.path; }
-        unsigned int GetType() const { return m_TextureData.type; }
+        uint32_t GetType() const { return m_TextureData.type; }
 
         void SetType(TextureType type) { m_TextureData.type = type; }
 
@@ -46,7 +46,7 @@ namespace Enxus
         void LoadImage();
 
     private:
-        unsigned int m_RendererId;
+        uint32_t m_RendererId;
         int m_Width, m_Height, m_NrChannels;
         // unsigned char *m_LocalBuffer; // texture data
 
