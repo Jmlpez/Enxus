@@ -13,6 +13,8 @@ namespace Enxus
         VertexBuffer(const void *data, uint32_t size);
         ~VertexBuffer();
 
+        void SetLayout(BufferLayout layout){m_Layout = layout;}
+        const BufferLayout &GetLayout() const {return  m_Layout;}
         void SetData(const void *data, uint32_t size, uint32_t offset = 0);
 
         void Bind() const;
@@ -20,6 +22,7 @@ namespace Enxus
 
     private:
         uint32_t m_RendererId;
+        BufferLayout m_Layout;
     };
 }
 #endif

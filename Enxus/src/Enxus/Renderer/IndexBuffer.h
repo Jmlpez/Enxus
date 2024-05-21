@@ -9,17 +9,17 @@ namespace Enxus
     {
 
     public:
-        IndexBuffer(unsigned int *data, unsigned int count);
+        IndexBuffer(uint32_t *data, uint32_t count);
         ~IndexBuffer();
 
         void Bind() const;
         void Unbind() const;
 
-        inline unsigned int GetCount() const { return m_Count; }
+        inline uint32_t GetCount() const { return m_Count; }
 
     private:
-        unsigned int m_RendererId;
-        unsigned int m_Count;
+        uint32_t m_RendererId;
+        uint32_t m_Count;
     };
 }
 
