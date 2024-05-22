@@ -16,7 +16,7 @@ namespace Enxus
         Model(const std::string &path);
         ~Model();
 
-        std::vector<Ref<Mesh>> &GetMeshes() { return m_Meshes; }
+        const std::vector<Ref<Mesh>> &GetMeshes() const { return m_Meshes; }
 
     private:
         void LoadModel(const std::string &path);
@@ -25,8 +25,8 @@ namespace Enxus
 
         std::vector<Ref<TextureMesh2D>> LoadMaterialTextures(aiMaterial *mat, aiTextureType type);
 
-        std::vector<VertexData> ProcessVertices(aiMesh *mesh);
-        std::vector<unsigned int> ProcessIndices(aiMesh *mesh);
+        std::vector<VertexData> ProcessVertices(aiMesh *mesh) const;
+        std::vector<uint32_t> ProcessIndices(aiMesh *mesh) const;
         std::vector<Ref<TextureMesh2D>> ProcessTextures(aiMesh *mesh, const aiScene *scene);
 
         static TextureType GetTextureType(aiTextureType type);

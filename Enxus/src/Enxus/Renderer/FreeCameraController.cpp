@@ -16,6 +16,13 @@ namespace Enxus
         m_Camera.SetUp(m_CameraUp);
         m_Camera.SetFront(m_CameraFront);
     };
+    FreeCameraController::FreeCameraController(float aspectRatio, float nearPlane, float farPlane)
+        : m_Camera(45.0f, aspectRatio, nearPlane, farPlane)
+    {
+        m_Camera.SetPos(m_CameraPos);
+        m_Camera.SetUp(m_CameraUp);
+        m_Camera.SetFront(m_CameraFront);
+    };
 
     void FreeCameraController::ResetCameraLocation()
     {
@@ -45,10 +52,15 @@ namespace Enxus
     void FreeCameraController::OnUpdate(Timestep ts)
     {
         float deltaTime = ts.GetSeconds();
-        const float cameraSpeed = m_CameraTranslationSpeed * deltaTime;
-        const float cameraRotationSpeed = m_CameraRotationSpeed * deltaTime;
+        float cameraSpeed = m_CameraTranslationSpeed * deltaTime;
+        float cameraRotationSpeed = m_CameraRotationSpeed * deltaTime;
 
         bool cameraMoved = false;
+
+        if (Input::IsKeyPressed(Key::LeftShift))
+        {
+            cameraSpeed *= 5;
+        }
 
         // camera locations
         if (Input::IsKeyPressed(Key::W))
@@ -131,8 +143,7 @@ namespace Enxus
         dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(FreeCameraController::OnWindowResized));
         dispatcher.Dispatch<MouseScrolledEvent>(BIND_EVENT_FN(FreeCameraController::OnMouseScrolled));
     }
-
-    void FreeCameraController::OnResize(unsigned int width, unsigned int height)
+    void FreeCameraController::OnResize(uint32_t width, uint32_t height)
     {
         m_Camera.SetViewportSize(width, height);
     }

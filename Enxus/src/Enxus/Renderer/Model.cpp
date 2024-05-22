@@ -18,7 +18,7 @@ namespace Enxus
     {
         Assimp::Importer importer;
 
-        auto importerStepsFlags = aiProcess_Triangulate | aiProcess_FlipUVs;
+        auto importerStepsFlags = aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_OptimizeMeshes;
         // (check about flips uvs later)
         // auto importerStepsFlags = aiProcess_Triangulate;
         /*
@@ -65,14 +65,14 @@ namespace Enxus
     }
     Ref<Mesh> Model::ProcessMesh(aiMesh *mesh, const aiScene *scene)
     {
-        std::vector<VertexData> vertices = ProcessVertices(mesh);
-        std::vector<unsigned int> indices = ProcessIndices(mesh);
-        std::vector<Ref<TextureMesh2D>> texturesRef = ProcessTextures(mesh, scene);
+        std::vector<VertexData> vertices = std::move(ProcessVertices(mesh));
+        std::vector<uint32_t> indices = std::move(ProcessIndices(mesh));
+        std::vector<Ref<TextureMesh2D>> texturesRef = std::move(ProcessTextures(mesh, scene));
 
         return CreateRef<Mesh>(vertices, indices, texturesRef);
     }
 
-    std::vector<VertexData> Model::ProcessVertices(aiMesh *mesh)
+    std::vector<VertexData> Model::ProcessVertices(aiMesh *mesh) const
     {
         std::vector<VertexData> vertices;
         for (unsigned int i = 0; i < mesh->mNumVertices; i++)
@@ -111,10 +111,10 @@ namespace Enxus
         return vertices;
     }
 
-    std::vector<unsigned int> Model::ProcessIndices(aiMesh *mesh)
+    std::vector<uint32_t> Model::ProcessIndices(aiMesh *mesh) const
     {
 
-        std::vector<unsigned int> indices;
+        std::vector<uint32_t> indices;
         for (unsigned int i = 0; i < mesh->mNumFaces; i++)
         {
             aiFace &face = mesh->mFaces[i];
@@ -136,10 +136,10 @@ namespace Enxus
 
         aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
 
-        std::vector<Ref<TextureMesh2D>> diffuseMaps = LoadMaterialTextures(material, aiTextureType_DIFFUSE);
+        std::vector<Ref<TextureMesh2D>> diffuseMaps = std::move(LoadMaterialTextures(material, aiTextureType_DIFFUSE));
         textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
 
-        std::vector<Ref<TextureMesh2D>> specularMaps = LoadMaterialTextures(material, aiTextureType_SPECULAR);
+        std::vector<Ref<TextureMesh2D>> specularMaps = std::move(LoadMaterialTextures(material, aiTextureType_SPECULAR));
         textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 
         return textures;

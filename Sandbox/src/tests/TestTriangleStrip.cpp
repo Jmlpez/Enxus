@@ -9,26 +9,30 @@ namespace OpenGLTest
         /*
         Remember that the negative Z-Axis is pointing towards the viewer
         */
-        m_Vertices = std::vector<Enxus::VertexData>{
+        std::vector<Enxus::VertexData> m_Vertices{
             {glm::vec3(0.5f, 0.0f, 0.5f), glm::vec2(0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f)},   // bottom right
             {glm::vec3(0.5f, 0.0f, -0.5f), glm::vec2(0.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f)},  // top right
             {glm::vec3(-0.5f, 0.0f, -0.5f), glm::vec2(1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f)}, // top left
             {glm::vec3(-0.5f, 0.0f, 0.5f), glm::vec2(1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f)},  // bottom left
         };
-        unsigned int indices[4] = {0, 3, 1, 2};
+
+        uint32_t indices[4] = {0, 3, 1, 2};
 
         m_VertexArray = Enxus::CreateRef<Enxus::VertexArray>();
 
-        m_VertexBuffer = Enxus::CreateRef<Enxus::VertexBuffer>(sizeof(m_Vertices) * sizeof(Enxus::VertexData));
-        m_VertexBuffer->SetData(&m_Vertices[0], sizeof(m_Vertices) * sizeof(Enxus::VertexData), 0);
+        Enxus::Ref<Enxus::VertexBuffer> vertexBuffer = Enxus::CreateRef<Enxus::VertexBuffer>(&m_Vertices[0], m_Vertices.size() * sizeof(Enxus::VertexData));
 
-        Enxus::VertexBufferLayout layout;
-        layout.Push(3, GL_FLOAT); // position
-        layout.Push(2, GL_FLOAT); // tex coords
-        layout.Push(3, GL_FLOAT); // normals
-        m_VertexArray->AddBuffer(*m_VertexBuffer, layout);
+        Enxus::BufferLayout layout = {
+            {Enxus::ShaderDataType::Float3, "aPos"},
+            {Enxus::ShaderDataType::Float2, "aTexCoord"},
+            {Enxus::ShaderDataType::Float3, "aNormal"},
+        };
 
-        m_IndexBuffer = Enxus::CreateRef<Enxus::IndexBuffer>(&indices[0], sizeof(indices));
+        vertexBuffer->SetLayout(layout);
+        m_VertexArray->AddVertexBuffer(vertexBuffer);
+
+        Enxus::Ref<Enxus::IndexBuffer> indexBuffer = Enxus::CreateRef<Enxus::IndexBuffer>(indices, 4);
+        m_VertexArray->SetIndexBuffer(indexBuffer);
 
         m_Container = Enxus::CreateRef<Enxus::TextureMesh2D>("Sandbox/res/images/container.jpg", Enxus::TextureType::DIFFUSE);
         m_AwesomeFace = Enxus::CreateRef<Enxus::TextureMesh2D>("Sandbox/res/images/awesomeface.png", Enxus::TextureType::DIFFUSE);
@@ -66,8 +70,8 @@ namespace OpenGLTest
             m_AwesomeFace->Bind(1);
 
             m_VertexArray->Bind();
-            m_IndexBuffer->Bind();
-            // Enxus::Renderer::SetPolygonMode(Enxus::PolygonMode::LINE);
+            // m_IndexBuffer->Bind();
+            //  Enxus::Renderer::SetPolygonMode(Enxus::PolygonMode::LINE);
             if (m_IsWireFrame)
                 Enxus::Renderer::SetPolygonMode(Enxus::PolygonMode::LINE);
             else

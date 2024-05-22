@@ -14,6 +14,7 @@ namespace Enxus
 
     public:
         FreeCameraController(float aspectRatio);
+        FreeCameraController(float aspectRatio, float nearPlane, float farPlane);
         ~FreeCameraController(){};
 
         Camera &GetCamera() { return m_Camera; }
@@ -21,7 +22,7 @@ namespace Enxus
         void OnUpdate(Timestep ts);
         void OnEvent(Event &event);
 
-        void OnResize(unsigned int width, unsigned int height);
+        void OnResize(uint32_t width, uint32_t height);
 
         void ResetCameraLocation();
         // camera vectors setters/getter

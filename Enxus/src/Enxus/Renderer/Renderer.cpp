@@ -19,7 +19,7 @@ namespace Enxus
         Renderer::SetPolygonMode(PolygonMode::FILL);
     }
 
-    void Renderer::SetViewport(unsigned int x, unsigned int y, unsigned int width, unsigned int height)
+    void Renderer::SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
     {
         GLCall(glViewport(x, y, width, height));
     }
@@ -53,16 +53,16 @@ namespace Enxus
         ASSERT(false);
     }
 
-    void Renderer::Draw(const Ref<VertexArray> &vao, const Ref<IndexBuffer> &ibo, const Ref<Shader> &shader)
+    void Renderer::Draw(const Ref<VertexArray> &vao, const Ref<Shader> &shader)
     {
         vao->Bind();
-        ibo->Bind();
         shader->Bind();
 
-        Renderer::DrawIndices(ibo->GetCount());
+        // has indices
+        if (vao->GetIndexBuffer())
+            Renderer::DrawIndices(vao->GetIndexBuffer()->GetCount());
 
         vao->Unbind();
-        ibo->Unbind();
         shader->Unbind();
     }
 
@@ -98,19 +98,10 @@ namespace Enxus
             shader->SetInt(("material." + name).c_str(), i);
             texture->Bind(i); // active the current texture slot
         }
-
-        mesh->GetVertexArray()->Bind();
         if (mesh->HasIndices())
-        {
-            Renderer::DrawIndices(mesh->GetIndexBuffer()->GetCount());
-        }
+            Renderer::DrawIndices(mesh->GetVertexArray()->GetIndexBuffer()->GetCount());
         else
-        {
             Renderer::DrawVertices(mesh->GetVertices().size());
-        }
-
-        mesh->GetVertexArray()->Unbind();
-        mesh->GetIndexBuffer()->Unbind();
     }
 
     void Renderer::DrawModel(const Ref<Model> &model, const Ref<Shader> &shader)
@@ -121,11 +112,11 @@ namespace Enxus
             DrawMesh(mesh, shader);
         }
     }
-    inline void Renderer::DrawVertices(unsigned int numOfVertices)
+    inline void Renderer::DrawVertices(uint32_t numOfVertices)
     {
         GLCall(glDrawArrays(GL_TRIANGLES, 0, numOfVertices));
     }
-    inline void Renderer::DrawIndices(unsigned int numOfIndices)
+    inline void Renderer::DrawIndices(uint32_t numOfIndices)
     {
         GLCall(glDrawElements(GL_TRIANGLES, numOfIndices, GL_UNSIGNED_INT, nullptr));
     }

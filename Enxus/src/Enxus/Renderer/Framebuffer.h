@@ -6,7 +6,7 @@ namespace Enxus
 
     struct FramebufferSpecification
     {
-        unsigned int Width, Height;
+        uint32_t Width, Height;
         unsigned Samples = 1;
     };
 
@@ -18,18 +18,18 @@ namespace Enxus
 
         // means that state is not valid so recreate it
         void Invalidate();
-        void Resize(unsigned int width, unsigned int height);
+        void Resize(uint32_t width, uint32_t height);
 
         void Bind();
         void Unbind();
 
-        unsigned int GetColorAttachmentRendererID() const { return m_ColorAttachment; }
+        uint32_t GetColorAttachmentRendererID() const { return m_ColorAttachment; }
 
         FramebufferSpecification GetSpecification() const { return m_Specification; }
 
     private:
-        unsigned int m_RendererID;
-        unsigned int m_ColorAttachment, m_DepthAttachment;
+        uint32_t m_RendererID;
+        uint32_t m_ColorAttachment, m_DepthAttachment;
         FramebufferSpecification m_Specification;
     };
     /* data */

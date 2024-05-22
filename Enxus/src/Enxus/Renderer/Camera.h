@@ -17,7 +17,7 @@ namespace Enxus
         ~Camera();
 
         // update viewport
-        void SetViewportSize(unsigned int vpWidth, unsigned int vpHeight);
+        void SetViewportSize(uint32_t vpWidth, uint32_t vpHeight);
 
         // set Camera Vectors
         void SetPos(glm::vec3 position);
@@ -35,16 +35,21 @@ namespace Enxus
         inline glm::vec3 GetFront() const { return m_Front; }
 
         // get Camera Attributes
+        inline float GetAspectRatio(){return m_AspectRatio;}
         inline float GetFOV() { return m_FOV; }
         inline float GetNearPlane() { return m_NearPlane; }
         inline float GetFarPlane() { return m_FarPlane; }
+
+        void SetFOV(float fov);
+        void SetNearPlane(float nearPlane);
+        void SetFarPlane(float farPlane);
 
     private:
         void RecalculateView();
         void RecalculateProjection();
 
     private:
-        unsigned int m_VpWidth, m_VpHeight;
+        uint32_t m_VpWidth, m_VpHeight;
 
         float m_FOV = 45.0f, m_AspectRatio = 0.0f, m_NearPlane = 0.01f, m_FarPlane = 50.0f;
 

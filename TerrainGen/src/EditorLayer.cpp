@@ -1,47 +1,24 @@
 #include "pch.h"
 #include "EditorLayer.h"
+#include "NoiseEditorPanel.h"
+#include "TerrainDimensionPanel.h"
+#include "SceneCompositionPanel.h"
+#include "TerrainBiomePanel.h"
+#include "TerrainScene.h"
 #include "imgui/imgui.h"
+#include "imgui/imgui_internal.h"
 
 EditorLayer::EditorLayer()
-    : Layer("Terrain Generator Editor Layer"), m_ViewportSize(0.0f, 0.0f)
+    : Layer("Terrain Generator Editor Layer"),
+      m_ViewportSize(0.0f, 0.0f)
 {
 
     //----------------- CAMERA -------------------//
-
     auto &window = Enxus::Application::Get().GetWindow();
-    unsigned int width = window.GetWidth();
-    unsigned int height = window.GetHeight();
+    uint32_t width = window.GetWidth();
+    uint32_t height = window.GetHeight();
 
-    m_CameraController = Enxus::CreateScope<Enxus::FreeCameraController>((float)width / (float)height);
-
-    //----------------- SHADER -------------------//
-    m_Shader = Enxus::CreateRef<Enxus::Shader>("TerrainGen/assets/shaders/model/box.vert", "TerrainGen/assets/shaders/model/box.frag");
-    m_GridShader = Enxus::CreateRef<Enxus::Shader>("TerrainGen/assets/shaders/editor-grid/grid.vert", "TerrainGen/assets/shaders/editor-grid/grid.frag");
-    m_TerrainShader = Enxus::CreateRef<Enxus::Shader>("TerrainGen/assets/shaders/heightmap/heightmap.vert", "TerrainGen/assets/shaders/heightmap/heightmap.frag");
-
-    //----------------- BOX MODEL -------------------//
-
-    m_Box = Enxus::CreateRef<Enxus::Model>("TerrainGen/assets/models/box/box.obj");
-
-    glm::mat4 model = glm::mat4(1.0f);
-    m_Shader->Bind();
-    m_Shader->SetMat4("uModel", model);
-    //----------------- GRID FLOOR -------------------//
-    m_GridFloor = Enxus::CreateScope<Grid>(50, 50, 1.0f);
-    m_GridShader->Bind();
-
-    m_GridShader->SetMat4("uModel", m_GridFloor->GetModel());
-
-    //----------------- TERRAIN -------------------//
-    m_Terrain = Enxus::CreateScope<HeightMapTerrain>();
-    m_Terrain->SetHeightMap("TerrainGen/assets/images/heightmaps/quad.png");
-    m_TerrainShader->Bind();
-    m_TerrainShader->SetMat4("uModel", glm::mat4(1.0f));
-
-    //----------------- Noise Texture -------------------//
-    m_NoiseTexture = Enxus::CreateScope<Enxus::Texture2D>(1, 1);
-    uint32_t whiteTex = 0xffffffff;
-    m_NoiseTexture->SetData(&whiteTex, 1, 1);
+    m_CameraController = Enxus::CreateScope<Enxus::FreeCameraController>((float)width / (float)height, 0.1f, 100.0f);
 }
 
 EditorLayer::~EditorLayer()
@@ -55,6 +32,23 @@ void EditorLayer::OnAttach()
     fbspec.Width = 800;
     fbspec.Height = 600;
     m_Framebuffer = Enxus::CreateScope<Enxus::Framebuffer>(fbspec);
+
+    // Terrain Scene initialization
+    TerrainScene::Init();
+
+    // Terrain Panels initialization
+    TerrainDimensionPanel::Init();
+    TerrainBiomePanel::Init();
+    SceneCompositionPanel::Init();
+
+    NoiseEditorPanel::Init();
+
+    // Initial values
+    TerrainScene::UpdateTerrainNoiseMap(NoiseEditorPanel::GetNoiseMap());
+    TerrainScene::UpdateSceneComposition(SceneCompositionPanel::GetPanelProps());
+    TerrainScene::UpdateTerrainDimensions(TerrainDimensionPanel::GetPanelProps());
+    TerrainScene::UpdateTerrainBiome(TerrainBiomePanel::GetPanelProps());
+
     ImGui::SetWindowFocus("Viewport");
 }
 
@@ -64,60 +58,21 @@ void EditorLayer::OnUpdate(Enxus::Timestep ts)
         Enxus::Application::Get().Close();
 
     if (m_IsViewportFocused)
+    {
         m_CameraController->OnUpdate(ts);
-
+    }
     HandleViewportResize();
 
-    m_Shader->Bind();
-    m_Shader->SetMat4("uView", m_CameraController->GetCamera().GetViewMatrix());
-    m_Shader->SetMat4("uProj", m_CameraController->GetCamera().GetProjectionMatrix());
-    m_Shader->Unbind();
-
-    m_GridShader->Bind();
-    m_GridShader->SetMat4("uView", m_CameraController->GetCamera().GetViewMatrix());
-    m_GridShader->SetMat4("uProj", m_CameraController->GetCamera().GetProjectionMatrix());
-    m_GridShader->Unbind();
-
-    m_TerrainShader->Bind();
-    m_TerrainShader->SetMat4("uView", m_CameraController->GetCamera().GetViewMatrix());
-    m_TerrainShader->SetMat4("uProj", m_CameraController->GetCamera().GetProjectionMatrix());
-    m_TerrainShader->Unbind();
-
-    if (m_IsWireframe)
-        Enxus::Renderer::SetPolygonMode(Enxus::PolygonMode::LINE);
-    else
-        Enxus::Renderer::SetPolygonMode(Enxus::PolygonMode::FILL);
+    TerrainScene::SubmitCamera(m_CameraController->GetCamera());
 
     {
         // Rendering
         m_Framebuffer->Bind();
         Enxus::Renderer::ClearColor(0.13f, 0.13f, 0.14f, 1.0f);
         Enxus::Renderer::Clear();
-        // Draw Grid floor
-        if (m_ShowGridFloor)
-        {
-            Enxus::Renderer::SetPolygonMode(Enxus::PolygonMode::LINE); // Draw the lines
-            Enxus::Renderer::Draw(m_GridFloor->GetVertexArray(), m_GridFloor->GetIndexBuffer(), m_GridShader);
-            Enxus::Renderer::SetPolygonMode(Enxus::PolygonMode::FILL); // Restore state
-        }
-        // Draw Box
-        {
-            Enxus::Renderer::DrawModel(m_Box, m_Shader);
 
-            // Enxus::Renderer::SetPolygonMode(Enxus::PolygonMode::LINE); // Draw the lines
-            // Enxus::Renderer::Draw(m_Terrain->GetVertexArray(), m_Terrain->GetIndexBuffer(), m_TerrainShader);
-            // m_Terrain->GetVertexArray()->Bind();
-            // m_Terrain->GetIndexBuffer()->Bind();
-            // m_TerrainShader->Bind();
-            // const uint32_t numOfStrips = m_Terrain->GetHeight() - 1;
-            // const uint32_t numOfVertPerStrip = m_Terrain->GetWidth() * 2;
-            // for (unsigned int strip = 0; strip < numOfStrips; strip++)
-            // {
-            //     size_t stripOffset = strip * numOfVertPerStrip * sizeof(unsigned int);
-            //     glDrawElements(GL_TRIANGLE_STRIP, numOfVertPerStrip, GL_UNSIGNED_INT, (void *)stripOffset);
-            // }
-            // Enxus::Renderer::SetPolygonMode(Enxus::PolygonMode::FILL); // Draw the lines
-        }
+        TerrainScene::OnUpdate();
+
         m_Framebuffer->Unbind();
     }
 }
@@ -173,10 +128,6 @@ void EditorLayer::OnImGuiRender()
     {
         if (ImGui::BeginMenu("File"))
         {
-            // Disabling fullscreen would allow the window to be moved to the front of other windows,
-            // which we can't undo at the moment without finer window depth/z control.
-            // ImGui::MenuItem("Fullscreen", NULL, &opt_fullscreen_persistant);
-
             if (ImGui::MenuItem("Exit"))
                 Enxus::Application::Get().Close();
             ImGui::EndMenu();
@@ -185,18 +136,10 @@ void EditorLayer::OnImGuiRender()
         ImGui::EndMenuBar();
     }
 
-    {
-        // Menu
-        ImGui::Begin("Menu");
-        ImGui::Checkbox("Grid Floor", &m_ShowGridFloor);
-        ImGui::Checkbox("Wireframe Mode", &m_IsWireframe);
-        // using size_t (aka unsigned long) to remove warning
-        // size_t textureId = m_ExampleTexture->GetRendererId();
-        ImGui::End();
-    }
+    TerrainMenuUI();
 
     {
-        // Scene
+        // Viewport
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0}); // remove the window padding
 
         ImGui::Begin("Viewport");
@@ -216,28 +159,45 @@ void EditorLayer::OnImGuiRender()
         ImGui::End();
         ImGui::PopStyleVar();
     }
-    // FPS Little Window
+    // FPS window sidebar
     {
-        ImGui::Begin("FPS");
-        // framerate
+
+        ImGui::BeginViewportSideBar("status", ImGui::GetMainViewport(), ImGuiDir_Down, 32, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+        float textOffset = 0;
         ImGui::Text("App average %.3f ms/frame", Enxus::Application::Get().GetTimestep().GetMiliseconds());
+        ImGui::SameLine(textOffset += 500);
         ImGui::Text("App average (%.1f FPS)", 1.0f / Enxus::Application::Get().GetTimestep());
         ImGui::End();
     }
-
-    NoiseGenerationUI();
+    // The Noise is updated separately
+    NoiseEditorPanel::OnImGuiRender();
+    if (NoiseEditorPanel::HasUpdated())
+    {
+        TerrainScene::UpdateTerrainNoiseMap(NoiseEditorPanel::GetNoiseMap());
+    }
 
     ImGui::End();
 }
 
-void EditorLayer::NoiseGenerationUI()
+void EditorLayer::TerrainMenuUI()
 {
-    // Noise Generation Properties Window
-    ImGui::Begin("Noise Generation");
-    //
-    size_t textureID = m_NoiseTexture->GetRendererId();
-    // ImGui::Image((void *)textureID, ImVec2(m_NoiseTexture->GetWidth(), m_NoiseTexture->GetHeight()), ImVec2{0, 1}, ImVec2{1, 0});
-    ImGui::Image((void *)textureID, ImVec2(100, 100), ImVec2{0, 1}, ImVec2{1, 0});
+
+    // Menu
+    ImGui::Begin("Terrain Menu");
+
+    ImGui::BeginTabBar("Terrain Menu TabBar");
+
+    TerrainDimensionPanel::OnImGuiRender();
+    auto dimensionProps = TerrainDimensionPanel::GetPanelProps();
+    TerrainScene::UpdateTerrainDimensions(dimensionProps);
+
+    TerrainBiomePanel::OnImGuiRender();
+    TerrainScene::UpdateTerrainBiome(TerrainBiomePanel::GetPanelProps());
+
+    SceneCompositionPanel::OnImGuiRender();
+    TerrainScene::UpdateSceneComposition(SceneCompositionPanel::GetPanelProps());
+
+    ImGui::EndTabBar();
 
     ImGui::End();
 }

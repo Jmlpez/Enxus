@@ -73,7 +73,7 @@ namespace Enxus
         GLCall(glBindFramebuffer(GL_FRAMEBUFFER, 0));
     }
 
-    void Framebuffer::Resize(unsigned int width, unsigned int height)
+    void Framebuffer::Resize(uint32_t width, uint32_t height)
     {
         // std::cout << width << "  " << height << std::endl;
         m_Specification.Width = width;

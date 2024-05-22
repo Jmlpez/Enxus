@@ -39,14 +39,14 @@ namespace Enxus
         std::string ParseShader(const std::string &filePath);
 
         // Compile shader source code
-        unsigned int CompileShader(unsigned int type, const std::string &source);
+        uint32_t CompileShader(uint32_t type, const std::string &source);
 
         // Create a shader program ready to be use with vertex and fragment shader attached
-        unsigned int CreateShader(const std::string &vertexShaderSource, const std::string &fragmentShaderSource);
+        uint32_t CreateShader(const std::string &vertexShaderSource, const std::string &fragmentShaderSource);
         // consider add geometry shader with same template
-        // unsigned int CreateShader(const std::string &vertexShaderSource, const std::string &geometryShaderSource,const std::string &fragmentShaderSource);
+        // uint32_t CreateShader(const std::string &vertexShaderSource, const std::string &geometryShaderSource,const std::string &fragmentShaderSource);
     private:
-        unsigned int m_RendererId;
+        uint32_t m_RendererId;
         // to store the location of the uniforms
         std::unordered_map<std::string, int> m_UniformLocationCache;
         // debugging purposes

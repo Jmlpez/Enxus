@@ -13,6 +13,7 @@
 #include "Enxus/Core/KeyCodes.h"
 #include "Enxus/Core/MouseCodes.h"
 #include "Enxus/ImGui/ImGuiLayer.h"
+#include "Enxus/Math/Math.h"
 
 // ---Renderer------------------------
 #include "Enxus/Renderer/Renderer.h"
@@ -27,6 +28,7 @@
 #include "Enxus/Renderer/Framebuffer.h"
 #include "Enxus/Renderer/Model.h"
 #include "Enxus/Renderer/Mesh.h"
+#include "Enxus/Renderer/SkyBox.h"
 // -----------------------------------
 
 #endif

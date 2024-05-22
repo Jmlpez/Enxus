@@ -19,6 +19,7 @@ ENXUS_INCLUDE_FLAGS += -I$(ENXUS_DIR)/src/Enxus/Core
 ENXUS_INCLUDE_FLAGS += -I$(ENXUS_DIR)/src/Enxus/Event
 ENXUS_INCLUDE_FLAGS += -I$(ENXUS_DIR)/src/Enxus/ImGui
 ENXUS_INCLUDE_FLAGS += -I$(ENXUS_DIR)/src/Enxus/Renderer
+ENXUS_INCLUDE_FLAGS += -I$(ENXUS_DIR)/src/Enxus/Math
 
 VENDOR_FLAGS = -I$(ENXUS_VENDOR_DIR)
 VENDOR_FLAGS += -I$(ENXUS_VENDOR_DIR)/imgui
@@ -81,22 +82,24 @@ rebuild:
 run-sandbox:
 	$(MAKE) -C $(ENXUS_DIR)
 	$(MAKE) sandbox-app
-	@echo "\n---------------------- RUNING -----------------------\n"
+	@echo "\n---------------------- RUNNING -----------------------\n"
 	@$(SANDBOX_TARGET)
-	@echo "\n------------------- END OF RUNING -------------------\n"	
+	@echo "\n------------------- END OF RUNNING -------------------\n"	
 
 #$(MAKE) terrain-app
 run-terrain:
 	$(MAKE) -C $(ENXUS_DIR)	
 	$(MAKE) terrain-app
-	@echo "\n---------------------- RUNING -----------------------\n"
+	@echo "\n---------------------- RUNNING -----------------------\n"
 	@$(TERRAIN_GEN_TARGET)
-	@echo "\n------------------- END OF RUNING -------------------\n"	
+	@echo "\n------------------- END OF RUNNING -------------------\n"	
 
 # Testing purposes
 pepe: pepe.cpp
 	g++ -std=gnu++17 -Wall -Wextra pepe.cpp -o pepe && ./pepe
 
+pch: 
+	$(CXX) $(CXXFLAGS) -c $(PCH_SRC) -o $(PCH_DIR)/pch.h.gch
 
 clean:
 	rm -fr $(BIN_DIR)/*

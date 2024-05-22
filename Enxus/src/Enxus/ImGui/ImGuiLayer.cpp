@@ -48,6 +48,8 @@ namespace Enxus
         // io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
         io.ConfigFlags |= ImGuiConfigFlags_DockingEnable; // Enable Docking
 
+        io.Fonts->AddFontFromFileTTF("Resources/Fonts/Lato/OpenSans-Regular.ttf", 16);
+
         // Setup Dear ImGui style
         ImGui::StyleColorsDark();
         // ImGui::StyleColorsClassic();

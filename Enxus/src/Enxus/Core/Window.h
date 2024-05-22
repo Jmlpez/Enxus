@@ -13,12 +13,12 @@ namespace Enxus
     struct WindowProps
     {
         std::string Title;
-        unsigned int Width;
-        unsigned int Height;
+        uint32_t Width;
+        uint32_t Height;
 
         WindowProps(const std::string &title = "Enxus Engine",
-                    unsigned int width = 1366,
-                    unsigned int height = 720)
+                    uint32_t width = 1366,
+                    uint32_t height = 720)
             : Title(title), Width(width), Height(height)
         {
         }
@@ -35,8 +35,8 @@ namespace Enxus
 
         void OnUpdate();
 
-        inline unsigned int GetWidth() { return m_Data.Width; }
-        inline unsigned int GetHeight() { return m_Data.Height; }
+        inline uint32_t GetWidth() { return m_Data.Width; }
+        inline uint32_t GetHeight() { return m_Data.Height; }
         inline std::string GetTitle() { return m_Data.Title; }
 
         void SetEventCallback(const EventCallbackFn &callback);
@@ -58,8 +58,8 @@ namespace Enxus
 
         struct WindowData
         {
-            unsigned int Width;
-            unsigned int Height;
+            uint32_t Width;
+            uint32_t Height;
             std::string Title;
             bool VSync;
 

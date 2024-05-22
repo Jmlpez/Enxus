@@ -22,7 +22,6 @@ namespace OpenGLTest
         // uint32_t m_VertexArrayID;
 
         Enxus::Ref<Enxus::VertexBuffer> m_VertexBuffer;
-        Enxus::Ref<Enxus::IndexBuffer> m_IndexBuffer;
         Enxus::Ref<Enxus::VertexArray> m_VertexArray;
 
         std::vector<Enxus::VertexData> m_Vertices;

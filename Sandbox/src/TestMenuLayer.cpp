@@ -9,6 +9,9 @@
 #include "TestSkyBox.h"
 #include "TestMovingVertex.h"
 #include "TestTriangleStrip.h"
+#include "TestCircle.h"
+#include "TestInstancing.h"
+#include "TestInstancingV2.h"
 #include "imgui/imgui.h"
 
 TestMenuLayer::TestMenuLayer()
@@ -17,10 +20,10 @@ TestMenuLayer::TestMenuLayer()
     //----------------- CAMERA -------------------//
 
     auto &window = Enxus::Application::Get().GetWindow();
-    unsigned int width = window.GetWidth();
-    unsigned int height = window.GetHeight();
+    uint32_t width = window.GetWidth();
+    uint32_t height = window.GetHeight();
 
-    m_CameraController = Enxus::CreateScope<Enxus::FreeCameraController>((float)width / (float)height);
+    m_CameraController = Enxus::CreateScope<Enxus::FreeCameraController>((float)width / (float)height, 0.01f, 100.0f);
 
     //----------------- FRAMEBUFFER -------------------//
     Enxus::FramebufferSpecification fbspec;
@@ -46,8 +49,11 @@ void TestMenuLayer::OnAttach()
     RegisterTest<OpenGLTest::TestSkyBox>("SkyBox");
     RegisterTest<OpenGLTest::TestMovingVertex>("Mesh vertices updating");
     RegisterTest<OpenGLTest::TestTriangleStrip>("Triangle Strip");
-
+    RegisterTest<OpenGLTest::TestCircle>("Circle (FragmentShader)");
+    RegisterTest<OpenGLTest::TestInstancing>("Instancing 1.0");
+    RegisterTest<OpenGLTest::TestInstancingV2>("Instancing 2.0");
     // start in the skybox test
+
     m_CurrentTest = new OpenGLTest::TestTriangleStrip();
 }
 
