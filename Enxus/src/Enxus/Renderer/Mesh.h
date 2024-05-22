@@ -40,16 +40,12 @@ namespace Enxus
         const std::vector<Ref<TextureMesh2D>> &GetTextures() const { return m_Textures; }
 
         Ref<VertexArray> GetVertexArray() const { return m_VertexArrayObject; }
-        Ref<VertexBuffer> GetVertexBuffer() const { return m_VertexBufferObject; }
-        Ref<IndexBuffer> GetIndexBuffer() const { return m_IndexBufferObject; }
 
         // smart pointers has the bool operator overloaded
         bool HasIndices() { return (bool)m_VertexArrayObject->GetIndexBuffer(); }
 
     private:
         Ref<VertexArray> m_VertexArrayObject;
-        Ref<VertexBuffer> m_VertexBufferObject;
-        Ref<IndexBuffer> m_IndexBufferObject;
 
         std::vector<VertexData> m_Vertices;
         std::vector<uint32_t> m_Indices;

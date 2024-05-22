@@ -72,7 +72,7 @@ namespace Enxus
         return CreateRef<Mesh>(vertices, indices, texturesRef);
     }
 
-    std::vector<VertexData> Model::ProcessVertices(aiMesh *mesh)
+    std::vector<VertexData> Model::ProcessVertices(aiMesh *mesh) const
     {
         std::vector<VertexData> vertices;
         for (unsigned int i = 0; i < mesh->mNumVertices; i++)
@@ -111,7 +111,7 @@ namespace Enxus
         return vertices;
     }
 
-    std::vector<uint32_t> Model::ProcessIndices(aiMesh *mesh)
+    std::vector<uint32_t> Model::ProcessIndices(aiMesh *mesh) const
     {
 
         std::vector<uint32_t> indices;

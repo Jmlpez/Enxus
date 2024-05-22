@@ -22,7 +22,6 @@ namespace OpenGLTest
         uint32_t m_SkyBoxRendererId;
 
         Enxus::Ref<Enxus::VertexArray> m_SkyBoxVAO;
-        Enxus::Ref<Enxus::VertexBuffer> m_SkyBoxVBO;
 
         Enxus::Ref<Enxus::Model> m_Box;
         Enxus::Ref<Enxus::Shader> m_SkyBoxShader, m_BoxShader;

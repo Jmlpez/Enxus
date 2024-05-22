@@ -40,10 +40,6 @@ namespace Enxus
     void Mesh::CreateBuffers()
     {
         m_VertexArrayObject = CreateRef<VertexArray>();
-        // m_VertexBufferObject = CreateRef<VertexBuffer>(&m_Vertices[0], (unsigned int)m_Vertices.size() * sizeof(VertexData));
-
-        // if (m_Indices.size() > 0) // if the mesh has indices
-        //    m_IndexBufferObject = CreateRef<IndexBuffer>(&m_Indices[0], (unsigned int)m_Indices.size());
 
         /*
         VERTEX DEFAULT LAYOUT:

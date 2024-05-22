@@ -23,11 +23,7 @@ namespace OpenGLTest
 
         bool m_IsWireFrame = true;
 
-        Enxus::Ref<Enxus::VertexBuffer> m_VertexBuffer;
-        Enxus::Ref<Enxus::IndexBuffer> m_IndexBuffer;
         Enxus::Ref<Enxus::VertexArray> m_VertexArray;
-
-        std::vector<Enxus::VertexData> m_Vertices;
 
         Enxus::Ref<Enxus::TextureMesh2D> m_Container, m_AwesomeFace;
         Enxus::Ref<Enxus::Shader> m_Shader;

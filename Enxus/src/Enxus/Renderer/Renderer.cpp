@@ -53,16 +53,16 @@ namespace Enxus
         ASSERT(false);
     }
 
-    void Renderer::Draw(const Ref<VertexArray> &vao, const Ref<IndexBuffer> &ibo, const Ref<Shader> &shader)
+    void Renderer::Draw(const Ref<VertexArray> &vao, const Ref<Shader> &shader)
     {
         vao->Bind();
-        // ibo->Bind();
         shader->Bind();
 
-        Renderer::DrawIndices(vao->GetIndexBuffer()->GetCount());
+        // has indices
+        if (vao->GetIndexBuffer())
+            Renderer::DrawIndices(vao->GetIndexBuffer()->GetCount());
 
         vao->Unbind();
-        // ibo->Unbind();
         shader->Unbind();
     }
 
@@ -98,19 +98,10 @@ namespace Enxus
             shader->SetInt(("material." + name).c_str(), i);
             texture->Bind(i); // active the current texture slot
         }
-
-        mesh->GetVertexArray()->Bind();
         if (mesh->HasIndices())
-        {
             Renderer::DrawIndices(mesh->GetVertexArray()->GetIndexBuffer()->GetCount());
-        }
         else
-        {
             Renderer::DrawVertices(mesh->GetVertices().size());
-        }
-
-        mesh->GetVertexArray()->Unbind();
-        mesh->GetIndexBuffer()->Unbind();
     }
 
     void Renderer::DrawModel(const Ref<Model> &model, const Ref<Shader> &shader)

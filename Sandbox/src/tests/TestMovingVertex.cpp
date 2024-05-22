@@ -83,7 +83,7 @@ namespace OpenGLTest
                 m_VertexBuffer->SetData(&newVertex, sizeof(Enxus::VertexData), sizeof(Enxus::VertexData));
             }
 
-            Enxus::Renderer::Draw(m_VertexArray, m_IndexBuffer, m_Shader);
+            Enxus::Renderer::Draw(m_VertexArray, m_Shader);
         }
     }
 

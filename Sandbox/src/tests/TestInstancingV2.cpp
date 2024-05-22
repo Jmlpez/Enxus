@@ -93,7 +93,7 @@ namespace OpenGLTest
             m_Shader->SetInt("material.texture_diffuse1", 0);
 
             mesh->GetVertexArray()->Bind();
-            GLCall(glDrawElementsInstanced(GL_TRIANGLES, mesh->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, 0, 1000));
+            GLCall(glDrawElementsInstanced(GL_TRIANGLES, mesh->GetVertexArray()->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, 0, 1000));
         }
 
         // Enxus::Renderer::DrawModel(m_Box, m_Shader);

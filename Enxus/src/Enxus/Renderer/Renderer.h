@@ -22,7 +22,7 @@ namespace Enxus
         static void Init();
         static void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height);
         static void SetPolygonMode(PolygonMode mode);
-        static void Draw(const Ref<VertexArray> &vao, const Ref<IndexBuffer> &ibo, const Ref<Shader> &shader);
+        static void Draw(const Ref<VertexArray> &vao, const Ref<Shader> &shader);
         static void DrawMesh(const Ref<Mesh> &mesh, const Ref<Shader> &shader);
         static void DrawModel(const Ref<Model> &model, const Ref<Shader> &shader);
         static void ClearColor(float red, float green, float blue, float alpha);

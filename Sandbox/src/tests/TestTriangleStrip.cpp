@@ -9,19 +9,18 @@ namespace OpenGLTest
         /*
         Remember that the negative Z-Axis is pointing towards the viewer
         */
-        m_Vertices = std::vector<Enxus::VertexData>{
+        std::vector<Enxus::VertexData> m_Vertices{
             {glm::vec3(0.5f, 0.0f, 0.5f), glm::vec2(0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f)},   // bottom right
             {glm::vec3(0.5f, 0.0f, -0.5f), glm::vec2(0.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f)},  // top right
             {glm::vec3(-0.5f, 0.0f, -0.5f), glm::vec2(1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f)}, // top left
             {glm::vec3(-0.5f, 0.0f, 0.5f), glm::vec2(1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f)},  // bottom left
         };
+
         uint32_t indices[4] = {0, 3, 1, 2};
 
         m_VertexArray = Enxus::CreateRef<Enxus::VertexArray>();
 
-        // Enxus::Ref<Enxus::VertexBuffer> vertexBuffer = Enxus::CreateRef<Enxus::VertexBuffer>(m_Vertices.size() * sizeof(Enxus::VertexData));
         Enxus::Ref<Enxus::VertexBuffer> vertexBuffer = Enxus::CreateRef<Enxus::VertexBuffer>(&m_Vertices[0], m_Vertices.size() * sizeof(Enxus::VertexData));
-        // vertexBuffer->SetData(&m_Vertices[0], m_Vertices.size() * sizeof(Enxus::VertexData));
 
         Enxus::BufferLayout layout = {
             {Enxus::ShaderDataType::Float3, "aPos"},

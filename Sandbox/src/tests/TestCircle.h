@@ -18,7 +18,6 @@ namespace OpenGLTest
 
     private:
         Enxus::Ref<Enxus::VertexArray> m_VAO;
-        Enxus::Ref<Enxus::VertexBuffer> m_VBO;
         Enxus::Ref<Enxus::Shader> m_CircleShader;
     };
 }
