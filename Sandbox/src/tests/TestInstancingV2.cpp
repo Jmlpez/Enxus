@@ -37,31 +37,19 @@ namespace OpenGLTest
             m_BoxInstanceMatrix[i] = model;
         }
         // There is only one mesh -> The BOX
-        m_Box->GetMeshes()[0]->GetVertexArray()->Bind();
 
-        unsigned int instanceBuffer;
-        glGenBuffers(1, &instanceBuffer);
-        glBindBuffer(GL_ARRAY_BUFFER, instanceBuffer);
-        glBufferData(GL_ARRAY_BUFFER, m_BoxInstanceMatrix.size() * sizeof(glm::mat4), &m_BoxInstanceMatrix[0], GL_STATIC_DRAW);
-        // glBindBuffer(GL_ARRAY_BUFFER, 0);
+        Enxus::Ref<Enxus::VertexBuffer> instanceBuffer =
+            Enxus::CreateRef<Enxus::VertexBuffer>(
+                &m_BoxInstanceMatrix[0],
+                m_BoxInstanceMatrix.size() * sizeof(glm::mat4));
 
-        std::size_t v4s = sizeof(glm::vec4);
-        glEnableVertexAttribArray(3);
-        glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, 4 * v4s, (void *)0);
-        glEnableVertexAttribArray(4);
-        glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, 4 * v4s, (void *)(1 * v4s));
-        glEnableVertexAttribArray(5);
-        glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, 4 * v4s, (void *)(2 * v4s));
-        glEnableVertexAttribArray(6);
-        glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, 4 * v4s, (void *)(3 * v4s));
+        Enxus::BufferLayout layout = {
+            {Enxus::ShaderDataType::Mat4, "aInstanceMatrix"},
+        };
+        instanceBuffer->SetLayout(layout);
+        m_Box->GetMeshes()[0]->GetVertexArray()->AddVertexBuffer(instanceBuffer);
 
-        glVertexAttribDivisor(3, 1);
-        glVertexAttribDivisor(4, 1);
-        glVertexAttribDivisor(5, 1);
-        glVertexAttribDivisor(6, 1);
-
-        m_Shader = Enxus::CreateRef<Enxus::Shader>("Sandbox/res/shaders/advanced-opengl/instancing/instancing-obj.vert",
-                                                   "Sandbox/res/shaders/advanced-opengl/instancing/instancing-obj.frag");
+        m_Shader = Enxus::CreateRef<Enxus::Shader>("Sandbox/res/shaders/advanced-opengl/instancing/instancing-obj.vert", "Sandbox/res/shaders/advanced-opengl/instancing/instancing-obj.frag");
         // m_Shader->Bind();
         // glm::mat4 model = glm::mat4(1.0f);
         // m_Shader->SetMat4("uModel", model);
