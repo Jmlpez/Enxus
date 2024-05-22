@@ -6,71 +6,71 @@ namespace OpenGLTest
 {
     TestInstancing::TestInstancing()
     {
-        // float quadVertices[] = {
+        float quadVertices[] = {
 
-        //     -0.05f, 0.05f, 1.0f, 0.0f, 0.0f,
-        //     0.05f, -0.05f, 0.0f, 1.0f, 0.0f,
-        //     -0.05f, -0.05f, 0.0f, 0.0f, 1.0f,
+            -0.05f, 0.05f, 1.0f, 0.0f, 0.0f,
+            0.05f, -0.05f, 0.0f, 1.0f, 0.0f,
+            -0.05f, -0.05f, 0.0f, 0.0f, 1.0f,
 
-        //     -0.05f, 0.05f, 1.0f, 0.0f, 0.0f,
-        //     0.05f, -0.05f, 0.0f, 1.0f, 0.0f,
-        //     0.05f, 0.05f, 0.0f, 1.0f, 1.0f};
+            -0.05f, 0.05f, 1.0f, 0.0f, 0.0f,
+            0.05f, -0.05f, 0.0f, 1.0f, 0.0f,
+            0.05f, 0.05f, 0.0f, 1.0f, 1.0f};
 
-        // m_VAO = Enxus::CreateRef<Enxus::VertexArray>();
-        // m_VBO = Enxus::CreateRef<Enxus::VertexBuffer>(quadVertices, sizeof(quadVertices));
+        m_VAO = Enxus::CreateRef<Enxus::VertexArray>();
+        Enxus::Ref<Enxus::VertexBuffer> quadVBO = Enxus::CreateRef<Enxus::VertexBuffer>(quadVertices, sizeof(quadVertices));
 
-        // Enxus::VertexBufferLayout layout;
-        // layout.Push(2, GL_FLOAT); // 0 --> position
-        // layout.Push(3, GL_FLOAT); // 1 --> color
-        // // layout.Push(2, GL_FLOAT); // 2 --> offset
+        Enxus::BufferLayout layout = {
+            {Enxus::ShaderDataType::Float2, "aPos"},
+            {Enxus::ShaderDataType::Float3, "aColor"},
+        };
 
-        // m_VAO->AddBuffer(m_VBO, layout);
+        quadVBO->SetLayout(layout);
+        m_VAO->AddVertexBuffer(quadVBO);
 
-        // // m_VAO->Bind();
+        int index = 0;
+        float offset = 0.1f;
+        for (int y = -10; y < 10; y += 2)
+        {
+            for (int x = -10; x < 10; x += 2)
+            {
+                glm::vec2 translation;
+                translation.x = (float)x / 10.0f + offset;
+                translation.y = (float)y / 10.0f + offset;
+                m_QuadTranslations[index++] = translation;
+            }
+        }
 
-        // int index = 0;
-        // float offset = 0.1f;
-        // for (int y = -10; y < 10; y += 2)
-        // {
-        //     for (int x = -10; x < 10; x += 2)
-        //     {
-        //         glm::vec2 translation;
-        //         translation.x = (float)x / 10.0f + offset;
-        //         translation.y = (float)y / 10.0f + offset;
-        //         m_QuadTranslations[index++] = translation;
-        //     }
-        // }
+        Enxus::Ref<Enxus::VertexBuffer> instanceBuffer =
+            Enxus::CreateRef<Enxus::VertexBuffer>(
+                &m_QuadTranslations[0],
+                m_QuadTranslations.size() * sizeof(glm::vec2));
 
-        // // m_InstancedBuffer = Enxus::CreateRef<Enxus::VertexBuffer>(I)
+        Enxus::BufferLayout instanceLayout = {
+            {Enxus::ShaderDataType::Float2, "aOffset"},
+        };
+        instanceBuffer->SetLayout(instanceLayout);
+        m_VAO->AddVertexBuffer(instanceBuffer);
 
-        // unsigned int instanceVBO;
-        // glGenBuffers(1, &instanceVBO);
-        // glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
-        // glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * 100, &m_QuadTranslations[0],
-        //              GL_STATIC_DRAW);
-        // glBindBuffer(GL_ARRAY_BUFFER, 0);
+        // I know exactly what vertex location is
+        GLCall(glVertexAttribDivisor(2, 1));
 
-        // glEnableVertexAttribArray(2);
-        // glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
-        // glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), (void *)0);
-        // glBindBuffer(GL_ARRAY_BUFFER, 0);
-        // glVertexAttribDivisor(2, 1);
-
-        // m_Shader = Enxus::CreateRef<Enxus::Shader>("Sandbox/res/shaders/advanced-opengl/instancing/instancing-quads.vert",
-        //                                            "Sandbox/res/shaders/advanced-opengl/instancing/instancing-quads.frag");
+        m_Shader = Enxus::CreateRef<Enxus::Shader>("Sandbox/res/shaders/advanced-opengl/instancing/instancing-quads.vert",
+                                                   "Sandbox/res/shaders/advanced-opengl/instancing/instancing-quads.frag");
     }
 
     TestInstancing::~TestInstancing()
     {
     }
 
-    void TestInstancing::OnUpdate(Enxus::Camera &camera) {
-        // (void)camera;
-        // GLCall(glDrawArraysInstanced(GL_TRIANGLES, 0, 6, 100));
+    void TestInstancing::OnUpdate(Enxus::Camera &camera)
+    {
+        glm::mat4 ortho = glm::ortho(-1.0f * camera.GetAspectRatio(), 1.0f * camera.GetAspectRatio(), -1.0f, 1.0f, -1.0f, 1.0f);
+        m_Shader->Bind();
+        m_Shader->SetMat4("uProj", ortho);
+        GLCall(glDrawArraysInstanced(GL_TRIANGLES, 0, 6, 100));
     };
 
     void TestInstancing::OnImGuiRender()
     {
     }
-
 }

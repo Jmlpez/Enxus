@@ -8,7 +8,9 @@ out VS_OUT {
     vec3 vColor;
 } vs_out;
 
+uniform mat4 uProj;
+
 void main() {
-    gl_Position = vec4(aPos + aOffset, 0.0, 1.0);
+    gl_Position = uProj * vec4(aPos + aOffset, 0.0, 1.0);
     vs_out.vColor = aColor;
 }

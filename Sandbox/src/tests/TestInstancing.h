@@ -17,10 +17,9 @@ namespace OpenGLTest
         void OnImGuiRender() override;
 
     private:
-        glm::vec2 m_QuadTranslations[100];
+        std::array<glm::vec2, 100> m_QuadTranslations;
 
         Enxus::Ref<Enxus::VertexArray> m_VAO;
-        Enxus::Ref<Enxus::VertexBuffer> m_VBO, m_InstancedBuffer;
         Enxus::Ref<Enxus::Shader> m_Shader;
     };
 }
