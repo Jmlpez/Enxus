@@ -41,8 +41,8 @@ void EditorLayer::OnAttach()
     SceneCompositionPanel::Init();
 
     m_NoiseEditorPanel = Enxus::CreateScope<NoiseEditorPanel>();
-    m_NoiseEditorPanel->SetNoiseWidth(250);
-    m_NoiseEditorPanel->SetNoiseHeight(250);
+    m_NoiseEditorPanel->SetNoiseWidth(241);
+    m_NoiseEditorPanel->SetNoiseHeight(241);
 
     // Initial values
     TerrainScene::UpdateTerrainNoiseMap(m_NoiseEditorPanel->GetNoiseMap());

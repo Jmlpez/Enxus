@@ -34,12 +34,14 @@ void TerrainMesh::CreateTerrain()
         x, y --> texture coordinates
         x, y, z --> normal vector
     */
-    Enxus::VertexBufferLayout layout;
-    layout.Push(3, GL_FLOAT);
-    layout.Push(2, GL_FLOAT);
-    layout.Push(3, GL_FLOAT);
+    Enxus::BufferLayout layout = {
+        {Enxus::ShaderDataType::Float3, "aPos"},
+        {Enxus::ShaderDataType::Float2, "aTexCoord"},
+        {Enxus::ShaderDataType::Float3, "aNormal"},
+    };
 
-    m_VertexArrayObject->AddBuffer(m_VertexBufferObject, layout);
+    m_VertexBufferObject->SetLayout(layout);
+    m_VertexArrayObject->AddVertexBuffer(m_VertexBufferObject);
 
     m_Indices = std::move(CreateIndices());
     m_IndexBufferObject = Enxus::CreateRef<Enxus::IndexBuffer>(&m_Indices[0], m_Indices.size());
@@ -188,8 +190,8 @@ void TerrainMesh::CalculateNoiseMap()
     float maxHeight = minHeight;
 
     int meshSimplificationIncrement = m_LevelOfDetail == 0 ? 1 : m_LevelOfDetail * 2;
-    int newWidth = ((m_Width - 1) / meshSimplificationIncrement) + 1;
-    int newHeight = ((m_Height - 1) / meshSimplificationIncrement) + 1;
+    uint32_t newWidth = ((m_Width - 1) / meshSimplificationIncrement) + 1;
+    uint32_t newHeight = ((m_Height - 1) / meshSimplificationIncrement) + 1;
 
     for (uint32_t i = 0; i < newHeight; i++)
     {
