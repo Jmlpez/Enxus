@@ -45,8 +45,7 @@ struct NoiseEditorPanelProps
 
     struct GeneralNoiseData
     {
-        int Width;
-        int Height;
+        bool IsInverted = false;
         int NoiseType = 0;
         int Seed = 1337;
 

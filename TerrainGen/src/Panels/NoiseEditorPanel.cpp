@@ -6,6 +6,9 @@ static NoiseEditorPanelProps s_Props;
 
 void NoiseEditorPanel::Init()
 {
+    srand(time(nullptr));
+    s_Props.GeneralNoise.Seed = rand() % 1000 + 1000;
+    s_Props.Fnl.SetSeed(s_Props.GeneralNoise.Seed);
 
     s_Props.NoisePreviewData.Texture =
         Enxus::CreateScope<Enxus::Texture2D>(s_Props.NoiseWidth,
@@ -87,6 +90,11 @@ void NoiseEditorPanel::OnImGuiRender()
             if (ImGui::Combo("Noise Type", &s_Props.GeneralNoise.NoiseType, enumNoiseType, IM_ARRAYSIZE(enumNoiseType)))
             {
                 s_Props.Fnl.SetNoiseType((FastNoiseLite::NoiseType)s_Props.GeneralNoise.NoiseType);
+                s_Props.NoiseUpdateFlag = true;
+            }
+
+            if (ImGui::Checkbox("Invert Noise", &s_Props.GeneralNoise.IsInverted))
+            {
                 s_Props.NoiseUpdateFlag = true;
             }
 
@@ -295,6 +303,7 @@ void NoiseEditorPanel::OnImGuiRender()
         }
 
         UpdateNoiseMap(s_Props.NoiseUpdateFlag);
+
         ImGui::Image((void *)(intptr_t)s_Props.NoisePreviewData.Texture->GetRendererId(), ImVec2(s_Props.NoisePreviewData.ImGuiWidth, s_Props.NoisePreviewData.ImGuiHeight));
         ImGui::End();
     }
@@ -358,8 +367,18 @@ void NoiseEditorPanel::UpdateNoiseMap(bool newMap)
                 normalizedNoise = std::clamp(normalizedNoise - smoothValue, 0.0f, 1.0f);
             }
 
-            s_Props.NoiseMapArray[noiseMapIndex++] = normalizedNoise;
+            s_Props.NoiseMapArray[noiseMapIndex] = normalizedNoise;
 
+            if (s_Props.GeneralNoise.IsInverted)
+            {
+                s_Props.NoiseMapArray[noiseMapIndex] = 1 - normalizedNoise;
+                noiseMapPixelArray[pixelArrayIndex] = 255 - noiseColor;
+                noiseMapPixelArray[pixelArrayIndex + 1] = 255 - noiseColor;
+                noiseMapPixelArray[pixelArrayIndex + 2] = 255 - noiseColor;
+                noiseMapPixelArray[pixelArrayIndex + 3] = 255;
+            }
+
+            noiseMapIndex++;
             pixelArrayIndex += 4;
         }
     }
