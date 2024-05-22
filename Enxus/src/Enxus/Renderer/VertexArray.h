@@ -21,6 +21,8 @@ namespace Enxus
         const std::vector<Ref<VertexBuffer>> &GetVertexBuffers() const { return m_VertexBuffers; }
         const Ref<IndexBuffer> &GetIndexBuffer() const { return m_IndexBuffer; }
 
+        inline void ResetVertexAttribIndex() { m_VertexAttribIndex = 0; }
+
         void Bind() const;
         void Unbind() const;
 

@@ -129,7 +129,6 @@ void TerrainScene::OnUpdate()
         // pass the index of the textures used
 
         s_Data.Terrain->GetVertexArray()->Bind();
-        s_Data.Terrain->GetIndexBuffer()->Bind();
 
         int meshSimplificationIncrement = s_Data.Terrain->GetLevelOfDetail() == 0 ? 1 : s_Data.Terrain->GetLevelOfDetail() * 2;
         int tempHeight = (s_Data.Terrain->GetHeight() - 1) / meshSimplificationIncrement + 1;

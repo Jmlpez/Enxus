@@ -53,13 +53,13 @@ public:
     inline uint32_t GetHeight() const { return m_Height; }
 
     inline Enxus::Ref<Enxus::VertexArray> GetVertexArray() const { return m_VertexArrayObject; }
-    inline Enxus::Ref<Enxus::IndexBuffer> GetIndexBuffer() const { return m_IndexBufferObject; }
 
 private:
     void CreateTerrain();
-    void CreateVertices();
     void CalculateNormals();
     void CalculateNoiseMap();
+
+    std::vector<TerrainVertex> CreateVertices();
     // Indices for Triangle Strip
     std::vector<unsigned int> CreateIndices();
 

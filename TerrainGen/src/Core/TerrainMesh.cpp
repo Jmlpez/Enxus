@@ -14,8 +14,6 @@ TerrainMesh::TerrainMesh(uint32_t width, uint32_t height)
 
     m_LevelOfDetail = 0;
 
-    m_VertexArrayObject = Enxus::CreateRef<Enxus::VertexArray>();
-
     CreateTerrain();
 }
 
@@ -25,7 +23,9 @@ TerrainMesh::~TerrainMesh()
 
 void TerrainMesh::CreateTerrain()
 {
-    CreateVertices();
+    m_VertexArrayObject = Enxus::CreateRef<Enxus::VertexArray>();
+
+    m_Vertices = std::move(CreateVertices());
     m_VertexBufferObject = Enxus::CreateRef<Enxus::VertexBuffer>(&m_Vertices[0], m_Vertices.size() * sizeof(TerrainVertex));
 
     /*
@@ -41,13 +41,15 @@ void TerrainMesh::CreateTerrain()
     };
 
     m_VertexBufferObject->SetLayout(layout);
+
+    m_VertexArrayObject->ResetVertexAttribIndex();
     m_VertexArrayObject->AddVertexBuffer(m_VertexBufferObject);
 
     m_Indices = std::move(CreateIndices());
     m_IndexBufferObject = Enxus::CreateRef<Enxus::IndexBuffer>(&m_Indices[0], m_Indices.size());
 }
 
-void TerrainMesh::CreateVertices()
+std::vector<TerrainVertex> TerrainMesh::CreateVertices()
 {
 
     float topLeftX = (float)m_Width / -2.0f;
@@ -82,7 +84,7 @@ void TerrainMesh::CreateVertices()
             vertices.emplace_back(position, texCoord, normal);
         }
     }
-    m_Vertices = std::move(vertices);
+    return vertices;
 }
 
 std::vector<unsigned int> TerrainMesh::CreateIndices()
@@ -267,6 +269,7 @@ void TerrainMesh::SetLevelOfDetail(int levelOfDetail)
     m_Indices.clear();
     m_VertexBufferObject.reset();
     m_IndexBufferObject.reset();
+    m_VertexArrayObject.reset();
 
     CreateTerrain();
     CalculateNoiseMap();
