@@ -99,7 +99,25 @@ namespace Enxus
             }
             case ShaderDataType::Mat3:
             case ShaderDataType::Mat4:
+            {
+
+                uint8_t count = element.GetComponentCount();
+                for (uint8_t i = 0; i < count; i++)
+                {
+                    int attribOffset = sizeof(float) * count * i;
+                    GLCall(glEnableVertexAttribArray(m_VertexAttribIndex));
+                    GLCall(glVertexAttribPointer(
+                        m_VertexAttribIndex,
+                        count,
+                        ShaderDataTypeToOpenGLBaseType(element.Type),
+                        element.Normalized ? GL_TRUE : GL_FALSE,
+                        layout.GetStride(),
+                        (const void *)(intptr_t)(element.Offset + attribOffset)));
+                    GLCall(glVertexAttribDivisor(m_VertexAttribIndex, 1));
+                    m_VertexAttribIndex++;
+                }
                 break;
+            }
             // to avoid switch warning
             case ShaderDataType::None:
             case ShaderDataType::Bool:
