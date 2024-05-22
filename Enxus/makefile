@@ -35,7 +35,7 @@ OPENGL_FLAGS = -lglfw -lGL -lGLEW -lX11 -lpthread -lassimp -lXrandr -lXi -ldl
 
 # Compiler
 CXX = g++
-DEBUG_FLAGS = -g
+DEBUG_FLAGS = -O2
 CXXFLAGS = -std=gnu++17 $(DEBUG_FLAGS) -Wall -Wextra
 
 # CPP Files 
