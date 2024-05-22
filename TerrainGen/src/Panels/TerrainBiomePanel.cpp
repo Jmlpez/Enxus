@@ -41,12 +41,20 @@ void TerrainBiomePanel::OnImGuiRender()
             std::string uiName = "Layer " + index;
             ImGui::PushID(uiName.c_str());
             ImGui::SeparatorText(uiName.c_str());
+
+            float prevStartHeight = (i != 0) ? s_Props.BiomeLayers[i - 1].StartHeight : 0.0f;
+            if (i != 0 && s_Props.BiomeLayers[i].StartHeight < prevStartHeight)
+            {
+                s_Props.BiomeLayers[i].StartHeight = prevStartHeight;
+            }
+
             ImGui::ColorEdit3("Color", glm::value_ptr(s_Props.BiomeLayers[i].Color));
             ImGui::SliderFloat("Color Strength", &s_Props.BiomeLayers[i].ColorStrength, 0.0f, 1.0f);
-            ImGui::SliderFloat("Start Height", &s_Props.BiomeLayers[i].StartHeight, i != 0 ? s_Props.BiomeLayers[i - 1].StartHeight : 0.0f, 1.0f);
+            ImGui::SliderFloat("Start Height", &s_Props.BiomeLayers[i].StartHeight, prevStartHeight, 1.0f);
             ImGui::SliderFloat("Blend Strength", &s_Props.BiomeLayers[i].BlendStrength, 0.0f, 1.0f);
             ImGui::DragFloat("Texture Scale", &s_Props.BiomeLayers[i].TextureScale, 0.001f, 0.0f, 1.0f);
             ImGui::Combo("Texture", &s_Props.BiomeLayers[i].TextureIndex, enumTerrainTextures, IM_ARRAYSIZE(enumTerrainTextures));
+
             ImGui::PopID();
         }
         ImGui::Dummy(ImVec2(0.0f, 15.0f));
