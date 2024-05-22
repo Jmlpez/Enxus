@@ -33,19 +33,21 @@ void TerrainBiomePanel::OnImGuiRender()
     if (ImGui::BeginTabItem("Biome"))
     {
 
-        ImGui::SliderInt("Layers", &s_Props.NumOfBiomeLayers, 1, 8);
+        ImGui::SliderInt("Layers", &s_Props.NumOfBiomeLayers, 0, 8);
 
         for (int i = 0; i < s_Props.NumOfBiomeLayers; i++)
         {
-            std::string index = std::to_string(i);
+            ImGui::PushID("Layer");
+            std::string index = std::to_string(i + 1);
             std::string uiName = "Layer " + index;
             ImGui::SeparatorText(uiName.c_str());
-            ImGui::ColorEdit3(("Color - " + index).c_str(), glm::value_ptr(s_Props.BiomeLayers[i].Color));
-            ImGui::SliderFloat(("Color Strength - " + index).c_str(), &s_Props.BiomeLayers[i].ColorStrength, 0.0f, 1.0f);
-            ImGui::SliderFloat(("Start Height - " + index).c_str(), &s_Props.BiomeLayers[i].StartHeight, 0.0f, 1.0f);
-            ImGui::SliderFloat(("Blend Strength - " + index).c_str(), &s_Props.BiomeLayers[i].BlendStrength, 0.0f, 1.0f);
-            ImGui::DragFloat(("Texture Scale - " + index).c_str(), &s_Props.BiomeLayers[i].TextureScale, 0.1f);
-            ImGui::Combo(("Texture - " + index).c_str(), &s_Props.BiomeLayers[i].TextureIndex, enumTerrainTextures, IM_ARRAYSIZE(enumTerrainTextures));
+            ImGui::ColorEdit3("Color", glm::value_ptr(s_Props.BiomeLayers[i].Color));
+            ImGui::SliderFloat("Color Strength", &s_Props.BiomeLayers[i].ColorStrength, 0.0f, 1.0f);
+            ImGui::SliderFloat("Start Height", &s_Props.BiomeLayers[i].StartHeight, 0.0f, 1.0f);
+            ImGui::SliderFloat("Blend Strength", &s_Props.BiomeLayers[i].BlendStrength, 0.0f, 1.0f);
+            ImGui::DragFloat("Texture Scale", &s_Props.BiomeLayers[i].TextureScale, 0.1f);
+            ImGui::Combo("Texture", &s_Props.BiomeLayers[i].TextureIndex, enumTerrainTextures, IM_ARRAYSIZE(enumTerrainTextures));
+            ImGui::PopID();
         }
         ImGui::Dummy(ImVec2(0.0f, 15.0f));
         ImGui::EndTabItem();
