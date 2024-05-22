@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "EditorLayer.h"
+#include "NoiseEditorPanel.h"
 #include "TerrainDimensionPanel.h"
 #include "SceneCompositionPanel.h"
 #include "TerrainBiomePanel.h"
@@ -40,12 +41,10 @@ void EditorLayer::OnAttach()
     TerrainBiomePanel::Init();
     SceneCompositionPanel::Init();
 
-    m_NoiseEditorPanel = Enxus::CreateScope<NoiseEditorPanel>();
-    m_NoiseEditorPanel->SetNoiseWidth(241);
-    m_NoiseEditorPanel->SetNoiseHeight(241);
+    NoiseEditorPanel::Init();
 
     // Initial values
-    TerrainScene::UpdateTerrainNoiseMap(m_NoiseEditorPanel->GetNoiseMap());
+    TerrainScene::UpdateTerrainNoiseMap(NoiseEditorPanel::GetNoiseMap());
     TerrainScene::UpdateSceneComposition(SceneCompositionPanel::GetPanelProps());
     TerrainScene::UpdateTerrainDimensions(TerrainDimensionPanel::GetPanelProps());
     TerrainScene::UpdateTerrainBiome(TerrainBiomePanel::GetPanelProps());
@@ -171,10 +170,10 @@ void EditorLayer::OnImGuiRender()
         ImGui::End();
     }
     // The Noise is updated separately
-    m_NoiseEditorPanel->OnImGuiRender();
-    if (m_NoiseEditorPanel->HasUpdated())
+    NoiseEditorPanel::OnImGuiRender();
+    if (NoiseEditorPanel::HasUpdated())
     {
-        TerrainScene::UpdateTerrainNoiseMap(m_NoiseEditorPanel->GetNoiseMap());
+        TerrainScene::UpdateTerrainNoiseMap(NoiseEditorPanel::GetNoiseMap());
     }
 
     ImGui::End();
@@ -191,17 +190,6 @@ void EditorLayer::TerrainMenuUI()
     TerrainDimensionPanel::OnImGuiRender();
     auto dimensionProps = TerrainDimensionPanel::GetPanelProps();
     TerrainScene::UpdateTerrainDimensions(dimensionProps);
-
-    if ((uint32_t)dimensionProps.Width != m_NoiseEditorPanel->GetNoiseWidth())
-    {
-        m_NoiseEditorPanel->SetNoiseWidth(dimensionProps.Width);
-        TerrainScene::UpdateTerrainNoiseMap(m_NoiseEditorPanel->GetNoiseMap());
-    }
-    if ((uint32_t)dimensionProps.Height != m_NoiseEditorPanel->GetNoiseHeight())
-    {
-        m_NoiseEditorPanel->SetNoiseHeight(dimensionProps.Height);
-        TerrainScene::UpdateTerrainNoiseMap(m_NoiseEditorPanel->GetNoiseMap());
-    }
 
     TerrainBiomePanel::OnImGuiRender();
     TerrainScene::UpdateTerrainBiome(TerrainBiomePanel::GetPanelProps());

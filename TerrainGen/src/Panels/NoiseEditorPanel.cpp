@@ -1,39 +1,66 @@
 #include "pch.h"
 #include "NoiseEditorPanel.h"
+#include "imgui/imgui.h"
 
-const int NoiseEditorPanel::s_TextureGeneratedWidth = 400;
-const int NoiseEditorPanel::s_TextureGeneratedHeight = 400;
+static NoiseEditorPanelProps s_Props;
 
-NoiseEditorPanel::NoiseEditorPanel()
+void NoiseEditorPanel::Init()
 {
-    m_GeneralNoise.Width = 241;
-    m_GeneralNoise.Height = 241;
 
-    m_NoisePreviewData.Texture =
-        Enxus::CreateScope<Enxus::Texture2D>(s_TextureGeneratedWidth,
-                                             s_TextureGeneratedHeight);
-    m_FalloffMap.Texture =
-        Enxus::CreateScope<Enxus::Texture2D>(s_TextureGeneratedWidth,
-                                             s_TextureGeneratedHeight);
+    s_Props.NoisePreviewData.Texture =
+        Enxus::CreateScope<Enxus::Texture2D>(s_Props.NoiseWidth,
+                                             s_Props.NoiseHeight);
+    s_Props.FalloffMap.Texture =
+        Enxus::CreateScope<Enxus::Texture2D>(s_Props.NoiseWidth,
+                                             s_Props.NoiseHeight);
+
+    // Just one memory allocation
+    s_Props.NoiseMapArray.reserve(s_Props.NoiseWidth * s_Props.NoiseHeight);
+    s_Props.NoiseMapArray.assign(s_Props.NoiseWidth * s_Props.NoiseHeight, 0.0f);
 
     // Generate the first image
     UpdateNoiseMap(true);
-    UpdateNoiseTexturePreview(true);
+}
+
+void NoiseEditorPanel::ShutDown()
+{
+}
+
+bool NoiseEditorPanel::HasUpdated() { return s_Props.NoiseUpdateFlag; }
+
+uint32_t NoiseEditorPanel::GetNoiseWidth()
+{
+    return (uint32_t)s_Props.NoiseWidth;
+}
+uint32_t NoiseEditorPanel::GetNoiseHeight()
+{
+    return (uint32_t)s_Props.NoiseHeight;
+}
+
+const std::vector<float> &NoiseEditorPanel::GetNoiseMap()
+{
+    return s_Props.NoiseMapArray;
 }
 
 void NoiseEditorPanel::SetNoiseWidth(uint32_t width)
 {
-    if ((int)width == m_GeneralNoise.Width)
-        return;
-    m_GeneralNoise.Width = width;
-    UpdateNoiseMap(true);
+    (void)width;
+    std::cout << "[NoiseEditorPanel Error] : SetNoiseWidth Currently not supported" << std::endl;
+    return;
+    // if ((int)width == s_Props.GeneralNoise.Width)
+    //     return;
+    // s_Props.GeneralNoise.Width = width;
+    // UpdateNoiseMap(true);
 }
 void NoiseEditorPanel::SetNoiseHeight(uint32_t height)
 {
-    if ((int)height == m_GeneralNoise.Height)
-        return;
-    m_GeneralNoise.Height = height;
-    UpdateNoiseMap(true);
+    (void)height;
+    std::cout << "[NoiseEditorPanel Error] : SetNoiseHeight Currently not supported" << std::endl;
+    return;
+    // if ((int)height == s_Props.GeneralNoise.Height)
+    //     return;
+    // s_Props.GeneralNoise.Height = height;
+    // UpdateNoiseMap(true);
 }
 
 void NoiseEditorPanel::OnImGuiRender()
@@ -45,7 +72,7 @@ void NoiseEditorPanel::OnImGuiRender()
     static const char *enumDomainWarpType[] = {"None", "OpenSimplex2", "OpenSimplex2 Reduced", "Basic Grid"};
     static const char *enumDomainWarpFractalType[] = {"None", "Progressive", "Independent"};
 
-    m_NoiseUpdateFlag = false;
+    s_Props.NoiseUpdateFlag = false;
 
     ImGui::Begin("Noise Generator Panel");
     ImGui::PushItemWidth(120);
@@ -57,34 +84,31 @@ void NoiseEditorPanel::OnImGuiRender()
         //----------------- GENERAL -------------------//
         {
             ImGui::TextUnformatted("General");
-            if (ImGui::Combo("Noise Type", &m_GeneralNoise.NoiseType, enumNoiseType, IM_ARRAYSIZE(enumNoiseType)))
+            if (ImGui::Combo("Noise Type", &s_Props.GeneralNoise.NoiseType, enumNoiseType, IM_ARRAYSIZE(enumNoiseType)))
             {
-                m_Fnl.SetNoiseType((FastNoiseLite::NoiseType)m_GeneralNoise.NoiseType);
-                m_NoiseUpdateFlag = true;
+                s_Props.Fnl.SetNoiseType((FastNoiseLite::NoiseType)s_Props.GeneralNoise.NoiseType);
+                s_Props.NoiseUpdateFlag = true;
             }
 
-            if (ImGui::DragInt("Seed", &m_GeneralNoise.Seed))
+            if (ImGui::DragInt("Seed", &s_Props.GeneralNoise.Seed))
             {
-                m_Fnl.SetSeed(m_GeneralNoise.Seed);
-                m_NoiseUpdateFlag = true;
+                s_Props.Fnl.SetSeed(s_Props.GeneralNoise.Seed);
+                s_Props.NoiseUpdateFlag = true;
             }
-            if (ImGui::DragFloat("Frequency", &m_GeneralNoise.Frequency, 0.0001f))
+            if (ImGui::DragFloat("Frequency", &s_Props.GeneralNoise.Frequency, 0.0001f))
             {
-                m_Fnl.SetFrequency(m_GeneralNoise.Frequency);
-                m_NoiseUpdateFlag = true;
+                s_Props.Fnl.SetFrequency(s_Props.GeneralNoise.Frequency);
+                s_Props.NoiseUpdateFlag = true;
             }
             ImGui::PushItemWidth(50);
-            if (ImGui::DragFloat("Offset X", &m_GeneralNoise.OffsetX, 1.0f))
+            if (ImGui::DragFloat("Offset X", &s_Props.GeneralNoise.OffsetX, 1.0f))
             {
-                // m_Fnl.SetFrequency(m_GeneralNoise.OffsetX);
-                m_NoiseUpdateFlag = true;
+                s_Props.NoiseUpdateFlag = true;
             }
             ImGui::SameLine();
-            if (ImGui::DragFloat("Offset Y", &m_GeneralNoise.OffsetY, 1.0f))
+            if (ImGui::DragFloat("Offset Y", &s_Props.GeneralNoise.OffsetY, 1.0f))
             {
-                // m_Fnl.SetFrequency(m_GeneralNoise.OffsetY);
-
-                m_NoiseUpdateFlag = true;
+                s_Props.NoiseUpdateFlag = true;
             }
             ImGui::PopItemWidth();
         }
@@ -93,37 +117,37 @@ void NoiseEditorPanel::OnImGuiRender()
         {
             ImGui::TextUnformatted("Fractal");
 
-            if (ImGui::Combo("Type", &m_FractalNoise.Type, enumFractalType, IM_ARRAYSIZE(enumFractalType)))
+            if (ImGui::Combo("Type", &s_Props.FractalNoise.Type, enumFractalType, IM_ARRAYSIZE(enumFractalType)))
             {
-                m_Fnl.SetFractalType((FastNoiseLite::FractalType)m_FractalNoise.Type);
-                m_NoiseUpdateFlag = true;
+                s_Props.Fnl.SetFractalType((FastNoiseLite::FractalType)s_Props.FractalNoise.Type);
+                s_Props.NoiseUpdateFlag = true;
             }
-            ImGui::BeginDisabled(m_FractalNoise.Type == 0);
-            if (ImGui::DragInt("Octaves", &m_FractalNoise.Octaves, 0.1f, 1, 20))
+            ImGui::BeginDisabled(s_Props.FractalNoise.Type == 0);
+            if (ImGui::DragInt("Octaves", &s_Props.FractalNoise.Octaves, 0.1f, 1, 20))
             {
-                m_Fnl.SetFractalOctaves(m_FractalNoise.Octaves);
-                m_NoiseUpdateFlag = true;
+                s_Props.Fnl.SetFractalOctaves(s_Props.FractalNoise.Octaves);
+                s_Props.NoiseUpdateFlag = true;
             }
-            if (ImGui::DragFloat("Lacunarity", &m_FractalNoise.Lacunarity, 0.01f))
+            if (ImGui::DragFloat("Lacunarity", &s_Props.FractalNoise.Lacunarity, 0.01f))
             {
-                m_Fnl.SetFractalLacunarity(m_FractalNoise.Lacunarity);
-                m_NoiseUpdateFlag = true;
+                s_Props.Fnl.SetFractalLacunarity(s_Props.FractalNoise.Lacunarity);
+                s_Props.NoiseUpdateFlag = true;
             }
-            if (ImGui::DragFloat("Gain", &m_FractalNoise.Gain, 0.001f))
+            if (ImGui::DragFloat("Gain", &s_Props.FractalNoise.Gain, 0.001f))
             {
-                m_Fnl.SetFractalGain(m_FractalNoise.Gain);
-                m_NoiseUpdateFlag = true;
+                s_Props.Fnl.SetFractalGain(s_Props.FractalNoise.Gain);
+                s_Props.NoiseUpdateFlag = true;
             }
-            if (ImGui::DragFloat("Weighted Strength", &m_FractalNoise.WeightedStrength, 0.01f))
+            if (ImGui::DragFloat("Weighted Strength", &s_Props.FractalNoise.WeightedStrength, 0.01f))
             {
-                m_Fnl.SetFractalWeightedStrength(m_FractalNoise.WeightedStrength);
-                m_NoiseUpdateFlag = true;
+                s_Props.Fnl.SetFractalWeightedStrength(s_Props.FractalNoise.WeightedStrength);
+                s_Props.NoiseUpdateFlag = true;
             }
-            ImGui::BeginDisabled(m_FractalNoise.Type != (int)FastNoiseLite::FractalType_PingPong);
-            if (ImGui::DragFloat("Ping Pong Strength", &m_FractalNoise.PingPongStrength, 0.01f))
+            ImGui::BeginDisabled(s_Props.FractalNoise.Type != (int)FastNoiseLite::FractalType_PingPong);
+            if (ImGui::DragFloat("Ping Pong Strength", &s_Props.FractalNoise.PingPongStrength, 0.01f))
             {
-                m_Fnl.SetFractalPingPongStrength(m_FractalNoise.PingPongStrength);
-                m_NoiseUpdateFlag = true;
+                s_Props.Fnl.SetFractalPingPongStrength(s_Props.FractalNoise.PingPongStrength);
+                s_Props.NoiseUpdateFlag = true;
             }
             ImGui::EndDisabled();
 
@@ -135,21 +159,21 @@ void NoiseEditorPanel::OnImGuiRender()
         {
             ImGui::TextUnformatted("Cellular");
 
-            ImGui::BeginDisabled(m_GeneralNoise.NoiseType != (int)FastNoiseLite::NoiseType_Cellular);
-            if (ImGui::Combo("Distance Function", &m_CellularNoise.Type, enumCellularType, IM_ARRAYSIZE(enumCellularType)))
+            ImGui::BeginDisabled(s_Props.GeneralNoise.NoiseType != (int)FastNoiseLite::NoiseType_Cellular);
+            if (ImGui::Combo("Distance Function", &s_Props.CellularNoise.Type, enumCellularType, IM_ARRAYSIZE(enumCellularType)))
             {
-                m_Fnl.SetCellularDistanceFunction((FastNoiseLite::CellularDistanceFunction)m_CellularNoise.Type);
-                m_NoiseUpdateFlag = true;
+                s_Props.Fnl.SetCellularDistanceFunction((FastNoiseLite::CellularDistanceFunction)s_Props.CellularNoise.Type);
+                s_Props.NoiseUpdateFlag = true;
             }
-            if (ImGui::Combo("Return Type", &m_CellularNoise.ReturnType, enumCellularReturnType, IM_ARRAYSIZE(enumCellularReturnType)))
+            if (ImGui::Combo("Return Type", &s_Props.CellularNoise.ReturnType, enumCellularReturnType, IM_ARRAYSIZE(enumCellularReturnType)))
             {
-                m_Fnl.SetCellularReturnType((FastNoiseLite::CellularReturnType)m_CellularNoise.ReturnType);
-                m_NoiseUpdateFlag = true;
+                s_Props.Fnl.SetCellularReturnType((FastNoiseLite::CellularReturnType)s_Props.CellularNoise.ReturnType);
+                s_Props.NoiseUpdateFlag = true;
             }
-            if (ImGui::DragFloat("Jitter", &m_CellularNoise.Jitter, 0.01f))
+            if (ImGui::DragFloat("Jitter", &s_Props.CellularNoise.Jitter, 0.01f))
             {
-                m_Fnl.SetCellularJitter(m_CellularNoise.Jitter);
-                m_NoiseUpdateFlag = true;
+                s_Props.Fnl.SetCellularJitter(s_Props.CellularNoise.Jitter);
+                s_Props.NoiseUpdateFlag = true;
             }
             ImGui::EndDisabled();
         }
@@ -159,53 +183,53 @@ void NoiseEditorPanel::OnImGuiRender()
             ImGui::PushID("Domain Warp");
             ImGui::TextUnformatted("Domain Warp");
 
-            if (ImGui::Combo("Type", &m_DomainWarp.Type, enumDomainWarpType, IM_ARRAYSIZE(enumDomainWarpType)))
+            if (ImGui::Combo("Type", &s_Props.DomainWarp.Type, enumDomainWarpType, IM_ARRAYSIZE(enumDomainWarpType)))
             {
-                m_FnlWarp.SetDomainWarpType((FastNoiseLite::DomainWarpType)(m_DomainWarp.Type - 1));
-                m_NoiseUpdateFlag = true;
+                s_Props.FnlWarp.SetDomainWarpType((FastNoiseLite::DomainWarpType)(s_Props.DomainWarp.Type - 1));
+                s_Props.NoiseUpdateFlag = true;
             }
-            ImGui::BeginDisabled(m_DomainWarp.Type == 0);
+            ImGui::BeginDisabled(s_Props.DomainWarp.Type == 0);
 
-            if (ImGui::DragFloat("Amplitude", &m_DomainWarp.Amplitude, 0.5f))
+            if (ImGui::DragFloat("Amplitude", &s_Props.DomainWarp.Amplitude, 0.5f))
             {
-                m_FnlWarp.SetDomainWarpAmp(m_DomainWarp.Amplitude);
-                m_NoiseUpdateFlag = true;
+                s_Props.FnlWarp.SetDomainWarpAmp(s_Props.DomainWarp.Amplitude);
+                s_Props.NoiseUpdateFlag = true;
             }
-            if (ImGui::DragInt("Seed", &m_DomainWarp.Seed))
+            if (ImGui::DragInt("Seed", &s_Props.DomainWarp.Seed))
             {
-                m_FnlWarp.SetSeed(m_DomainWarp.Seed);
-                m_NoiseUpdateFlag = true;
+                s_Props.FnlWarp.SetSeed(s_Props.DomainWarp.Seed);
+                s_Props.NoiseUpdateFlag = true;
             }
-            if (ImGui::DragFloat("Frequency", &m_DomainWarp.Frequency, 0.001f))
+            if (ImGui::DragFloat("Frequency", &s_Props.DomainWarp.Frequency, 0.001f))
             {
-                m_FnlWarp.SetFrequency(m_DomainWarp.Frequency);
-                m_NoiseUpdateFlag = true;
+                s_Props.FnlWarp.SetFrequency(s_Props.DomainWarp.Frequency);
+                s_Props.NoiseUpdateFlag = true;
             }
 
             /// Domain Warp Fractal
             ImGui::PushID("Domain Warp Fractal");
             ImGui::TextUnformatted("Domain Warp Fractal");
 
-            if (ImGui::Combo("Type", &m_DomainWarpFractal.Type, enumDomainWarpFractalType, IM_ARRAYSIZE(enumDomainWarpFractalType)))
+            if (ImGui::Combo("Type", &s_Props.DomainWarpFractal.Type, enumDomainWarpFractalType, IM_ARRAYSIZE(enumDomainWarpFractalType)))
             {
-                m_FnlWarp.SetFractalType((FastNoiseLite::FractalType)(m_DomainWarpFractal.Type ? m_DomainWarpFractal.Type + 3 : 0));
-                m_NoiseUpdateFlag = true;
+                s_Props.FnlWarp.SetFractalType((FastNoiseLite::FractalType)(s_Props.DomainWarpFractal.Type ? s_Props.DomainWarpFractal.Type + 3 : 0));
+                s_Props.NoiseUpdateFlag = true;
             }
-            ImGui::BeginDisabled(m_DomainWarpFractal.Type == 0);
-            if (ImGui::DragInt("Octaves", &m_DomainWarpFractal.Octaves, 0.1f, 1, 20))
+            ImGui::BeginDisabled(s_Props.DomainWarpFractal.Type == 0);
+            if (ImGui::DragInt("Octaves", &s_Props.DomainWarpFractal.Octaves, 0.1f, 1, 20))
             {
-                m_FnlWarp.SetFractalOctaves(m_DomainWarpFractal.Octaves);
-                m_NoiseUpdateFlag = true;
+                s_Props.FnlWarp.SetFractalOctaves(s_Props.DomainWarpFractal.Octaves);
+                s_Props.NoiseUpdateFlag = true;
             }
-            if (ImGui::DragFloat("Lacunarity", &m_DomainWarpFractal.Lacunarity, 0.01f))
+            if (ImGui::DragFloat("Lacunarity", &s_Props.DomainWarpFractal.Lacunarity, 0.01f))
             {
-                m_FnlWarp.SetFractalLacunarity(m_DomainWarpFractal.Lacunarity);
-                m_NoiseUpdateFlag = true;
+                s_Props.FnlWarp.SetFractalLacunarity(s_Props.DomainWarpFractal.Lacunarity);
+                s_Props.NoiseUpdateFlag = true;
             }
-            if (ImGui::DragFloat("Gain", &m_DomainWarpFractal.Gain, 0.01f))
+            if (ImGui::DragFloat("Gain", &s_Props.DomainWarpFractal.Gain, 0.01f))
             {
-                m_FnlWarp.SetFractalGain(m_DomainWarpFractal.Gain);
-                m_NoiseUpdateFlag = true;
+                s_Props.FnlWarp.SetFractalGain(s_Props.DomainWarpFractal.Gain);
+                s_Props.NoiseUpdateFlag = true;
             }
             ImGui::EndDisabled();
             ImGui::EndDisabled();
@@ -219,38 +243,38 @@ void NoiseEditorPanel::OnImGuiRender()
     }
     if (ImGui::BeginTabItem("Falloff Settings"))
     {
-        if (ImGui::Checkbox("Activate", &m_FalloffMap.IsActivated))
+        if (ImGui::Checkbox("Activate", &s_Props.FalloffMap.IsActivated))
         {
-            m_NoiseUpdateFlag = true;
+            s_Props.NoiseUpdateFlag = true;
         }
 
-        if (ImGui::DragFloat("Beta value", &m_FalloffMap.Beta, 0.1f, 0.1f, 10.0f))
+        if (ImGui::DragFloat("Beta value", &s_Props.FalloffMap.Beta, 0.1f, 0.1f, 10.0f))
         {
-            m_NoiseUpdateFlag = true;
+            s_Props.NoiseUpdateFlag = true;
         }
 
-        ImGui::Image((void *)(intptr_t)m_FalloffMap.Texture->GetRendererId(), ImVec2(m_NoisePreviewData.ImGuiWidth, m_NoisePreviewData.ImGuiHeight));
+        ImGui::Image((void *)(intptr_t)s_Props.FalloffMap.Texture->GetRendererId(), ImVec2(s_Props.NoisePreviewData.ImGuiWidth, s_Props.NoisePreviewData.ImGuiHeight));
 
         ImGui::EndTabItem();
     }
     if (ImGui::BeginTabItem("Preview Settings"))
     {
-        ImGui::Checkbox("Auto Size", &m_NoisePreviewData.IsAutoSize);
-        ImGui::BeginDisabled(m_NoisePreviewData.IsAutoSize);
+        ImGui::Checkbox("Auto Size", &s_Props.NoisePreviewData.IsAutoSize);
+        ImGui::BeginDisabled(s_Props.NoisePreviewData.IsAutoSize);
 
         ImGui::PushItemWidth(50);
-        ImGui::DragInt("Width", &m_NoisePreviewData.ImGuiWidth, 1, 32, 2048);
+        ImGui::DragInt("Width", &s_Props.NoisePreviewData.ImGuiWidth, 1, 32, 2048);
         ImGui::SameLine();
-        ImGui::DragInt("Height", &m_NoisePreviewData.ImGuiHeight, 1, 32, 2048);
+        ImGui::DragInt("Height", &s_Props.NoisePreviewData.ImGuiHeight, 1, 32, 2048);
         ImGui::PopItemWidth();
         ImGui::EndDisabled();
-        if (ImGui::DragFloat("Black Point", &m_NoisePreviewData.ColorTexMin, 0.01f))
+        if (ImGui::DragFloat("Black Point", &s_Props.NoisePreviewData.ColorTexMin, 0.01f))
         {
-            m_NoiseUpdateFlag = true;
+            s_Props.NoiseUpdateFlag = true;
         }
-        if (ImGui::DragFloat("White Point", &m_NoisePreviewData.ColorTexMax, 0.01f))
+        if (ImGui::DragFloat("White Point", &s_Props.NoisePreviewData.ColorTexMax, 0.01f))
         {
-            m_NoiseUpdateFlag = true;
+            s_Props.NoiseUpdateFlag = true;
         }
 
         ImGui::EndTabItem();
@@ -263,16 +287,15 @@ void NoiseEditorPanel::OnImGuiRender()
     {
         ImGui::Begin("Noise Texture");
 
-        if (m_NoisePreviewData.IsAutoSize)
+        if (s_Props.NoisePreviewData.IsAutoSize)
         {
             ImVec2 autoSize = ImGui::GetContentRegionAvail();
             int minSize = std::min(autoSize.x, autoSize.y);
-            m_NoisePreviewData.ImGuiWidth = m_NoisePreviewData.ImGuiHeight = minSize;
+            s_Props.NoisePreviewData.ImGuiWidth = s_Props.NoisePreviewData.ImGuiHeight = minSize;
         }
 
-        UpdateNoiseMap(m_NoiseUpdateFlag);
-        UpdateNoiseTexturePreview(m_NoiseUpdateFlag);
-        ImGui::Image((void *)(intptr_t)m_NoisePreviewData.Texture->GetRendererId(), ImVec2(m_NoisePreviewData.ImGuiWidth, m_NoisePreviewData.ImGuiHeight));
+        UpdateNoiseMap(s_Props.NoiseUpdateFlag);
+        ImGui::Image((void *)(intptr_t)s_Props.NoisePreviewData.Texture->GetRendererId(), ImVec2(s_Props.NoisePreviewData.ImGuiWidth, s_Props.NoisePreviewData.ImGuiHeight));
         ImGui::End();
     }
 }
@@ -280,116 +303,73 @@ void NoiseEditorPanel::OnImGuiRender()
 void NoiseEditorPanel::UpdateNoiseMap(bool newMap)
 {
     if (!newMap)
-    {
         return;
-    }
 
-    m_NoiseMapArray.clear();
+    // For colors
+    // The denominator arises from  (1 - (-1))
+    // which are the maximun and minimun values of the noise (i.e the noise output is in that range)
+    float colorScale = 255.0f / 2.0f;
 
-    const uint32_t noiseFullSize = m_GeneralNoise.Width * m_GeneralNoise.Height;
-    if (noiseFullSize > m_NoiseMapArray.capacity())
-        m_NoiseMapArray.reserve(noiseFullSize);
-
-    for (int y = 0; y < m_GeneralNoise.Height; y++)
-    {
-        for (int x = 0; x < m_GeneralNoise.Width; x++)
-        {
-
-            float posX = (float)(x - m_GeneralNoise.Width / 2.0f);
-            float posY = (float)(y - m_GeneralNoise.Height / 2.0f);
-
-            if (m_DomainWarp.Type > 0)
-            {
-                m_FnlWarp.DomainWarp(posX, posY);
-            }
-
-            // convert noise from [-1, 1] to [0, 1]
-            float noise = (m_Fnl.GetNoise(posX + m_GeneralNoise.OffsetX, posY + m_GeneralNoise.OffsetY) + 1.0f) * 0.5f;
-
-            if (m_FalloffMap.IsActivated)
-            {
-                float nPosX = (float)x / (float)m_GeneralNoise.Width * 2.0f - 1;
-                float nPosY = (float)y / (float)m_GeneralNoise.Height * 2.0f - 1;
-
-                float falloffValue = std::max(std::abs(nPosX), std::abs(nPosY));
-
-                float smoothValue = Enxus::Math::blend(falloffValue, m_FalloffMap.Beta);
-
-                noise = std::clamp(noise - smoothValue, 0.0f, 1.0f);
-            }
-
-            m_NoiseMapArray.emplace_back(noise);
-        }
-    }
-}
-
-void NoiseEditorPanel::UpdateNoiseTexturePreview(bool newPreview)
-{
-    if (!newPreview)
-        return;
-    // For the colors
-    float scale = 255.0f / (m_NoisePreviewData.ColorTexMax - m_NoisePreviewData.ColorTexMin);
-
-    // to make easy to type..
-    int imgWidth = s_TextureGeneratedWidth;
-    int imgHeight = s_TextureGeneratedHeight;
-
-    unsigned char *noisePreviewPixelArray = new unsigned char[imgWidth * imgHeight * 4];
-    unsigned char *falloffMapPixelArray = new unsigned char[imgWidth * imgHeight * 4];
+    uint8_t *noiseMapPixelArray = new uint8_t[s_Props.NoiseWidth * s_Props.NoiseHeight * 4];
+    uint8_t *falloffMapPixelArray = new uint8_t[s_Props.NoiseWidth * s_Props.NoiseHeight * 4];
 
     int pixelArrayIndex = 0;
-    for (int y = 0; y < imgHeight; y++)
+    int noiseMapIndex = 0;
+    for (uint16_t y = 0; y < s_Props.NoiseHeight; y++)
     {
-        for (int x = 0; x < imgWidth; x++)
+        for (uint16_t x = 0; x < s_Props.NoiseWidth; x++)
         {
 
-            float posX = (float)(x - imgWidth / 2);
-            float posY = (float)(y - imgHeight / 2);
+            float posX = (float)(x - s_Props.NoiseWidth / 2.0f);
+            float posY = (float)(y - s_Props.NoiseHeight / 2.0f);
 
-            if (m_DomainWarp.Type > 0)
+            if (s_Props.DomainWarp.Type > 0)
             {
-                m_FnlWarp.DomainWarp(posX, posY);
+                s_Props.FnlWarp.DomainWarp(posX, posY);
             }
-            float noise = m_Fnl.GetNoise(posX + m_GeneralNoise.OffsetX, posY + m_GeneralNoise.OffsetY);
 
-            unsigned char cNoise = (unsigned char)std::max(0.0f, std::min(255.0f, (noise - m_NoisePreviewData.ColorTexMin) * scale));
+            float noise = s_Props.Fnl.GetNoise(posX + s_Props.GeneralNoise.OffsetX, posY + s_Props.GeneralNoise.OffsetY);
+
+            // convert noise from [-1, 1] to [0, 1]
+            float normalizedNoise = (noise + 1.0f) * 0.5f;
+
+            uint8_t noiseColor = (uint8_t)std::max(0.0f, std::min(255.0f, (noise + 1.0f) * colorScale));
 
             // noise texture color data
-            noisePreviewPixelArray[pixelArrayIndex] = cNoise;
-            noisePreviewPixelArray[pixelArrayIndex + 1] = cNoise;
-            noisePreviewPixelArray[pixelArrayIndex + 2] = cNoise;
-            noisePreviewPixelArray[pixelArrayIndex + 3] = 255;
+            noiseMapPixelArray[pixelArrayIndex] = noiseColor;
+            noiseMapPixelArray[pixelArrayIndex + 1] = noiseColor;
+            noiseMapPixelArray[pixelArrayIndex + 2] = noiseColor;
+            noiseMapPixelArray[pixelArrayIndex + 3] = 255;
 
-            if (m_FalloffMap.IsActivated)
+            if (s_Props.FalloffMap.IsActivated)
             {
-                float nPosX = (float)x / (float)imgWidth * 2.0f - 1;
-                float nPosY = (float)y / (float)imgHeight * 2.0f - 1;
+                float nPosX = (float)x / (float)s_Props.NoiseWidth * 2.0f - 1;
+                float nPosY = (float)y / (float)s_Props.NoiseHeight * 2.0f - 1;
 
                 float falloffValue = std::max(std::abs(nPosX), std::abs(nPosY));
-                unsigned char falloffColor = Enxus::Math::blend(falloffValue, m_FalloffMap.Beta) * 255;
+                float smoothValue = Enxus::Math::blend(falloffValue, s_Props.FalloffMap.Beta);
 
+                uint8_t falloffColor = smoothValue * 255;
                 falloffMapPixelArray[pixelArrayIndex] = falloffColor;
                 falloffMapPixelArray[pixelArrayIndex + 1] = falloffColor;
                 falloffMapPixelArray[pixelArrayIndex + 2] = falloffColor;
                 falloffMapPixelArray[pixelArrayIndex + 3] = 255;
-            }
-            // falloffValue = Evaluate(falloffValue);
 
-            // unsigned char cNoise = Evaluate(falloffValue) * 255.0f;
+                normalizedNoise = std::clamp(normalizedNoise - smoothValue, 0.0f, 1.0f);
+            }
+
+            s_Props.NoiseMapArray[noiseMapIndex++] = normalizedNoise;
 
             pixelArrayIndex += 4;
         }
     }
+    s_Props.NoisePreviewData.Texture->SetData(noiseMapPixelArray, s_Props.NoiseWidth, s_Props.NoiseHeight);
 
-    m_NoisePreviewData.Texture->Resize(imgWidth, imgHeight);
-    m_NoisePreviewData.Texture->SetData(noisePreviewPixelArray, imgWidth, imgHeight);
-
-    if (m_FalloffMap.IsActivated)
+    if (s_Props.FalloffMap.IsActivated)
     {
-        m_FalloffMap.Texture->Resize(imgWidth, imgHeight);
-        m_FalloffMap.Texture->SetData(falloffMapPixelArray, imgWidth, imgHeight);
+        s_Props.FalloffMap.Texture->SetData(falloffMapPixelArray, s_Props.NoiseWidth, s_Props.NoiseHeight);
     }
 
-    delete[] noisePreviewPixelArray;
+    delete[] noiseMapPixelArray;
     delete[] falloffMapPixelArray;
 }

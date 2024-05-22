@@ -2,7 +2,6 @@
 #define EDITOR_LAYER_H
 
 #include "Enxus.h"
-#include "NoiseEditorPanel.h"
 
 class EditorLayer : public Enxus::Layer
 {
@@ -25,8 +24,6 @@ private:
     bool m_IsViewportFocused = false;
     bool m_IsViewportHovered = false;
 
-    // Noise Panel
-    Enxus::Scope<NoiseEditorPanel> m_NoiseEditorPanel;
 
     Enxus::Scope<Enxus::FreeCameraController> m_CameraController;
     // Framebuffers

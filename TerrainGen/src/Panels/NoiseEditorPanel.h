@@ -1,40 +1,24 @@
 #ifndef NOISE_EDITOR_PANEL_H
 #define NOISE_EDITOR_PANEL_H
 
-#include "Enxus.h"
 #include "FastNoiseLite.h"
-#include "imgui/imgui.h"
+#include "Enxus.h"
 
-class NoiseEditorPanel
+struct NoiseEditorPanelProps
 {
-public:
-    NoiseEditorPanel();
-    ~NoiseEditorPanel(){};
-
-    void OnImGuiRender();
-
-    void SetNoiseWidth(uint32_t width);
-    void SetNoiseHeight(uint32_t height);
-
-    inline bool HasUpdated() { return m_NoiseUpdateFlag; }
-    inline uint32_t GetNoiseWidth() { return (uint32_t)m_GeneralNoise.Width; }
-    inline uint32_t GetNoiseHeight() { return (uint32_t)m_GeneralNoise.Height; }
-    inline const std::vector<float> &GetNoiseMap() const { return m_NoiseMapArray; }
-
-private:
-    void UpdateNoiseMap(bool newMap);
-    void UpdateNoiseTexturePreview(bool newPreview);
-
-private:
     // this is the size of the generated texture using the noise
-    static const int s_TextureGeneratedWidth;
-    static const int s_TextureGeneratedHeight;
+    const uint32_t NoiseWidth = 241;
+    const uint32_t NoiseHeight = 241;
 
-    FastNoiseLite m_Fnl;
-    FastNoiseLite m_FnlWarp;
+    FastNoiseLite Fnl;
+    FastNoiseLite FnlWarp;
 
     // To check when update the texture image
-    bool m_NoiseUpdateFlag = true;
+    bool NoiseUpdateFlag = true;
+
+    // will be exported to be used in the editor
+    //(if not, I would had used a raw array)
+    std::vector<float> NoiseMapArray;
 
     struct FalloffMapData
     {
@@ -44,7 +28,7 @@ private:
         // same width and height that the noise map texture
         Enxus::Scope<Enxus::Texture2D> Texture;
 
-    } m_FalloffMap;
+    } FalloffMap;
 
     struct NoiseTexturePreview
     {
@@ -57,13 +41,7 @@ private:
         int ImGuiHeight;
         Enxus::Scope<Enxus::Texture2D> Texture;
 
-    } m_NoisePreviewData;
-
-    // its going to be used only in this class
-
-    // will be exported to be used in the editor
-    //(if not, I would had used a raw array)
-    std::vector<float> m_NoiseMapArray;
+    } NoisePreviewData;
 
     struct GeneralNoiseData
     {
@@ -76,7 +54,7 @@ private:
         float OffsetX = 0.0f;
         float OffsetY = 0.0f;
 
-    } m_GeneralNoise;
+    } GeneralNoise;
 
     struct FractalNoiseData
     {
@@ -86,14 +64,14 @@ private:
         float Gain = 0.5f;
         float WeightedStrength = 0.0f;
         float PingPongStrength = 2.0f;
-    } m_FractalNoise;
+    } FractalNoise;
 
     struct CellularNoiseData
     {
         int Type = 1;
         int ReturnType = 1;
         float Jitter = 1.0f;
-    } m_CellularNoise;
+    } CellularNoise;
 
     struct DomainWarpData
     {
@@ -102,7 +80,7 @@ private:
         int Type = 0;
         int RotationType = 0;
         float Amplitude = 1.0f;
-    } m_DomainWarp;
+    } DomainWarp;
 
     struct DomainWarpFractalData
     {
@@ -110,7 +88,26 @@ private:
         int Octaves = 3;
         float Lacunarity = 2.0f;
         float Gain = 0.5f;
-    } m_DomainWarpFractal;
+    } DomainWarpFractal;
+};
+
+class NoiseEditorPanel
+{
+public:
+    static void Init();
+    static void ShutDown();
+
+    static void OnImGuiRender();
+    static void SetNoiseWidth(uint32_t width);
+    static void SetNoiseHeight(uint32_t height);
+
+    static bool HasUpdated();
+    static uint32_t GetNoiseWidth();
+    static uint32_t GetNoiseHeight();
+    static const std::vector<float> &GetNoiseMap();
+
+private:
+    static void UpdateNoiseMap(bool newMap);
 };
 
 #endif
