@@ -11,11 +11,11 @@ in VS_OUT {
 
 struct DirLight {
     vec3 direction;
-
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
 };
+
 vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir);
 uniform DirLight uDirLight;
 

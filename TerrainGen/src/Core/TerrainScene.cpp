@@ -2,6 +2,7 @@
 
 struct TerrainSceneData
 {
+    Enxus::Ref<Enxus::Model> Box;
     Enxus::Ref<TerrainMesh> Terrain;
 
     SceneCompositionPanelProps SceneCompositionData;
@@ -13,6 +14,7 @@ struct TerrainSceneData
 
     // Shaders
     Enxus::Ref<Enxus::Shader> TerrainShader;
+    Enxus::Ref<Enxus::Shader> ModelShader;
 
     std::array<Enxus::Ref<Enxus::TextureMesh2D>, 7> TexturesList;
 
@@ -54,7 +56,26 @@ void TerrainScene::Init()
     s_Data.TerrainShader = Enxus::CreateRef<Enxus::Shader>("TerrainGen/assets/shaders/terrain/terrain.vert",
                                                            "TerrainGen/assets/shaders/terrain/terrain.frag");
 
-    // Default terrain
+    // [TODO] Use Uniform Buffer Objects for things like camera and lighting
+
+    //----------------- BOX -------------------//
+
+    s_Data.Box = Enxus::CreateRef<Enxus::Model>("TerrainGen/assets/models/box/box.obj");
+    s_Data.ModelShader = Enxus::CreateRef<Enxus::Shader>(
+        "TerrainGen/assets/shaders/model/model.vert",
+        "TerrainGen/assets/shaders/model/model.frag");
+
+    s_Data.ModelShader->Bind();
+    glm::mat4 boxModel = glm::mat4(1.0f);
+    boxModel = glm::translate(boxModel, glm::vec3(0.0f, 2.0f, 0.0f));
+    s_Data.ModelShader->SetMat4("uModel", boxModel);
+    s_Data.ModelShader->SetVec3("uDirLight.direction", s_Data.SceneCompositionData.LightDirection);
+    s_Data.ModelShader->SetFloat3("uDirLight.ambient", 0.1f, 0.1f, 0.1f);
+    s_Data.ModelShader->SetFloat3("uDirLight.diffuse", 1.0f, 1.0f, 1.0f);
+    s_Data.ModelShader->SetFloat3("uDirLight.specular", 1.0f, 1.0f, 1.0f);
+
+    //----------------- Default Terrain -------------------//
+
     s_Data.Terrain = Enxus::CreateRef<TerrainMesh>(241, 241);
     s_Data.TerrainShader->Bind();
     glm::mat4 terrainModel = glm::mat4(1.0f);
@@ -67,7 +88,6 @@ void TerrainScene::Init()
 
     //----------------- Sky Box -------------------//
     s_Data.SkyBox = Enxus::CreateRef<Enxus::SkyBox>();
-
     s_Data.SkyBox->SetCubeMapFaces(
         {"TerrainGen/assets/images/skybox/right.tga",
          "TerrainGen/assets/images/skybox/left.tga",
@@ -93,17 +113,17 @@ void TerrainScene::OnUpdate()
     else
         Enxus::Renderer::SetPolygonMode(Enxus::PolygonMode::FILL);
 
+    //----------------- Draw Terrain -------------------//
+
     {
         s_Data.TerrainShader->Bind();
-
         s_Data.TerrainShader->SetMat4("uView", s_Data.CameraData.ViewMatrix);
         s_Data.TerrainShader->SetMat4("uProj", s_Data.CameraData.ProjectionMatrix);
-
         s_Data.TerrainShader->SetVec3("uCameraPos", s_Data.CameraData.Position);
         s_Data.TerrainShader->SetVec3("uDirLight.direction", s_Data.SceneCompositionData.LightDirection);
+
         s_Data.TerrainShader->SetFloat("uMinHeight", s_Data.Terrain->GetMinHeight());
         s_Data.TerrainShader->SetFloat("uMaxHeight", s_Data.Terrain->GetMaxHeight());
-
         s_Data.TerrainShader->SetInt("uNumOfColors", s_Data.TerrainBiomeData.NumOfBiomeLayers);
 
         for (int i = 0; i < s_Data.TerrainBiomeData.NumOfBiomeLayers; i++)
@@ -130,17 +150,55 @@ void TerrainScene::OnUpdate()
 
         s_Data.Terrain->GetVertexArray()->Bind();
 
-        int meshSimplificationIncrement = s_Data.Terrain->GetLevelOfDetail() == 0 ? 1 : s_Data.Terrain->GetLevelOfDetail() * 2;
-        int tempHeight = (s_Data.Terrain->GetHeight() - 1) / meshSimplificationIncrement + 1;
-        int tempWidth = (s_Data.Terrain->GetWidth() - 1) / meshSimplificationIncrement + 1;
-        const uint32_t numOfStrips = tempHeight - 1;
-        const uint32_t numOfVertPerStrip = tempWidth * 2;
+        uint32_t simplifiedWidth = s_Data.Terrain->GetSimplifiedWidth();
+        uint32_t simplifiedHeight = s_Data.Terrain->GetSimplifiedHeight();
+
+        const uint32_t numOfStrips = simplifiedHeight - 1;
+        const uint32_t numOfVertPerStrip = simplifiedWidth * 2;
         for (unsigned int strip = 0; strip < numOfStrips; strip++)
         {
             size_t stripOffset = strip * numOfVertPerStrip * sizeof(unsigned int);
-            glDrawElements(GL_TRIANGLE_STRIP, numOfVertPerStrip, GL_UNSIGNED_INT, (void *)stripOffset);
+            GLCall(glDrawElements(GL_TRIANGLE_STRIP, numOfVertPerStrip, GL_UNSIGNED_INT, (void *)stripOffset));
         }
     }
+
+    //----------------- Draw the rest of the objects -------------------//
+    {
+        s_Data.ModelShader->Bind();
+        s_Data.ModelShader->SetMat4("uView", s_Data.CameraData.ViewMatrix);
+        s_Data.ModelShader->SetMat4("uProj", s_Data.CameraData.ProjectionMatrix);
+        s_Data.ModelShader->SetVec3("uCameraPos", s_Data.CameraData.Position);
+        s_Data.ModelShader->SetVec3("uDirLight.direction", s_Data.SceneCompositionData.LightDirection);
+
+        const auto &meshes = s_Data.Box->GetMeshes();
+        for (const auto &mesh : meshes)
+        {
+            const auto &meshTextures = mesh->GetTextures();
+            for (int i = 0; i < meshTextures.size(); i++)
+            {
+                const Enxus::Ref<Enxus::TextureMesh2D> &texture = meshTextures[i];
+                std::string textureName;
+
+                switch (texture->GetType())
+                {
+                case Enxus::TextureType::DIFFUSE:
+                    textureName = "diffuseMap";
+                    break;
+                case Enxus::TextureType::SPECULAR:
+                    textureName = "specularMap";
+                    break;
+                // add normal map... etc
+                default:
+                    break;
+                }
+                s_Data.ModelShader->SetInt(("uMaterial." + textureName).c_str(), i);
+                texture->Bind(i);
+            }
+            mesh->GetVertexArray()->Bind();
+            GLCall(glDrawElements(GL_TRIANGLES, mesh->GetVertexArray()->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr));
+        }
+    }
+
     // Draw Skybox at last
     {
         // always render the skybox with fill mode and not wireframe
