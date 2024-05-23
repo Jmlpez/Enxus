@@ -26,7 +26,7 @@ void TerrainMesh::CreateTerrain()
     m_VertexArrayObject = Enxus::CreateRef<Enxus::VertexArray>();
 
     m_Vertices = std::move(CreateVertices());
-    m_VertexBufferObject = Enxus::CreateRef<Enxus::VertexBuffer>(&m_Vertices[0], m_Vertices.size() * sizeof(TerrainVertex));
+    m_VertexBufferObject = Enxus::CreateRef<Enxus::VertexBuffer>(&m_Vertices[0], m_Vertices.size() * sizeof(Enxus::VertexData));
 
     /*
         Terrain Vertex Layout
@@ -49,7 +49,7 @@ void TerrainMesh::CreateTerrain()
     m_IndexBufferObject = Enxus::CreateRef<Enxus::IndexBuffer>(&m_Indices[0], m_Indices.size());
 }
 
-std::vector<TerrainVertex> TerrainMesh::CreateVertices()
+std::vector<Enxus::VertexData> TerrainMesh::CreateVertices()
 {
 
     float topLeftX = (float)m_Width / -2.0f;
@@ -59,7 +59,7 @@ std::vector<TerrainVertex> TerrainMesh::CreateVertices()
     uint32_t simplifiedWidth = GetSimplifiedSize(m_Width, simplificationStep);
     uint32_t simplifiedHeight = GetSimplifiedSize(m_Height, simplificationStep);
 
-    std::vector<TerrainVertex> vertices;
+    std::vector<Enxus::VertexData> vertices;
     vertices.reserve(simplifiedHeight * simplifiedWidth);
 
     for (uint32_t i = 0; i < m_Height; i += simplificationStep)
@@ -112,7 +112,7 @@ std::vector<uint32_t> TerrainMesh::CreateIndices()
 
 void TerrainMesh::CalculateNormals()
 {
-    // Reset  TerrainVertex normals to 0
+    // Reset  Enxus::VertexData normals to 0
     for (auto &vertex : m_Vertices)
         vertex.Normal = glm::vec3(0);
 
@@ -143,7 +143,7 @@ void TerrainMesh::CalculateNormals()
         }
     }
 
-    // Normalize the TerrainVertex normals
+    // Normalize the Enxus::VertexData normals
     for (auto &vertex : m_Vertices)
         vertex.Normal = glm::normalize(vertex.Normal);
 }
@@ -175,7 +175,7 @@ void TerrainMesh::SetVertexDistance(float distance)
         }
     }
     CalculateNormals();
-    m_VertexBufferObject->SetData(&m_Vertices[0], m_Vertices.size() * sizeof(TerrainVertex));
+    m_VertexBufferObject->SetData(&m_Vertices[0], m_Vertices.size() * sizeof(Enxus::VertexData));
 }
 
 void TerrainMesh::CalculateNoiseMap()
@@ -209,7 +209,7 @@ void TerrainMesh::CalculateNoiseMap()
 
     // Calculate normals before sending data to the gpu
     CalculateNormals();
-    m_VertexBufferObject->SetData(&m_Vertices[0], m_Vertices.size() * sizeof(TerrainVertex));
+    m_VertexBufferObject->SetData(&m_Vertices[0], m_Vertices.size() * sizeof(Enxus::VertexData));
 }
 
 void TerrainMesh::SetElevation(float elevation)

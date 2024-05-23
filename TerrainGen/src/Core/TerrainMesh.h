@@ -62,7 +62,7 @@ private:
     void CalculateNormals();
     void CalculateNoiseMap();
 
-    std::vector<TerrainVertex> CreateVertices();
+    std::vector<Enxus::VertexData> CreateVertices();
     // Indices for Triangle Strip
     std::vector<uint32_t> CreateIndices();
 
@@ -84,7 +84,7 @@ private:
 
     std::vector<float> m_NoiseMap;
 
-    std::vector<TerrainVertex> m_Vertices;
+    std::vector<Enxus::VertexData> m_Vertices;
     std::vector<uint32_t> m_Indices;
 
     Enxus::Ref<Enxus::VertexArray> m_VertexArrayObject;
