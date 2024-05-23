@@ -15,12 +15,18 @@ public:
     static void OnUpdate();
 
     static void UpdateTerrainNoiseMap(const std::vector<float> &noiseMap);
-
     static void UpdateTerrainDimensions(const TerrainDimensionPanelProps &props);
     static void UpdateTerrainBiome(const TerrainBiomePanelProps &props);
     static void UpdateSceneComposition(const SceneCompositionPanelProps &props);
 
     static void SubmitCamera(const Enxus::Camera &camera);
+
+private:
+    static void InitTerrain();
+    static void InitModels();
+    static void InitSkyBox();
+
+    static void UpdateModelPositions();
 };
 
 #endif // TerrainScene.h

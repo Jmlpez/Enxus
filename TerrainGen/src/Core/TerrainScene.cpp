@@ -5,6 +5,13 @@ struct TerrainSceneData
     Enxus::Ref<Enxus::Model> Box;
     Enxus::Ref<TerrainMesh> Terrain;
 
+    struct ModelPlacementProps
+    {
+        uint32_t Amount = 100;
+        float Scale = 0.05f;
+        std::vector<glm::vec2> Positions;
+    } ModelPlacementData;
+
     SceneCompositionPanelProps SceneCompositionData;
     TerrainBiomePanelProps TerrainBiomeData;
 
@@ -53,39 +60,76 @@ void TerrainScene::Init()
         s_Data.TexturesList[i] = Enxus::CreateRef<Enxus::TextureMesh2D>(texturesPaths[i], Enxus::TextureType::DIFFUSE);
     }
 
+    // [TODO] Use Uniform Buffer Objects for things like camera and lighting
+    InitTerrain();
+    InitModels();
+    InitSkyBox();
+}
+
+void TerrainScene::ShutDown()
+{
+}
+
+void TerrainScene::InitTerrain()
+{
+    //----------------- Default Terrain -------------------//
+    s_Data.Terrain = Enxus::CreateRef<TerrainMesh>(241, 241);
+
     s_Data.TerrainShader = Enxus::CreateRef<Enxus::Shader>("TerrainGen/assets/shaders/terrain/terrain.vert",
                                                            "TerrainGen/assets/shaders/terrain/terrain.frag");
-
-    // [TODO] Use Uniform Buffer Objects for things like camera and lighting
-
-    //----------------- BOX -------------------//
-
-    s_Data.Box = Enxus::CreateRef<Enxus::Model>("TerrainGen/assets/models/box/box.obj");
-    s_Data.ModelShader = Enxus::CreateRef<Enxus::Shader>(
-        "TerrainGen/assets/shaders/model/model.vert",
-        "TerrainGen/assets/shaders/model/model.frag");
-
-    s_Data.ModelShader->Bind();
-    glm::mat4 boxModel = glm::mat4(1.0f);
-    boxModel = glm::translate(boxModel, glm::vec3(0.0f, 2.0f, 0.0f));
-    s_Data.ModelShader->SetMat4("uModel", boxModel);
-    s_Data.ModelShader->SetVec3("uDirLight.direction", s_Data.SceneCompositionData.LightDirection);
-    s_Data.ModelShader->SetFloat3("uDirLight.ambient", 0.1f, 0.1f, 0.1f);
-    s_Data.ModelShader->SetFloat3("uDirLight.diffuse", 1.0f, 1.0f, 1.0f);
-    s_Data.ModelShader->SetFloat3("uDirLight.specular", 1.0f, 1.0f, 1.0f);
-
-    //----------------- Default Terrain -------------------//
-
-    s_Data.Terrain = Enxus::CreateRef<TerrainMesh>(241, 241);
     s_Data.TerrainShader->Bind();
     glm::mat4 terrainModel = glm::mat4(1.0f);
+    // terrainModel = glm::translate(terrainModel, glm::vec3(7.8325f, 0.0f, 0.0f));
     s_Data.TerrainShader->SetMat4("uModel", terrainModel);
 
     s_Data.TerrainShader->SetVec3("uDirLight.direction", s_Data.SceneCompositionData.LightDirection);
     s_Data.TerrainShader->SetFloat3("uDirLight.ambient", 0.1f, 0.1f, 0.1f);
     s_Data.TerrainShader->SetFloat3("uDirLight.diffuse", 1.0f, 1.0f, 1.0f);
     s_Data.TerrainShader->SetFloat3("uDirLight.specular", 1.0f, 1.0f, 1.0f);
+}
 
+void TerrainScene::InitModels()
+{
+    s_Data.Box = Enxus::CreateRef<Enxus::Model>("TerrainGen/assets/models/box/box.obj");
+    // s_Data.Box = Enxus::CreateRef<Enxus::Model>("Sandbox/res/models/backpack/backpack.obj");
+    s_Data.ModelShader = Enxus::CreateRef<Enxus::Shader>(
+        "TerrainGen/assets/shaders/model/model.vert",
+        "TerrainGen/assets/shaders/model/model.frag");
+
+    s_Data.ModelShader->Bind();
+    // glm::mat4 boxModel = glm::mat4(1.0f);
+    // boxModel = glm::translate(boxModel, glm::vec3(0.0f, 2.0f, 0.0f));
+    //   s_Data.ModelShader->SetMat4("uModel", boxModel);
+    s_Data.ModelShader->SetVec3("uDirLight.direction", s_Data.SceneCompositionData.LightDirection);
+    s_Data.ModelShader->SetFloat3("uDirLight.ambient", 0.1f, 0.1f, 0.1f);
+    s_Data.ModelShader->SetFloat3("uDirLight.diffuse", 1.0f, 1.0f, 1.0f);
+    s_Data.ModelShader->SetFloat3("uDirLight.specular", 1.0f, 1.0f, 1.0f);
+
+    //----------------- Random initial locations -------------------//
+    // This info must come from the Poisson Disk algorithm
+    for (int i = 0; i < s_Data.ModelPlacementData.Amount; i++)
+    {
+        float x = rand() % s_Data.Terrain->GetWidth();
+        float y = rand() % s_Data.Terrain->GetHeight();
+        s_Data.ModelPlacementData.Positions.emplace_back(x, y);
+    }
+
+    Enxus::Ref<Enxus::VertexBuffer> instanceBuffer = Enxus::CreateRef<Enxus::VertexBuffer>(s_Data.ModelPlacementData.Amount * sizeof(glm::mat4));
+
+    // Adding an empty instance buffer to hold the instance matrix
+    Enxus::BufferLayout instanceLayout = {
+        {Enxus::ShaderDataType::Mat4, "aInstanceMatrix"},
+    };
+    instanceBuffer->SetLayout(instanceLayout);
+    // This must be done for each model..
+    for (const auto &mesh : s_Data.Box->GetMeshes())
+    {
+        mesh->GetVertexArray()->AddVertexBuffer(instanceBuffer);
+    }
+}
+
+void TerrainScene::InitSkyBox()
+{
     //----------------- Sky Box -------------------//
     s_Data.SkyBox = Enxus::CreateRef<Enxus::SkyBox>();
     s_Data.SkyBox->SetCubeMapFaces(
@@ -101,8 +145,34 @@ void TerrainScene::Init()
         "TerrainGen/assets/shaders/skybox/skybox.frag");
 }
 
-void TerrainScene::ShutDown()
+void TerrainScene::UpdateModelPositions()
 {
+    glm::mat4 initialMatrix = glm::mat4(1.0f);
+    float scaleFactor = s_Data.Terrain->GetVertexDistance();
+    float offsetX = (s_Data.Terrain->GetWidth() / 2) * scaleFactor;
+    float offsetZ = (s_Data.Terrain->GetHeight() / 2) * scaleFactor;
+
+    // translate to 0,0 (in the top left corner, no in the center)
+    initialMatrix = glm::translate(initialMatrix, glm::vec3(-offsetX, 0.0f, -offsetZ));
+
+    glm::mat4 *instanceMatrices = new glm::mat4[s_Data.ModelPlacementData.Amount];
+    for (int i = 0; i < s_Data.ModelPlacementData.Amount; i++)
+    {
+        glm::vec2 coords = s_Data.ModelPlacementData.Positions[i];
+        glm::vec3 vertexPos = s_Data.Terrain->GetVertexFromCoords(coords.x, coords.y);
+        float offsetY = vertexPos.y;
+        instanceMatrices[i] = glm::translate(initialMatrix, glm::vec3(coords.x * scaleFactor, offsetY, coords.y * scaleFactor));
+        instanceMatrices[i] = glm::scale(instanceMatrices[i], glm::vec3(scaleFactor));
+    }
+
+    for (const auto &mesh : s_Data.Box->GetMeshes())
+    {
+        // Thas last added buffer is the instance buffer which was created in InitModels method
+        auto &instanceBuffer = mesh->GetVertexArray()->GetVertexBuffers().back();
+        instanceBuffer->SetData(instanceMatrices, s_Data.ModelPlacementData.Amount * sizeof(glm::mat4));
+    }
+
+    delete instanceMatrices;
 }
 
 void TerrainScene::OnUpdate()
@@ -162,7 +232,7 @@ void TerrainScene::OnUpdate()
         }
     }
 
-    //----------------- Draw the rest of the objects -------------------//
+    //----------------- Draw the models using instancing -------------------//
     {
         s_Data.ModelShader->Bind();
         s_Data.ModelShader->SetMat4("uView", s_Data.CameraData.ViewMatrix);
@@ -174,11 +244,10 @@ void TerrainScene::OnUpdate()
         for (const auto &mesh : meshes)
         {
             const auto &meshTextures = mesh->GetTextures();
-            for (int i = 0; i < meshTextures.size(); i++)
+            for (uint8_t i = 0; i < meshTextures.size(); i++)
             {
                 const Enxus::Ref<Enxus::TextureMesh2D> &texture = meshTextures[i];
                 std::string textureName;
-
                 switch (texture->GetType())
                 {
                 case Enxus::TextureType::DIFFUSE:
@@ -195,7 +264,8 @@ void TerrainScene::OnUpdate()
                 texture->Bind(i);
             }
             mesh->GetVertexArray()->Bind();
-            GLCall(glDrawElements(GL_TRIANGLES, mesh->GetVertexArray()->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr));
+            // GLCall(glDrawElements(GL_TRIANGLES, mesh->GetVertexArray()->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr));
+            GLCall(glDrawElementsInstanced(GL_TRIANGLES, mesh->GetVertexArray()->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr, s_Data.ModelPlacementData.Amount));
         }
     }
 
@@ -227,6 +297,7 @@ void TerrainScene::OnUpdate()
 void TerrainScene::UpdateTerrainNoiseMap(const std::vector<float> &noiseMap)
 {
     s_Data.Terrain->SetNoiseMap(noiseMap);
+    UpdateModelPositions();
 }
 
 void TerrainScene::UpdateTerrainDimensions(const TerrainDimensionPanelProps &props)
@@ -247,14 +318,17 @@ void TerrainScene::UpdateTerrainDimensions(const TerrainDimensionPanelProps &pro
     if (props.Elevation != s_Data.Terrain->GetElevation())
     {
         s_Data.Terrain->SetElevation(props.Elevation);
+        UpdateModelPositions();
     }
     if (props.VertexScale != s_Data.Terrain->GetVertexDistance())
     {
         s_Data.Terrain->SetVertexDistance(props.VertexScale);
+        UpdateModelPositions();
     }
     if (props.ElevationCurve != (int)s_Data.Terrain->GetHeightElevationCurve())
     {
         s_Data.Terrain->SetHeightElevationCurve((AnimationCurve)props.ElevationCurve);
+        UpdateModelPositions();
     }
 }
 
