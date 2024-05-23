@@ -55,16 +55,16 @@ std::vector<TerrainVertex> TerrainMesh::CreateVertices()
     float topLeftX = (float)m_Width / -2.0f;
     float topLeftZ = (float)m_Height / -2.0f;
 
-    int meshSimplificationIncrement = m_LevelOfDetail == 0 ? 1 : m_LevelOfDetail * 2;
-    int newWidth = ((m_Width - 1) / meshSimplificationIncrement) + 1;
-    int newHeight = ((m_Height - 1) / meshSimplificationIncrement) + 1;
+    uint32_t simplificationStep = GetMeshSimplificationStep();
+    uint32_t simplifiedWidth = GetSimplifiedSize(m_Width, simplificationStep);
+    uint32_t simplifiedHeight = GetSimplifiedSize(m_Height, simplificationStep);
 
     std::vector<TerrainVertex> vertices;
-    vertices.reserve(newHeight * newWidth);
+    vertices.reserve(simplifiedHeight * simplifiedWidth);
 
-    for (uint32_t i = 0; i < m_Height; i += meshSimplificationIncrement)
+    for (uint32_t i = 0; i < m_Height; i += simplificationStep)
     {
-        for (uint32_t j = 0; j < m_Width; j += meshSimplificationIncrement)
+        for (uint32_t j = 0; j < m_Width; j += simplificationStep)
         {
             // Position
             glm::vec3 position;
@@ -87,24 +87,23 @@ std::vector<TerrainVertex> TerrainMesh::CreateVertices()
     return vertices;
 }
 
-std::vector<unsigned int> TerrainMesh::CreateIndices()
+std::vector<uint32_t> TerrainMesh::CreateIndices()
 {
-    int meshSimplificationIncrement = m_LevelOfDetail == 0 ? 1 : m_LevelOfDetail * 2;
-    int newWidth = ((m_Width - 1) / meshSimplificationIncrement) + 1;
-    int newHeight = ((m_Height - 1) / meshSimplificationIncrement) + 1;
+    uint32_t simplifiedWidth = GetSimplifiedWidth();
+    uint32_t simplifiedHeight = GetSimplifiedHeight();
 
-    std::vector<unsigned int> indices((newHeight - 1) * (newWidth * 2), 0);
+    std::vector<uint32_t> indices((simplifiedHeight - 1) * (simplifiedWidth * 2), 0);
 
     int index = 0;
 
     // Triangle strip indices
-    for (uint32_t i = 0; i < newHeight - 1; i++)
+    for (uint32_t i = 0; i < simplifiedHeight - 1; i++)
     {
-        int offset = newWidth * i;
-        for (uint32_t j = 0; j < newWidth; j++)
+        int offset = simplifiedWidth * i;
+        for (uint32_t j = 0; j < simplifiedWidth; j++)
         {
             indices[index] = offset + j;
-            indices[index + 1] = offset + j + newWidth;
+            indices[index + 1] = offset + j + simplifiedWidth;
             index += 2;
         }
     }
@@ -117,14 +116,13 @@ void TerrainMesh::CalculateNormals()
     for (auto &vertex : m_Vertices)
         vertex.Normal = glm::vec3(0);
 
-    int meshSimplificationIncrement = m_LevelOfDetail == 0 ? 1 : m_LevelOfDetail * 2;
-    int newWidth = ((m_Width - 1) / meshSimplificationIncrement) + 1;
-    int newHeight = ((m_Height - 1) / meshSimplificationIncrement) + 1;
+    uint32_t simplifiedWidth = GetSimplifiedWidth();
+    uint32_t simplifiedHeight = GetSimplifiedHeight();
 
-    uint32_t numOfStrips = newHeight - 1;
+    uint32_t numOfStrips = simplifiedHeight - 1;
     for (uint32_t strip = 0; strip < numOfStrips; strip++)
     {
-        uint32_t numOfVertexPerStrip = newWidth * 2;
+        uint32_t numOfVertexPerStrip = simplifiedWidth * 2;
         uint32_t indexOffset = strip * numOfVertexPerStrip;
         bool flipDir = false;
         for (uint32_t i = 2; i < numOfVertexPerStrip; i++)
@@ -165,13 +163,11 @@ void TerrainMesh::SetVertexDistance(float distance)
     float topLeftX = (float)m_Width / -2.0f;
     float topLeftZ = (float)m_Height / -2.0f;
 
-    int meshSimplificationIncrement = m_LevelOfDetail == 0 ? 1 : m_LevelOfDetail * 2;
-    int newWidth = ((m_Width - 1) / meshSimplificationIncrement) + 1;
-    int newHeight = ((m_Height - 1) / meshSimplificationIncrement) + 1;
+    uint32_t simplificationStep = GetMeshSimplificationStep();
 
-    for (uint32_t i = 0, vertexIndex = 0; i < m_Height; i += meshSimplificationIncrement)
+    for (uint32_t i = 0, vertexIndex = 0; i < m_Height; i += simplificationStep)
     {
-        for (uint32_t j = 0; j < m_Width; j += meshSimplificationIncrement)
+        for (uint32_t j = 0; j < m_Width; j += simplificationStep)
         {
             m_Vertices[vertexIndex].Position.x = (topLeftX + j) * m_VertexDistance; // to center int x-axis
             m_Vertices[vertexIndex].Position.z = (topLeftZ + i) * m_VertexDistance; // to center int z-axis
@@ -191,16 +187,16 @@ void TerrainMesh::CalculateNoiseMap()
     float minHeight = Evaluate(m_NoiseMap[0]) * m_Elevation;
     float maxHeight = minHeight;
 
-    int meshSimplificationIncrement = m_LevelOfDetail == 0 ? 1 : m_LevelOfDetail * 2;
-    uint32_t newWidth = ((m_Width - 1) / meshSimplificationIncrement) + 1;
-    uint32_t newHeight = ((m_Height - 1) / meshSimplificationIncrement) + 1;
+    uint32_t simplificationStep = GetMeshSimplificationStep();
+    uint32_t simplifiedWidth = GetSimplifiedSize(m_Width, simplificationStep);
+    uint32_t simplifiedHeight = GetSimplifiedSize(m_Height, simplificationStep);
 
-    for (uint32_t i = 0; i < newHeight; i++)
+    for (uint32_t i = 0; i < simplifiedHeight; i++)
     {
-        for (uint32_t j = 0; j < newWidth; j++)
+        for (uint32_t j = 0; j < simplifiedWidth; j++)
         {
-            uint32_t vertexIndex = (i * newWidth + j);
-            uint32_t noiseIndex = (i * m_Width + j) * meshSimplificationIncrement;
+            uint32_t vertexIndex = (i * simplifiedWidth + j);
+            uint32_t noiseIndex = (i * m_Width + j) * simplificationStep;
             float newYPos = Evaluate(m_NoiseMap[noiseIndex]) * m_Elevation;
             m_Vertices[vertexIndex].Position.y = newYPos;
 
@@ -275,7 +271,7 @@ void TerrainMesh::SetLevelOfDetail(int levelOfDetail)
     CalculateNoiseMap();
 }
 
-glm::vec3 TerrainMesh::GetNormalFromIndices(unsigned int indexA, unsigned int indexB, unsigned int indexC, bool flipDir)
+glm::vec3 TerrainMesh::GetNormalFromIndices(uint32_t indexA, uint32_t indexB, uint32_t indexC, bool flipDir)
 {
     glm::vec3 pointA = m_Vertices[indexA].Position;
     glm::vec3 pointB = m_Vertices[indexB].Position;
@@ -307,4 +303,34 @@ float TerrainMesh::Evaluate(float t)
     ASSERT(false);
     // to avoid warning
     return AnimationCurve::Linear;
+}
+
+uint32_t TerrainMesh::GetSimplifiedWidth()
+{
+    uint32_t step = GetMeshSimplificationStep();
+    return GetSimplifiedSize(m_Width, step);
+}
+
+uint32_t TerrainMesh::GetSimplifiedHeight()
+{
+    uint32_t step = GetMeshSimplificationStep();
+    return GetSimplifiedSize(m_Height, step);
+}
+
+uint32_t TerrainMesh::GetMeshSimplificationStep()
+{
+    // there is no simplification
+    if (m_LevelOfDetail == 0)
+        return 1;
+    return m_LevelOfDetail << 1; // 2x
+}
+uint32_t TerrainMesh::GetSimplifiedSize(uint32_t size, uint8_t step)
+{
+    if (step <= 0)
+    {
+        std::cout << "[TerrainMesh Error]: step cannot be less or equal than 0" << std::endl;
+        ASSERT(false);
+        return 0;
+    }
+    return ((size - 1) / step) + 1;
 }

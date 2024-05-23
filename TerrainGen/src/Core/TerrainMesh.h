@@ -54,6 +54,9 @@ public:
 
     inline Enxus::Ref<Enxus::VertexArray> GetVertexArray() const { return m_VertexArrayObject; }
 
+    uint32_t GetSimplifiedWidth();
+    uint32_t GetSimplifiedHeight();
+
 private:
     void CreateTerrain();
     void CalculateNormals();
@@ -61,13 +64,13 @@ private:
 
     std::vector<TerrainVertex> CreateVertices();
     // Indices for Triangle Strip
-    std::vector<unsigned int> CreateIndices();
+    std::vector<uint32_t> CreateIndices();
 
-    glm::vec3 GetNormalFromIndices(unsigned int indexA, unsigned int indexB, unsigned int indexC, bool flipDir);
     float Evaluate(float t);
+    uint32_t GetMeshSimplificationStep();
+    uint32_t GetSimplifiedSize(uint32_t size, uint8_t step);
 
-private:
-    // int GetNewSizeFromLOD()
+    glm::vec3 GetNormalFromIndices(uint32_t indexA, uint32_t indexB, uint32_t indexC, bool flipDir);
 
 private:
     uint32_t m_Width, m_Height;
@@ -82,7 +85,7 @@ private:
     std::vector<float> m_NoiseMap;
 
     std::vector<TerrainVertex> m_Vertices;
-    std::vector<unsigned int> m_Indices;
+    std::vector<uint32_t> m_Indices;
 
     Enxus::Ref<Enxus::VertexArray> m_VertexArrayObject;
     Enxus::Ref<Enxus::VertexBuffer> m_VertexBufferObject;
