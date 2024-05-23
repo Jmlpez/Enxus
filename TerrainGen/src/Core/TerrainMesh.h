@@ -3,19 +3,6 @@
 
 #include "Enxus.h"
 
-struct TerrainVertex
-{
-    glm::vec3 Position;
-    glm::vec2 TexCoord;
-    glm::vec3 Normal;
-
-    TerrainVertex(glm::vec3 position)
-        : Position(position), TexCoord(0), Normal(0) {}
-
-    TerrainVertex(glm::vec3 position, glm::vec2 texCoord, glm::vec3 normal)
-        : Position(position), TexCoord(texCoord), Normal(normal) {}
-};
-
 enum AnimationCurve
 {
     Linear = 0,
@@ -41,7 +28,6 @@ public:
     void SetHeight(uint32_t height);
 
     inline int GetLevelOfDetail() const { return m_LevelOfDetail; }
-
     inline float GetElevation() const { return m_Elevation; }
     inline float GetVertexDistance() const { return m_VertexDistance; }
     inline AnimationCurve GetHeightElevationCurve() const { return m_ElevationCurve; }
@@ -54,6 +40,7 @@ public:
 
     inline Enxus::Ref<Enxus::VertexArray> GetVertexArray() const { return m_VertexArrayObject; }
 
+    glm::vec3 GetVertexFromCoords(uint32_t x, uint32_t y);
     uint32_t GetSimplifiedWidth();
     uint32_t GetSimplifiedHeight();
 

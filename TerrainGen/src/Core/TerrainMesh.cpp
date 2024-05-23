@@ -214,12 +214,11 @@ void TerrainMesh::CalculateNoiseMap()
 
 void TerrainMesh::SetElevation(float elevation)
 {
-    if (m_Elevation == elevation)
+    if (m_Elevation == elevation || m_NoiseMap.empty())
         return;
-
+    if (elevation == 0)
+        elevation = 0.001f; // small value to visualize the noise
     m_Elevation = elevation;
-    if (m_NoiseMap.empty())
-        return;
 
     CalculateNoiseMap();
 }
@@ -269,6 +268,18 @@ void TerrainMesh::SetLevelOfDetail(int levelOfDetail)
 
     CreateTerrain();
     CalculateNoiseMap();
+}
+
+glm::vec3 TerrainMesh::GetVertexFromCoords(uint32_t x, uint32_t y)
+{
+    if (x > m_Width || y > m_Height)
+    {
+        std::cout << "[TerrainMesh Error]: x: " << x << ", y: " << y << " has invalid values" << std::endl;
+        ASSERT(false);
+    }
+
+    uint32_t index = y * m_Height + x;
+    return m_Vertices[index].Position;
 }
 
 glm::vec3 TerrainMesh::GetNormalFromIndices(uint32_t indexA, uint32_t indexB, uint32_t indexC, bool flipDir)
