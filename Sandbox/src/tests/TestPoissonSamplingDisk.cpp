@@ -4,7 +4,6 @@
 
 namespace OpenGLTest
 {
-
     void TestPoissonSamplingDisk::CalculateGrid()
     {
         const int WIDTH = 300;
@@ -48,10 +47,11 @@ namespace OpenGLTest
 
         auto canPlace = [&](glm::vec2 newPoint) -> bool
         {
-            glm::ivec2 cellCoords((int)(newPoint.x / cellSize), (int)(newPoint.y / cellSize));
-            for (int i = std::max(0, cellCoords.y - 2); i < std::min(cellCoords.y + 3, rows); ++i)
+            int row = (int)(newPoint.y / cellSize);
+            int col = (int)(newPoint.x / cellSize);
+            for (int i = std::max(0, row - 2); i < std::min(row + 3, rows); ++i)
             {
-                for (int j = std::max(0, cellCoords.x - 2); j < std::min(cellCoords.x + 3, cols); ++j)
+                for (int j = std::max(0, col - 2); j < std::min(col + 3, cols); ++j)
                 {
                     const glm::vec2 &point = grid[i][j];
                     if (point != EMPTY_CELL && glm::distance(point, newPoint) < RADIUS)
@@ -60,13 +60,13 @@ namespace OpenGLTest
             }
             return true;
         };
-        glm::ivec2 initial(randInt(engine), randInt(engine));
+        glm::ivec2 initial(WIDTH / 2, HEIGHT / 2);
 
         pointsQueue.push_back(initial);
         pointList.push_back(initial);
 
-        int gridRow = int(initial.x / cellSize);
-        int gridCol = int(initial.y / cellSize);
+        int gridRow = int(initial.y / cellSize);
+        int gridCol = int(initial.x / cellSize);
         grid[gridRow][gridCol] = initial;
 
         int currentAdded = 1;
@@ -83,8 +83,8 @@ namespace OpenGLTest
                     pointsQueue.push_back(randPoint);
                     pointList.push_back(randPoint);
 
-                    int newGridRow = (int)(randPoint.x / cellSize);
-                    int newGridCol = (int)(randPoint.y / cellSize);
+                    int newGridRow = (int)(randPoint.y / cellSize);
+                    int newGridCol = (int)(randPoint.x / cellSize);
                     grid[newGridRow][newGridCol] = randPoint;
 
                     currentAdded++;
@@ -96,12 +96,6 @@ namespace OpenGLTest
                 pointsQueue.erase(pointsQueue.begin() + index);
         }
 
-        // Output points for verification
-        for (const auto &point : pointList)
-        {
-            std::cout << "Point: (" << point.x << ", " << point.y << ")\n";
-        }
-
         float topLeftX = (float)WIDTH;
         float topLeftZ = (float)HEIGHT;
         for (int i = 0; i < pointList.size(); i++)
@@ -111,7 +105,7 @@ namespace OpenGLTest
             point.y = point.y / 10.0f;
             glm::mat4 model = glm::mat4(1.0f);
             model = glm::translate(model, glm::vec3(point.x, 0.0f, point.y));
-            model = glm::scale(model, glm::vec3(0.05f));
+            model = glm::scale(model, glm::vec3(0.125f));
             m_BoxInstanceMatrix[i] = model;
         }
     }

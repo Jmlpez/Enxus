@@ -1,18 +1,17 @@
 #include "TerrainScene.h"
+#include "PoissonDiskSampler.h"
 
 struct TerrainSceneData
 {
     Enxus::Ref<Enxus::Model> Box;
     Enxus::Ref<TerrainMesh> Terrain;
 
-    struct ModelPlacementProps
-    {
-        uint32_t Amount = 100;
-        float Scale = 0.05f;
-        std::vector<glm::vec2> Positions;
-    } ModelPlacementData;
+    Enxus::Scope<PoissonDiskSampler> RandomSampler;
+
+    std::vector<glm::vec2> ModelPositions;
 
     SceneCompositionPanelProps SceneCompositionData;
+    ModelPlacementPanelProps ModelPlacementData;
     TerrainBiomePanelProps TerrainBiomeData;
 
     // SkyBox
@@ -107,14 +106,15 @@ void TerrainScene::InitModels()
 
     //----------------- Random initial locations -------------------//
     // This info must come from the Poisson Disk algorithm
-    for (int i = 0; i < s_Data.ModelPlacementData.Amount; i++)
-    {
-        float x = rand() % s_Data.Terrain->GetWidth();
-        float y = rand() % s_Data.Terrain->GetHeight();
-        s_Data.ModelPlacementData.Positions.emplace_back(x, y);
-    }
+    s_Data.RandomSampler = Enxus::CreateScope<PoissonDiskSampler>(s_Data.Terrain->GetWidth() - 1,
+                                                                  s_Data.Terrain->GetHeight() - 1,
+                                                                  s_Data.ModelPlacementData.Radius,
+                                                                  s_Data.ModelPlacementData.Amount);
+    s_Data.RandomSampler->CalculatePoints();
+    s_Data.ModelPositions = s_Data.RandomSampler->GetSampledPoints();
 
-    Enxus::Ref<Enxus::VertexBuffer> instanceBuffer = Enxus::CreateRef<Enxus::VertexBuffer>(s_Data.ModelPlacementData.Amount * sizeof(glm::mat4));
+    Enxus::Ref<Enxus::VertexBuffer>
+        instanceBuffer = Enxus::CreateRef<Enxus::VertexBuffer>(s_Data.ModelPlacementData.Amount * sizeof(glm::mat4));
 
     // Adding an empty instance buffer to hold the instance matrix
     Enxus::BufferLayout instanceLayout = {
@@ -147,6 +147,7 @@ void TerrainScene::InitSkyBox()
 
 void TerrainScene::UpdateModelPositions()
 {
+
     glm::mat4 initialMatrix = glm::mat4(1.0f);
     float scaleFactor = s_Data.Terrain->GetVertexDistance();
     float offsetX = (s_Data.Terrain->GetWidth() / 2) * scaleFactor;
@@ -156,13 +157,14 @@ void TerrainScene::UpdateModelPositions()
     initialMatrix = glm::translate(initialMatrix, glm::vec3(-offsetX, 0.0f, -offsetZ));
 
     glm::mat4 *instanceMatrices = new glm::mat4[s_Data.ModelPlacementData.Amount];
-    for (int i = 0; i < s_Data.ModelPlacementData.Amount; i++)
+
+    for (uint32_t i = 0; i < s_Data.ModelPlacementData.Amount && i < s_Data.ModelPositions.size(); i++)
     {
-        glm::vec2 coords = s_Data.ModelPlacementData.Positions[i];
+        glm::vec2 coords = s_Data.ModelPositions[i];
         glm::vec3 vertexPos = s_Data.Terrain->GetVertexFromCoords(coords.x, coords.y);
         float offsetY = vertexPos.y;
         instanceMatrices[i] = glm::translate(initialMatrix, glm::vec3(coords.x * scaleFactor, offsetY, coords.y * scaleFactor));
-        instanceMatrices[i] = glm::scale(instanceMatrices[i], glm::vec3(scaleFactor));
+        instanceMatrices[i] = glm::scale(instanceMatrices[i], glm::vec3(s_Data.ModelPlacementData.Scale));
     }
 
     for (const auto &mesh : s_Data.Box->GetMeshes())
@@ -265,7 +267,7 @@ void TerrainScene::OnUpdate()
             }
             mesh->GetVertexArray()->Bind();
             // GLCall(glDrawElements(GL_TRIANGLES, mesh->GetVertexArray()->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr));
-            GLCall(glDrawElementsInstanced(GL_TRIANGLES, mesh->GetVertexArray()->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr, s_Data.ModelPlacementData.Amount));
+            GLCall(glDrawElementsInstanced(GL_TRIANGLES, mesh->GetVertexArray()->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr, s_Data.ModelPositions.size()));
         }
     }
 
@@ -340,4 +342,27 @@ void TerrainScene::UpdateTerrainBiome(const TerrainBiomePanelProps &props)
 void TerrainScene::UpdateSceneComposition(const SceneCompositionPanelProps &props)
 {
     s_Data.SceneCompositionData = props;
+}
+
+void TerrainScene::UpdateModelPlacement(const ModelPlacementPanelProps &props)
+{
+    if (s_Data.ModelPlacementData.Radius != props.Radius)
+    {
+        s_Data.ModelPlacementData.Radius = props.Radius;
+        s_Data.RandomSampler->SetRadius(props.Radius);
+        s_Data.ModelPositions = s_Data.RandomSampler->GetSampledPoints();
+        UpdateModelPositions();
+    }
+    if (s_Data.ModelPlacementData.Scale != props.Scale)
+    {
+        s_Data.ModelPlacementData.Scale = props.Scale;
+        UpdateModelPositions();
+    }
+    if (s_Data.ModelPlacementData.Amount != props.Amount)
+    {
+        s_Data.ModelPlacementData.Amount = props.Amount;
+        s_Data.RandomSampler->SetAmount(props.Amount);
+        s_Data.ModelPositions = s_Data.RandomSampler->GetSampledPoints();
+        UpdateModelPositions();
+    }
 }

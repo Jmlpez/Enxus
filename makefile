@@ -95,7 +95,9 @@ run-terrain:
 	@echo "\n------------------- END OF RUNNING -------------------\n"	
 
 # Testing purposes
-pepe: pepe.cpp
+pepe: create-pepe
+	
+create-pepe:
 	g++ -std=gnu++17 -Wall -Wextra pepe.cpp -o pepe && ./pepe
 
 pch: 

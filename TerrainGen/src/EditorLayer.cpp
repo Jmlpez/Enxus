@@ -4,6 +4,7 @@
 #include "TerrainDimensionPanel.h"
 #include "SceneCompositionPanel.h"
 #include "TerrainBiomePanel.h"
+#include "ModelPlacementPanel.h"
 #include "TerrainScene.h"
 #include "imgui/imgui.h"
 #include "imgui/imgui_internal.h"
@@ -33,21 +34,23 @@ void EditorLayer::OnAttach()
     fbspec.Height = 600;
     m_Framebuffer = Enxus::CreateScope<Enxus::Framebuffer>(fbspec);
 
-    // Terrain Scene initialization
-    TerrainScene::Init();
-
     // Terrain Panels initialization
     TerrainDimensionPanel::Init();
     TerrainBiomePanel::Init();
     SceneCompositionPanel::Init();
+    ModelPlacementPanel::Init();
 
     NoiseEditorPanel::Init();
+
+    // Terrain Scene initialization
+    TerrainScene::Init();
 
     // Initial values
     TerrainScene::UpdateTerrainNoiseMap(NoiseEditorPanel::GetNoiseMap());
     TerrainScene::UpdateSceneComposition(SceneCompositionPanel::GetPanelProps());
     TerrainScene::UpdateTerrainDimensions(TerrainDimensionPanel::GetPanelProps());
     TerrainScene::UpdateTerrainBiome(TerrainBiomePanel::GetPanelProps());
+    TerrainScene::UpdateModelPlacement(ModelPlacementPanel::GetPanelProps());
 
     ImGui::SetWindowFocus("Viewport");
 }
@@ -196,6 +199,9 @@ void EditorLayer::TerrainMenuUI()
 
     SceneCompositionPanel::OnImGuiRender();
     TerrainScene::UpdateSceneComposition(SceneCompositionPanel::GetPanelProps());
+
+    ModelPlacementPanel::OnImGuiRender();
+    TerrainScene::UpdateModelPlacement(ModelPlacementPanel::GetPanelProps());
 
     ImGui::EndTabBar();
 
