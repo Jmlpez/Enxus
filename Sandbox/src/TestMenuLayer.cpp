@@ -12,6 +12,7 @@
 #include "TestCircle.h"
 #include "TestInstancing.h"
 #include "TestInstancingV2.h"
+#include "TestPoissonSamplingDisk.h"
 #include "imgui/imgui.h"
 
 TestMenuLayer::TestMenuLayer()
@@ -52,9 +53,10 @@ void TestMenuLayer::OnAttach()
     RegisterTest<OpenGLTest::TestCircle>("Circle (FragmentShader)");
     RegisterTest<OpenGLTest::TestInstancing>("Instancing 1.0");
     RegisterTest<OpenGLTest::TestInstancingV2>("Instancing 2.0");
+    RegisterTest<OpenGLTest::TestPoissonSamplingDisk>("Poisson Sampling Disk");
     // start in the skybox test
 
-    m_CurrentTest = new OpenGLTest::TestTriangleStrip();
+    m_CurrentTest = new OpenGLTest::TestPoissonSamplingDisk();
 }
 
 void TestMenuLayer::OnUpdate(Enxus::Timestep ts)
