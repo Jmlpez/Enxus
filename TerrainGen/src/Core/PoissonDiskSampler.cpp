@@ -13,8 +13,8 @@ void PoissonDiskSampler::InitGrid()
 {
     m_CellSize = m_Radius / glm::root_two<float>();
 
-    m_GridRows = static_cast<int>(m_Height / m_CellSize) + 1;
-    m_GridCols = static_cast<int>(m_Width / m_CellSize) + 1;
+    m_GridRows = (int)(m_Height / m_CellSize) + 1;
+    m_GridCols = (int)(m_Width / m_CellSize) + 1;
 
     m_Grid = std::vector<std::vector<glm::vec2>>(m_GridRows, std::vector<glm::vec2>(m_GridCols, EMPTY_CELL));
 
@@ -28,12 +28,12 @@ void PoissonDiskSampler::InitGrid()
 void PoissonDiskSampler::CalculatePoints()
 {
     static const uint32_t s_MaxAttemps = 30;
-    int currentAdded = 1;
+    uint32_t currentAdded = 1;
     while (!m_PointsQueue.empty() && currentAdded < m_Amount)
     {
         int index = std::uniform_int_distribution<int>(0, m_PointsQueue.size() - 1)(m_RandomGenEngine);
         bool found = false;
-        for (int k = 0; k < s_MaxAttemps; k++)
+        for (uint32_t k = 0; k < s_MaxAttemps; k++)
         {
             glm::vec2 randPoint = GeneratePointAround(m_PointsQueue[index]);
             if (IsInBounds(randPoint) && CanPlacePoint(randPoint))
@@ -54,8 +54,8 @@ void PoissonDiskSampler::AddPoint(glm::vec2 point)
     m_PointsQueue.push_back(point);
     m_FinalPointsList.push_back(point);
 
-    int col = static_cast<int>(point.x / m_CellSize);
-    int row = static_cast<int>(point.y / m_CellSize);
+    int col = (int)(point.x / m_CellSize);
+    int row = (int)(point.y / m_CellSize);
     m_Grid[row][col] = point;
 }
 bool PoissonDiskSampler::IsInBounds(glm::vec2 point)
