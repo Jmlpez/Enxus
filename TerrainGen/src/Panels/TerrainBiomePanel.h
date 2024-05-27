@@ -18,6 +18,7 @@ struct TerrainBiomePanelProps
         int TextureIndex;
     };
 
+    // Add the 8 as a constant
     std::array<BiomeLayerData, 8> BiomeLayers;
 };
 

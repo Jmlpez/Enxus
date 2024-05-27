@@ -20,15 +20,15 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir);
 uniform DirLight uDirLight;
 
 const float EPSILON = 1e-4;
-const int MAX_NUM_OF_COLORS = 8;
-uniform int uNumOfColors;
+const int MAX_NUM_OF_LAYERS = 8;
+uniform int uNumOfLayers;
 
 // vVertexPos.y > biomeStartHeight --> apply biomeColor
-uniform float uBiomeStartHeight[MAX_NUM_OF_COLORS];
-uniform float uBiomeBlends[MAX_NUM_OF_COLORS];
-uniform float uBiomeColorStrength[MAX_NUM_OF_COLORS];
-uniform vec3 uBiomeColors[MAX_NUM_OF_COLORS];
-uniform bool uBiomeTextureUsed[MAX_NUM_OF_COLORS];
+uniform float uBiomeStartHeight[MAX_NUM_OF_LAYERS];
+uniform float uBiomeBlends[MAX_NUM_OF_LAYERS];
+uniform float uBiomeColorStrength[MAX_NUM_OF_LAYERS];
+uniform vec3 uBiomeColors[MAX_NUM_OF_LAYERS];
+uniform bool uBiomeTextureUsed[MAX_NUM_OF_LAYERS];
 
 uniform float uMinHeight;
 uniform float uMaxHeight;
@@ -53,7 +53,7 @@ void main() {
     vec3 blendAxes = abs(fs_in.vNormal);
     blendAxes /= blendAxes.x + blendAxes.y + blendAxes.z;
 
-    for(int i = 0; i < uNumOfColors; i++) {
+    for(int i = 0; i < uNumOfLayers; i++) {
         // blending the colors
         float drawStrength = InverseLerp(-uBiomeBlends[i] / 2 - EPSILON, uBiomeBlends[i] / 2, heightPercent - uBiomeStartHeight[i]);
 
