@@ -9,7 +9,7 @@ struct DirLight {
     vec3 specular;
 };
 
-vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir);
+vec4 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir);
 uniform DirLight uDirLight;
 
 in VS_OUT {
@@ -33,13 +33,13 @@ void main() {
     vec3 normal = normalize(fs_in.vNormal);
     vec3 viewDir = normalize(uCameraPos - fs_in.vFragPos);
 
-    vec3 result = CalcDirLight(uDirLight, normal, viewDir);
+    vec4 result = CalcDirLight(uDirLight, normal, viewDir);
 
-    FragColor = vec4(result, 1.0);
+    FragColor = result;
 
 }
 
-vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir) {
+vec4 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir) {
 
     vec3 lightDir = normalize(-light.direction);
 
@@ -52,12 +52,12 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir) {
     //vec3 diffuse = light.diffuse * diff * vec3(texture2D(uObjectMaterial.diffuse, vTexCoord));
     //vec3 specular = light.specular * spec * vec3(texture2D(uObjectMaterial.specular, vTexCoord));
 
-    vec3 diffuseColor = vec3(texture2D(uMaterial.diffuseMap, fs_in.vTexCoord));
-    vec3 specularColor = vec3(texture2D(uMaterial.specularMap, fs_in.vTexCoord));
+    vec4 diffuseColor = vec4(texture2D(uMaterial.diffuseMap, fs_in.vTexCoord));
+    vec4 specularColor = vec4(texture2D(uMaterial.specularMap, fs_in.vTexCoord));
 
-    vec3 ambient = light.ambient * diffuseColor;
-    vec3 diffuse = light.diffuse * diff * diffuseColor;
-    vec3 specular = light.specular * spec * specularColor;
+    vec4 ambient = vec4(light.ambient, 1.0) * diffuseColor;
+    vec4 diffuse = vec4(light.diffuse, 1.0) * diff * diffuseColor;
+    vec4 specular = vec4(light.specular, 1.0) * spec * specularColor;
 
     return ambient + diffuse + specular;
 }
