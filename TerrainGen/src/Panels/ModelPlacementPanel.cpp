@@ -5,8 +5,15 @@ static ModelPlacementPanelProps s_Props;
 
 void ModelPlacementPanel::Init()
 {
-    s_Props.Radius = 25.0f;
-    s_Props.Amount = 1000;
+    s_Props.NumOfModels = 0;
+    for (auto &modelData : s_Props.ModelsData)
+    {
+        modelData.Radius = 25.0f;
+        modelData.Scale = 0.1f;
+        modelData.OffsetHeight = 0.0f;
+        modelData.Amount = 1000;
+        modelData.ModelIndex = 0;
+    }
 }
 
 void ModelPlacementPanel::ShutDown()
@@ -20,11 +27,25 @@ const ModelPlacementPanelProps &ModelPlacementPanel::GetPanelProps()
 
 void ModelPlacementPanel::OnImGuiRender()
 {
+    static const char *enumModelArray[] = {"None", "Box", "Backpack"};
+
     if (ImGui::BeginTabItem("Objects"))
     {
-        ImGui::SliderFloat("Radius", &s_Props.Radius, 5.0f, 100.0f);
-        ImGui::DragFloat("Scale", &s_Props.Scale, 0.001f);
-        ImGui::SliderInt("Amount", (int *)&s_Props.Amount, 1, 1000);
+        ImGui::SliderInt("Models", &s_Props.NumOfModels, 0, 8);
+        for (int i = 0; i < s_Props.NumOfModels; i++)
+        {
+            const std::string &layer = "Layer " + std::to_string(i + 1);
+            ImGui::SeparatorText(layer.c_str());
+            ImGui::PushID(layer.c_str());
+            {
+                ImGui::SliderFloat("Radius", &s_Props.ModelsData[i].Radius, 5.0f, 100.0f);
+                ImGui::SliderInt("Amount", &s_Props.ModelsData[i].Amount, 1, 1000);
+                ImGui::DragFloat("Scale", &s_Props.ModelsData[i].Scale, 0.001f);
+                ImGui::DragFloat("OffsetY", &s_Props.ModelsData[i].OffsetHeight, 0.001f);
+                ImGui::Combo("Model", &s_Props.ModelsData[i].ModelIndex, enumModelArray, IM_ARRAYSIZE(enumModelArray));
+            }
+            ImGui::PopID();
+        }
         ImGui::EndTabItem();
     }
 }

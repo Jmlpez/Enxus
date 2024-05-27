@@ -5,9 +5,19 @@
 
 struct ModelPlacementPanelProps
 {
-    float Radius = 25.0f;
-    float Scale = 0.01f;
-    uint32_t Amount = 1000;
+    const int MaxNumOfModels = 8;
+    const int MaxAmount = 5000;
+    struct ModelPlacementData
+    {
+        float Radius = 25.0f;
+        float OffsetHeight = 0.0f;
+        float Scale = 0.1f;
+        int Amount = 1000;
+        int ModelIndex = 0;
+    };
+
+    int NumOfModels = 0;
+    std::array<ModelPlacementData, 8> ModelsData;
 };
 
 class ModelPlacementPanel

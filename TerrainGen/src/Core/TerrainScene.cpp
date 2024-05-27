@@ -6,9 +6,13 @@ struct TerrainSceneData
     Enxus::Ref<Enxus::Model> Box;
     Enxus::Ref<TerrainMesh> Terrain;
 
-    Enxus::Scope<PoissonDiskSampler> RandomSampler;
-
-    std::vector<glm::vec2> ModelPositions;
+    struct ModelPositionData
+    {
+        Enxus::Scope<PoissonDiskSampler> RandomSampler;
+        std::vector<glm::vec2> Positions;
+        std::vector<glm::mat4> InstanceMatrix;
+    };
+    std::array<ModelPositionData, 8> ModelPositions;
 
     SceneCompositionPanelProps SceneCompositionData;
     ModelPlacementPanelProps ModelPlacementData;
@@ -22,7 +26,12 @@ struct TerrainSceneData
     Enxus::Ref<Enxus::Shader> TerrainShader;
     Enxus::Ref<Enxus::Shader> ModelShader;
 
-    std::array<Enxus::Ref<Enxus::TextureMesh2D>, 7> TexturesList;
+    struct ResourcesData
+    {
+        static std::string s_AssetsPath;
+        std::array<Enxus::Ref<Enxus::TextureMesh2D>, 7> TerrainTextureList;
+        std::array<Enxus::Ref<Enxus::Model>, 2> ModelList;
+    } Resources;
 
     struct CameraData
     {
@@ -33,6 +42,7 @@ struct TerrainSceneData
 };
 
 static TerrainSceneData s_Data;
+std::string TerrainSceneData::ResourcesData::s_AssetsPath = "TerrainGen/assets/";
 
 void TerrainScene::SubmitCamera(const Enxus::Camera &camera)
 {
@@ -44,19 +54,31 @@ void TerrainScene::SubmitCamera(const Enxus::Camera &camera)
 void TerrainScene::Init()
 {
     //----------------- TERRAIN TEXTURES -------------------//
+    // For now must be in the same order as the ImGui enum array in TerrainBiomePanel
     static const std::string texturesPaths[7] = {
-        "TerrainGen/assets/images/materials-debug/water.png",
-        "TerrainGen/assets/images/materials-debug/grass.png",
-        "TerrainGen/assets/images/materials-debug/rocks1.png",
-        "TerrainGen/assets/images/materials-debug/rocks2.png",
-        "TerrainGen/assets/images/materials-debug/sandy-grass.png",
-        "TerrainGen/assets/images/materials-debug/stony-ground.png",
-        "TerrainGen/assets/images/materials-debug/snow.png",
+        s_Data.Resources.s_AssetsPath + "images/materials-debug/water.png",
+        s_Data.Resources.s_AssetsPath + "images/materials-debug/grass.png",
+        s_Data.Resources.s_AssetsPath + "images/materials-debug/rocks1.png",
+        s_Data.Resources.s_AssetsPath + "images/materials-debug/rocks2.png",
+        s_Data.Resources.s_AssetsPath + "images/materials-debug/sandy-grass.png",
+        s_Data.Resources.s_AssetsPath + "images/materials-debug/stony-ground.png",
+        s_Data.Resources.s_AssetsPath + "images/materials-debug/snow.png",
     };
 
     for (int i = 0; i < 7; i++)
     {
-        s_Data.TexturesList[i] = Enxus::CreateRef<Enxus::TextureMesh2D>(texturesPaths[i], Enxus::TextureType::DIFFUSE);
+        s_Data.Resources.TerrainTextureList[i] = Enxus::CreateRef<Enxus::TextureMesh2D>(texturesPaths[i], Enxus::TextureType::DIFFUSE);
+    }
+
+    //----------------- MODELS -------------------//
+    // For now must be in the same order as the ImGui enum array in ModelPlacementPanel
+    static const std::string modelsPaths[2] = {
+        s_Data.Resources.s_AssetsPath + "models/box/box.obj",
+        s_Data.Resources.s_AssetsPath + "models/box/box.obj",
+    };
+    for (int i = 0; i < 2; i++)
+    {
+        s_Data.Resources.ModelList[i] = Enxus::CreateRef<Enxus::Model>(modelsPaths[i]);
     }
 
     // [TODO] Use Uniform Buffer Objects for things like camera and lighting
@@ -89,16 +111,12 @@ void TerrainScene::InitTerrain()
 
 void TerrainScene::InitModels()
 {
-    s_Data.Box = Enxus::CreateRef<Enxus::Model>("TerrainGen/assets/models/box/box.obj");
-    // s_Data.Box = Enxus::CreateRef<Enxus::Model>("Sandbox/res/models/backpack/backpack.obj");
+    // For now the same shader will draw all the models
     s_Data.ModelShader = Enxus::CreateRef<Enxus::Shader>(
         "TerrainGen/assets/shaders/model/model.vert",
         "TerrainGen/assets/shaders/model/model.frag");
 
     s_Data.ModelShader->Bind();
-    // glm::mat4 boxModel = glm::mat4(1.0f);
-    // boxModel = glm::translate(boxModel, glm::vec3(0.0f, 2.0f, 0.0f));
-    //   s_Data.ModelShader->SetMat4("uModel", boxModel);
     s_Data.ModelShader->SetVec3("uDirLight.direction", s_Data.SceneCompositionData.LightDirection);
     s_Data.ModelShader->SetFloat3("uDirLight.ambient", 0.1f, 0.1f, 0.1f);
     s_Data.ModelShader->SetFloat3("uDirLight.diffuse", 1.0f, 1.0f, 1.0f);
@@ -106,25 +124,40 @@ void TerrainScene::InitModels()
 
     //----------------- Random initial locations -------------------//
     // This info must come from the Poisson Disk algorithm
-    s_Data.RandomSampler = Enxus::CreateScope<PoissonDiskSampler>(s_Data.Terrain->GetWidth() - 1,
-                                                                  s_Data.Terrain->GetHeight() - 1,
-                                                                  s_Data.ModelPlacementData.Radius,
-                                                                  s_Data.ModelPlacementData.Amount);
-    s_Data.RandomSampler->CalculatePoints();
-    s_Data.ModelPositions = s_Data.RandomSampler->GetSampledPoints();
-
-    Enxus::Ref<Enxus::VertexBuffer>
-        instanceBuffer = Enxus::CreateRef<Enxus::VertexBuffer>(s_Data.ModelPlacementData.Amount * sizeof(glm::mat4));
-
-    // Adding an empty instance buffer to hold the instance matrix
-    Enxus::BufferLayout instanceLayout = {
-        {Enxus::ShaderDataType::Mat4, "aInstanceMatrix"},
-    };
-    instanceBuffer->SetLayout(instanceLayout);
-    // This must be done for each model..
-    for (const auto &mesh : s_Data.Box->GetMeshes())
+    for (int i = 0; i < s_Data.ModelPlacementData.MaxNumOfModels; i++)
     {
-        mesh->GetVertexArray()->AddVertexBuffer(instanceBuffer);
+        const float initialRadius = 10.0f;
+        const uint32_t initialAmount = 100;
+        s_Data.ModelPositions[i].RandomSampler =
+            Enxus::CreateScope<PoissonDiskSampler>(s_Data.Terrain->GetWidth() - 1,
+                                                   s_Data.Terrain->GetHeight() - 1,
+                                                   initialRadius,
+                                                   initialAmount);
+        // Initially there are no models
+
+        s_Data.ModelPositions[i].RandomSampler->CalculatePoints();
+        s_Data.ModelPositions[i].Positions = s_Data.ModelPositions[i].RandomSampler->GetSampledPoints();
+    }
+
+    for (auto &model : s_Data.Resources.ModelList)
+    {
+        // if the model has not been loaded, ignore it
+        if (!model)
+            continue;
+
+        Enxus::Ref<Enxus::VertexBuffer>
+            instanceBuffer = Enxus::CreateRef<Enxus::VertexBuffer>(s_Data.ModelPlacementData.MaxAmount * sizeof(glm::mat4));
+
+        // Adding an empty instance buffer to hold the instance matrix
+        Enxus::BufferLayout instanceLayout = {
+            {Enxus::ShaderDataType::Mat4, "aInstanceMatrix"},
+        };
+        instanceBuffer->SetLayout(instanceLayout);
+        // This must be done for each model..
+        for (const auto &mesh : model->GetMeshes())
+        {
+            mesh->GetVertexArray()->AddVertexBuffer(instanceBuffer);
+        }
     }
 }
 
@@ -156,25 +189,26 @@ void TerrainScene::UpdateModelPositions()
     // translate to 0,0 (in the top left corner, no in the center)
     initialMatrix = glm::translate(initialMatrix, glm::vec3(-offsetX, 0.0f, -offsetZ));
 
-    glm::mat4 *instanceMatrices = new glm::mat4[s_Data.ModelPlacementData.Amount];
-
-    for (uint32_t i = 0; i < s_Data.ModelPlacementData.Amount && i < s_Data.ModelPositions.size(); i++)
+    for (int i = 0; i < s_Data.ModelPlacementData.NumOfModels; i++)
     {
-        glm::vec2 coords = s_Data.ModelPositions[i];
-        glm::vec3 vertexPos = s_Data.Terrain->GetVertexFromCoords(coords.x, coords.y);
-        float offsetY = vertexPos.y;
-        instanceMatrices[i] = glm::translate(initialMatrix, glm::vec3(coords.x * scaleFactor, offsetY, coords.y * scaleFactor));
-        instanceMatrices[i] = glm::scale(instanceMatrices[i], glm::vec3(s_Data.ModelPlacementData.Scale));
-    }
+        const auto &currentModelData = s_Data.ModelPlacementData.ModelsData[i];
+        const auto &currentModelPositions = s_Data.ModelPositions[i];
 
-    for (const auto &mesh : s_Data.Box->GetMeshes())
-    {
-        // Thas last added buffer is the instance buffer which was created in InitModels method
-        auto &instanceBuffer = mesh->GetVertexArray()->GetVertexBuffers().back();
-        instanceBuffer->SetData(instanceMatrices, s_Data.ModelPlacementData.Amount * sizeof(glm::mat4));
-    }
+        // glm::mat4 *instanceMatrices = new glm::mat4[currentModelData.Amount];
+        std::vector<glm::mat4> matrices;
+        for (uint32_t j = 0; j < (uint32_t)currentModelData.Amount && j < currentModelPositions.Positions.size(); j++)
+        {
+            glm::vec2 coords = currentModelPositions.Positions[j];
+            glm::vec3 vertexPos = s_Data.Terrain->GetVertexFromCoords(coords.x, coords.y);
+            float offsetY = vertexPos.y;
+            glm::mat4 modelMatrix = glm::translate(initialMatrix, glm::vec3(coords.x * scaleFactor, offsetY, coords.y * scaleFactor));
+            modelMatrix = glm::scale(modelMatrix, glm::vec3(currentModelData.Scale));
+            matrices.emplace_back(modelMatrix);
+        }
+        s_Data.ModelPositions[i].InstanceMatrix = std::move(matrices);
 
-    delete instanceMatrices;
+        // delete instanceMatrices;
+    }
 }
 
 void TerrainScene::OnUpdate()
@@ -196,27 +230,28 @@ void TerrainScene::OnUpdate()
 
         s_Data.TerrainShader->SetFloat("uMinHeight", s_Data.Terrain->GetMinHeight());
         s_Data.TerrainShader->SetFloat("uMaxHeight", s_Data.Terrain->GetMaxHeight());
-        s_Data.TerrainShader->SetInt("uNumOfColors", s_Data.TerrainBiomeData.NumOfBiomeLayers);
+        s_Data.TerrainShader->SetInt("uNumOfLayers", s_Data.TerrainBiomeData.NumOfBiomeLayers);
 
         for (int i = 0; i < s_Data.TerrainBiomeData.NumOfBiomeLayers; i++)
         {
             bool textureUsed = false;
             // Bind Textures
+            std::string index = std::to_string(i);
             if (s_Data.TerrainBiomeData.BiomeLayers[i].TextureIndex != 0)
             {
-                s_Data.TerrainShader->SetFloat("uTexturesScale[" + std::to_string(i) + "]", s_Data.TerrainBiomeData.BiomeLayers[i].TextureScale);
-                s_Data.TerrainShader->SetInt("uTerrainTextures[" + std::to_string(i) + "]", i);
+                s_Data.TerrainShader->SetFloat("uTexturesScale[" + index + "]", s_Data.TerrainBiomeData.BiomeLayers[i].TextureScale);
+                s_Data.TerrainShader->SetInt("uTerrainTextures[" + index + "]", i);
 
-                s_Data.TexturesList[s_Data.TerrainBiomeData.BiomeLayers[i].TextureIndex - 1]->Bind(i);
+                s_Data.Resources.TerrainTextureList[s_Data.TerrainBiomeData.BiomeLayers[i].TextureIndex - 1]->Bind(i);
 
                 textureUsed = true;
             }
-            s_Data.TerrainShader->SetBool("uBiomeTextureUsed[" + std::to_string(i) + "]", textureUsed);
+            s_Data.TerrainShader->SetBool("uBiomeTextureUsed[" + index + "]", textureUsed);
 
-            s_Data.TerrainShader->SetFloat("uBiomeStartHeight[" + std::to_string(i) + "]", s_Data.TerrainBiomeData.BiomeLayers[i].StartHeight);
-            s_Data.TerrainShader->SetFloat("uBiomeBlends[" + std::to_string(i) + "]", s_Data.TerrainBiomeData.BiomeLayers[i].BlendStrength);
-            s_Data.TerrainShader->SetFloat("uBiomeColorStrength[" + std::to_string(i) + "]", s_Data.TerrainBiomeData.BiomeLayers[i].ColorStrength);
-            s_Data.TerrainShader->SetVec3("uBiomeColors[" + std::to_string(i) + "]", s_Data.TerrainBiomeData.BiomeLayers[i].Color);
+            s_Data.TerrainShader->SetFloat("uBiomeStartHeight[" + index + "]", s_Data.TerrainBiomeData.BiomeLayers[i].StartHeight);
+            s_Data.TerrainShader->SetFloat("uBiomeBlends[" + index + "]", s_Data.TerrainBiomeData.BiomeLayers[i].BlendStrength);
+            s_Data.TerrainShader->SetFloat("uBiomeColorStrength[" + index + "]", s_Data.TerrainBiomeData.BiomeLayers[i].ColorStrength);
+            s_Data.TerrainShader->SetVec3("uBiomeColors[" + index + "]", s_Data.TerrainBiomeData.BiomeLayers[i].Color);
         }
         // pass the index of the textures used
 
@@ -242,32 +277,48 @@ void TerrainScene::OnUpdate()
         s_Data.ModelShader->SetVec3("uCameraPos", s_Data.CameraData.Position);
         s_Data.ModelShader->SetVec3("uDirLight.direction", s_Data.SceneCompositionData.LightDirection);
 
-        const auto &meshes = s_Data.Box->GetMeshes();
-        for (const auto &mesh : meshes)
+        for (uint32_t i = 0; i < s_Data.ModelPlacementData.NumOfModels; i++)
         {
-            const auto &meshTextures = mesh->GetTextures();
-            for (uint8_t i = 0; i < meshTextures.size(); i++)
+            const uint32_t modelIndex = s_Data.ModelPlacementData.ModelsData[i].ModelIndex;
+
+            // If no model are selected, ignore it
+            // The 0 index is reserverd for the NoneModel value
+            if (modelIndex == 0)
+                continue;
+
+            const auto &model = s_Data.Resources.ModelList[modelIndex - 1];
+
+            for (auto &mesh : model->GetMeshes())
             {
-                const Enxus::Ref<Enxus::TextureMesh2D> &texture = meshTextures[i];
-                std::string textureName;
-                switch (texture->GetType())
+                const auto &meshTextures = mesh->GetTextures();
+                for (uint8_t i = 0; i < meshTextures.size(); i++)
                 {
-                case Enxus::TextureType::DIFFUSE:
-                    textureName = "diffuseMap";
-                    break;
-                case Enxus::TextureType::SPECULAR:
-                    textureName = "specularMap";
-                    break;
-                // add normal map... etc
-                default:
-                    break;
+                    const Enxus::Ref<Enxus::TextureMesh2D> &texture = meshTextures[i];
+                    std::string textureName;
+                    switch (texture->GetType())
+                    {
+                    case Enxus::TextureType::DIFFUSE:
+                        textureName = "diffuseMap";
+                        break;
+                    case Enxus::TextureType::SPECULAR:
+                        textureName = "specularMap";
+                        break;
+                    // add normal map... etc
+                    default:
+                        break;
+                    }
+                    s_Data.ModelShader->SetInt(("uMaterial." + textureName).c_str(), i);
+                    texture->Bind(i);
                 }
-                s_Data.ModelShader->SetInt(("uMaterial." + textureName).c_str(), i);
-                texture->Bind(i);
+
+                mesh->GetVertexArray()->Bind();
+                const uint32_t renderedAmount = s_Data.ModelPositions[i].Positions.size();
+
+                // Thas last added buffer is the instance buffer which was created in InitModels method
+                auto &instanceBuffer = mesh->GetVertexArray()->GetVertexBuffers().back();
+                instanceBuffer->SetData(&s_Data.ModelPositions[i].InstanceMatrix[0], renderedAmount * sizeof(glm::mat4));
+                GLCall(glDrawElementsInstanced(GL_TRIANGLES, mesh->GetVertexArray()->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr, renderedAmount));
             }
-            mesh->GetVertexArray()->Bind();
-            // GLCall(glDrawElements(GL_TRIANGLES, mesh->GetVertexArray()->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr));
-            GLCall(glDrawElementsInstanced(GL_TRIANGLES, mesh->GetVertexArray()->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr, s_Data.ModelPositions.size()));
         }
     }
 
@@ -346,23 +397,43 @@ void TerrainScene::UpdateSceneComposition(const SceneCompositionPanelProps &prop
 
 void TerrainScene::UpdateModelPlacement(const ModelPlacementPanelProps &props)
 {
-    if (s_Data.ModelPlacementData.Radius != props.Radius)
+
+    if (s_Data.ModelPlacementData.NumOfModels != props.NumOfModels)
     {
-        s_Data.ModelPlacementData.Radius = props.Radius;
-        s_Data.RandomSampler->SetRadius(props.Radius);
-        s_Data.ModelPositions = s_Data.RandomSampler->GetSampledPoints();
-        UpdateModelPositions();
+        s_Data.ModelPlacementData.NumOfModels = props.NumOfModels;
     }
-    if (s_Data.ModelPlacementData.Scale != props.Scale)
+
+    // Update the model location properties
+    for (int i = 0; i < props.NumOfModels; i++)
     {
-        s_Data.ModelPlacementData.Scale = props.Scale;
-        UpdateModelPositions();
-    }
-    if (s_Data.ModelPlacementData.Amount != props.Amount)
-    {
-        s_Data.ModelPlacementData.Amount = props.Amount;
-        s_Data.RandomSampler->SetAmount(props.Amount);
-        s_Data.ModelPositions = s_Data.RandomSampler->GetSampledPoints();
-        UpdateModelPositions();
+        auto &currentModelData = s_Data.ModelPlacementData.ModelsData[i];
+        auto &propsModelData = props.ModelsData[i];
+        if (currentModelData.Radius != propsModelData.Radius)
+        {
+            currentModelData.Radius = propsModelData.Radius;
+            s_Data.ModelPositions[i].RandomSampler->SetRadius(propsModelData.Radius);
+            s_Data.ModelPositions[i].Positions = s_Data.ModelPositions[i].RandomSampler->GetSampledPoints();
+            UpdateModelPositions();
+        }
+        if (currentModelData.Scale != propsModelData.Scale)
+        {
+            currentModelData.Scale = propsModelData.Scale;
+            UpdateModelPositions();
+        }
+        if (currentModelData.Amount != propsModelData.Amount)
+        {
+            currentModelData.Amount = propsModelData.Amount;
+            s_Data.ModelPositions[i].RandomSampler->SetAmount(propsModelData.Amount);
+            s_Data.ModelPositions[i].Positions = s_Data.ModelPositions[i].RandomSampler->GetSampledPoints();
+            UpdateModelPositions();
+        }
+        if (currentModelData.ModelIndex != propsModelData.ModelIndex)
+        {
+            currentModelData.ModelIndex = propsModelData.ModelIndex;
+        }
+        if (currentModelData.OffsetHeight != propsModelData.OffsetHeight)
+        {
+            currentModelData.OffsetHeight = propsModelData.OffsetHeight;
+        }
     }
 }
