@@ -219,6 +219,8 @@ void TerrainScene::UpdateModelPositions()
             float minHeight = s_Data.Terrain->GetMinHeight();
             float maxHeight = s_Data.Terrain->GetMaxHeight();
             float heightPercent = std::clamp((offsetY - minHeight) / (maxHeight - minHeight), 0.0f, 1.0f);
+
+            // If its outside of the current boundaries of the panel
             if (heightPercent < currentModelData.HeightRangeBegin || heightPercent > currentModelData.HeightRangeEnd)
             {
                 continue;
@@ -229,8 +231,6 @@ void TerrainScene::UpdateModelPositions()
             matrices.emplace_back(modelMatrix);
         }
         s_Data.ModelPositions[i].InstanceMatrix = std::move(matrices);
-
-        // delete instanceMatrices;
     }
 }
 

@@ -278,7 +278,14 @@ glm::vec3 TerrainMesh::GetVertexFromCoords(uint32_t x, uint32_t y)
         ASSERT(false);
     }
 
-    uint32_t index = y * m_Height + x;
+    uint32_t step = GetMeshSimplificationStep();
+    x /= step;
+    y /= step;
+
+    uint32_t height = GetSimplifiedHeight();
+
+    uint32_t index = y * height + x;
+
     return m_Vertices[index].Position;
 }
 
