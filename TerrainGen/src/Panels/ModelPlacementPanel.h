@@ -9,11 +9,12 @@ struct ModelPlacementPanelProps
     const int MaxAmount = 5000;
     struct ModelPlacementData
     {
-        float Radius = 25.0f;
+        float Radius = 8.0f;
         float OffsetHeight = 0.0f;
         float Scale = 0.1f;
         int Amount = 1000;
         int ModelIndex = 0;
+        float HeightRangeBegin, HeightRangeEnd;
     };
 
     int NumOfModels = 0;

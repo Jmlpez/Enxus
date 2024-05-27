@@ -30,7 +30,7 @@ struct TerrainSceneData
     {
         static std::string s_AssetsPath;
         std::array<Enxus::Ref<Enxus::TextureMesh2D>, 7> TerrainTextureList;
-        std::array<Enxus::Ref<Enxus::Model>, 2> ModelList;
+        std::array<Enxus::Ref<Enxus::Model>, 7> ModelList;
     } Resources;
 
     struct CameraData
@@ -53,6 +53,13 @@ void TerrainScene::SubmitCamera(const Enxus::Camera &camera)
 
 void TerrainScene::Init()
 {
+
+    //----------------- BLENDING -------------------//
+    GLCall(glEnable(GL_BLEND));
+    // Blending equation: source_color * source_factor + destination_color * destination_factor
+    // usually source factor is the alpha channel of the source_color
+    // and destination factor 1 - the alpha channel of the source_color
+    GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
     //----------------- TERRAIN TEXTURES -------------------//
     // For now must be in the same order as the ImGui enum array in TerrainBiomePanel
     static const std::string texturesPaths[7] = {
@@ -72,14 +79,21 @@ void TerrainScene::Init()
 
     //----------------- MODELS -------------------//
     // For now must be in the same order as the ImGui enum array in ModelPlacementPanel
-    static const std::string modelsPaths[2] = {
+    static const std::string modelsPaths[7] = {
         s_Data.Resources.s_AssetsPath + "models/box/box.obj",
-        s_Data.Resources.s_AssetsPath + "models/box/box.obj",
+        s_Data.Resources.s_AssetsPath + "models/trees/BirchTree_1.obj",
+        s_Data.Resources.s_AssetsPath + "models/trees/DeadTree_2.obj",
+        s_Data.Resources.s_AssetsPath + "models/trees/MapleTree_1.obj",
+        s_Data.Resources.s_AssetsPath + "models/trees/NormalTree_2.obj",
+        s_Data.Resources.s_AssetsPath + "models/trees/PalmTree_2.obj",
+        s_Data.Resources.s_AssetsPath + "models/trees/PineTree_1.obj",
     };
-    for (int i = 0; i < 2; i++)
+    for (int i = 0; i < 7; i++)
     {
         s_Data.Resources.ModelList[i] = Enxus::CreateRef<Enxus::Model>(modelsPaths[i]);
     }
+    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
     // [TODO] Use Uniform Buffer Objects for things like camera and lighting
     InitTerrain();
@@ -201,6 +215,15 @@ void TerrainScene::UpdateModelPositions()
             glm::vec2 coords = currentModelPositions.Positions[j];
             glm::vec3 vertexPos = s_Data.Terrain->GetVertexFromCoords(coords.x, coords.y);
             float offsetY = vertexPos.y;
+
+            float minHeight = s_Data.Terrain->GetMinHeight();
+            float maxHeight = s_Data.Terrain->GetMaxHeight();
+            float heightPercent = std::clamp((offsetY - minHeight) / (maxHeight - minHeight), 0.0f, 1.0f);
+            if (heightPercent < currentModelData.HeightRangeBegin || heightPercent > currentModelData.HeightRangeEnd)
+            {
+                continue;
+            }
+
             glm::mat4 modelMatrix = glm::translate(initialMatrix, glm::vec3(coords.x * scaleFactor, offsetY, coords.y * scaleFactor));
             modelMatrix = glm::scale(modelMatrix, glm::vec3(currentModelData.Scale));
             matrices.emplace_back(modelMatrix);
@@ -312,7 +335,7 @@ void TerrainScene::OnUpdate()
                 }
 
                 mesh->GetVertexArray()->Bind();
-                const uint32_t renderedAmount = s_Data.ModelPositions[i].Positions.size();
+                const uint32_t renderedAmount = s_Data.ModelPositions[i].InstanceMatrix.size();
 
                 // Thas last added buffer is the instance buffer which was created in InitModels method
                 auto &instanceBuffer = mesh->GetVertexArray()->GetVertexBuffers().back();
@@ -434,6 +457,18 @@ void TerrainScene::UpdateModelPlacement(const ModelPlacementPanelProps &props)
         if (currentModelData.OffsetHeight != propsModelData.OffsetHeight)
         {
             currentModelData.OffsetHeight = propsModelData.OffsetHeight;
+        }
+        if (currentModelData.HeightRangeBegin != propsModelData.HeightRangeBegin)
+        {
+            currentModelData.HeightRangeBegin = propsModelData.HeightRangeBegin;
+            s_Data.ModelPositions[i].Positions = s_Data.ModelPositions[i].RandomSampler->GetSampledPoints();
+            UpdateModelPositions();
+        }
+        if (currentModelData.HeightRangeEnd != propsModelData.HeightRangeEnd)
+        {
+            currentModelData.HeightRangeEnd = propsModelData.HeightRangeEnd;
+            s_Data.ModelPositions[i].Positions = s_Data.ModelPositions[i].RandomSampler->GetSampledPoints();
+            UpdateModelPositions();
         }
     }
 }

@@ -13,6 +13,8 @@ void ModelPlacementPanel::Init()
         modelData.OffsetHeight = 0.0f;
         modelData.Amount = 1000;
         modelData.ModelIndex = 0;
+        modelData.HeightRangeBegin = 0.0f;
+        modelData.HeightRangeEnd = 1.0f;
     }
 }
 
@@ -27,7 +29,16 @@ const ModelPlacementPanelProps &ModelPlacementPanel::GetPanelProps()
 
 void ModelPlacementPanel::OnImGuiRender()
 {
-    static const char *enumModelArray[] = {"None", "Box", "Backpack"};
+    static const char *enumModelArray[] = {
+        "None",
+        "Box",
+        "BirchTree",
+        "DeadTree",
+        "MapleTree",
+        "NormalTree",
+        "PalmTree",
+        "PineTree",
+    };
 
     if (ImGui::BeginTabItem("Objects"))
     {
@@ -38,10 +49,11 @@ void ModelPlacementPanel::OnImGuiRender()
             ImGui::SeparatorText(layer.c_str());
             ImGui::PushID(layer.c_str());
             {
-                ImGui::SliderFloat("Radius", &s_Props.ModelsData[i].Radius, 5.0f, 100.0f);
+                ImGui::SliderFloat("Radius", &s_Props.ModelsData[i].Radius, 2.0f, 25.0f);
                 ImGui::SliderInt("Amount", &s_Props.ModelsData[i].Amount, 1, 1000);
                 ImGui::DragFloat("Scale", &s_Props.ModelsData[i].Scale, 0.001f);
                 ImGui::DragFloat("OffsetY", &s_Props.ModelsData[i].OffsetHeight, 0.001f);
+                ImGui::DragFloatRange2("Height Range", &s_Props.ModelsData[i].HeightRangeBegin, &s_Props.ModelsData[i].HeightRangeEnd, 0.001f, 0.0f, 1.0f, "Min: %.3f", "Max: %.3f", ImGuiSliderFlags_AlwaysClamp);
                 ImGui::Combo("Model", &s_Props.ModelsData[i].ModelIndex, enumModelArray, IM_ARRAYSIZE(enumModelArray));
             }
             ImGui::PopID();
