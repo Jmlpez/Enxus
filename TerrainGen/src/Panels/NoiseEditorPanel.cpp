@@ -3,11 +3,13 @@
 #include "imgui/imgui.h"
 
 static NoiseEditorPanelProps s_Props;
+float NoiseEditorPanelProps::s_NoiseOffsetMultiplier = 10.0f;
 
 void NoiseEditorPanel::Init()
 {
-    srand(time(nullptr));
-    s_Props.GeneralNoise.Seed = rand() % 1000 + 1000;
+    std::random_device randomSeed;
+    std::mt19937 randomNumEngine(randomSeed());
+    s_Props.GeneralNoise.Seed = std::uniform_int_distribution<int>(0, 9999)(randomNumEngine);
     s_Props.Fnl.SetSeed(s_Props.GeneralNoise.Seed);
 
     s_Props.NoisePreviewData.Texture =
@@ -109,12 +111,12 @@ void NoiseEditorPanel::OnImGuiRender()
                 s_Props.NoiseUpdateFlag = true;
             }
             ImGui::PushItemWidth(50);
-            if (ImGui::DragFloat("Offset X", &s_Props.GeneralNoise.OffsetX, 1.0f))
+            if (ImGui::DragFloat("Offset X", &s_Props.GeneralNoise.OffsetX, 0.1f, -100.0f, 100.0f))
             {
                 s_Props.NoiseUpdateFlag = true;
             }
             ImGui::SameLine();
-            if (ImGui::DragFloat("Offset Y", &s_Props.GeneralNoise.OffsetY, 1.0f))
+            if (ImGui::DragFloat("Offset Y", &s_Props.GeneralNoise.OffsetY, 0.1f, -100.0f, 100.0f))
             {
                 s_Props.NoiseUpdateFlag = true;
             }
@@ -337,7 +339,9 @@ void NoiseEditorPanel::UpdateNoiseMap(bool newMap)
                 s_Props.FnlWarp.DomainWarp(posX, posY);
             }
 
-            float noise = s_Props.Fnl.GetNoise(posX + s_Props.GeneralNoise.OffsetX, posY + s_Props.GeneralNoise.OffsetY);
+            float noise = s_Props.Fnl.GetNoise(
+                posX + s_Props.GeneralNoise.OffsetX * s_Props.s_NoiseOffsetMultiplier,
+                posY + s_Props.GeneralNoise.OffsetY * s_Props.s_NoiseOffsetMultiplier);
 
             // convert noise from [-1, 1] to [0, 1]
             float normalizedNoise = (noise + 1.0f) * 0.5f;

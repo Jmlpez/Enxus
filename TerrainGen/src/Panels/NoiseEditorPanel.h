@@ -9,6 +9,7 @@ struct NoiseEditorPanelProps
     // this is the size of the generated texture using the noise
     const uint32_t NoiseWidth = 241;
     const uint32_t NoiseHeight = 241;
+    static float s_NoiseOffsetMultiplier;
 
     FastNoiseLite Fnl;
     FastNoiseLite FnlWarp;
