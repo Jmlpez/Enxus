@@ -12,9 +12,9 @@ struct ModelPlacementPanelProps
         float Radius = 8.0f;
         float OffsetHeight = 0.0f;
         float Scale = 0.1f;
-        int Amount = 1000;
+        int Amount = 250;
         int ModelIndex = 0;
-        float HeightRangeBegin, HeightRangeEnd;
+        float HeightRangeBegin = 0.0f, HeightRangeEnd = 1.0f;
     };
 
     int NumOfModels = 0;

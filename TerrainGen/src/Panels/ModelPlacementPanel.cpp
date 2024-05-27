@@ -8,10 +8,10 @@ void ModelPlacementPanel::Init()
     s_Props.NumOfModels = 0;
     for (auto &modelData : s_Props.ModelsData)
     {
-        modelData.Radius = 25.0f;
+        modelData.Radius = 8.0f;
         modelData.Scale = 0.1f;
         modelData.OffsetHeight = 0.0f;
-        modelData.Amount = 1000;
+        modelData.Amount = 250;
         modelData.ModelIndex = 0;
         modelData.HeightRangeBegin = 0.0f;
         modelData.HeightRangeEnd = 1.0f;
@@ -52,7 +52,7 @@ void ModelPlacementPanel::OnImGuiRender()
                 ImGui::SliderFloat("Radius", &s_Props.ModelsData[i].Radius, 2.0f, 25.0f);
                 ImGui::SliderInt("Amount", &s_Props.ModelsData[i].Amount, 1, 1000);
                 ImGui::DragFloat("Scale", &s_Props.ModelsData[i].Scale, 0.001f);
-                ImGui::DragFloat("OffsetY", &s_Props.ModelsData[i].OffsetHeight, 0.001f);
+                ImGui::DragFloat("OffsetY", &s_Props.ModelsData[i].OffsetHeight, 0.01f);
                 ImGui::DragFloatRange2("Height Range", &s_Props.ModelsData[i].HeightRangeBegin, &s_Props.ModelsData[i].HeightRangeEnd, 0.001f, 0.0f, 1.0f, "Min: %.3f", "Max: %.3f", ImGuiSliderFlags_AlwaysClamp);
                 ImGui::Combo("Model", &s_Props.ModelsData[i].ModelIndex, enumModelArray, IM_ARRAYSIZE(enumModelArray));
             }

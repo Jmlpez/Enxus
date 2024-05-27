@@ -5,7 +5,7 @@ layout(location = 1) in vec2 aTexCoord;
 layout(location = 2) in vec3 aNormal;
 layout(location = 3) in mat4 aInstanceMatrix;
 
-// uniform mat4 uModel;
+uniform float uOffsetY;
 uniform mat4 uView;
 uniform mat4 uProj;
 
@@ -17,9 +17,11 @@ out VS_OUT {
 
 void main() {
 
-    gl_Position = uProj * uView * aInstanceMatrix * vec4(aPos, 1.0);
+    vec3 position = aPos;
+    position.y += uOffsetY;
+    gl_Position = uProj * uView * aInstanceMatrix * vec4(position, 1.0);
 
     vs_out.vTexCoord = aTexCoord;
     vs_out.vNormal = mat3(transpose(inverse(aInstanceMatrix))) * aNormal;
-    vs_out.vFragPos = vec3(aInstanceMatrix * vec4(aPos, 1.0));
+    vs_out.vFragPos = vec3(aInstanceMatrix * vec4(position, 1.0));
 }

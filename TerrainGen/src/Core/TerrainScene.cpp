@@ -300,7 +300,7 @@ void TerrainScene::OnUpdate()
         s_Data.ModelShader->SetVec3("uCameraPos", s_Data.CameraData.Position);
         s_Data.ModelShader->SetVec3("uDirLight.direction", s_Data.SceneCompositionData.LightDirection);
 
-        for (uint32_t i = 0; i < s_Data.ModelPlacementData.NumOfModels; i++)
+        for (int i = 0; i < s_Data.ModelPlacementData.NumOfModels; i++)
         {
             const uint32_t modelIndex = s_Data.ModelPlacementData.ModelsData[i].ModelIndex;
 
@@ -310,7 +310,6 @@ void TerrainScene::OnUpdate()
                 continue;
 
             const auto &model = s_Data.Resources.ModelList[modelIndex - 1];
-
             for (auto &mesh : model->GetMeshes())
             {
                 const auto &meshTextures = mesh->GetTextures();
@@ -333,6 +332,8 @@ void TerrainScene::OnUpdate()
                     s_Data.ModelShader->SetInt(("uMaterial." + textureName).c_str(), i);
                     texture->Bind(i);
                 }
+
+                s_Data.ModelShader->SetFloat("uOffsetY", s_Data.ModelPlacementData.ModelsData[i].OffsetHeight);
 
                 mesh->GetVertexArray()->Bind();
                 const uint32_t renderedAmount = s_Data.ModelPositions[i].InstanceMatrix.size();
