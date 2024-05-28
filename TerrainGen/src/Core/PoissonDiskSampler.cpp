@@ -3,9 +3,10 @@
 static const glm::vec2 EMPTY_CELL = glm::vec2(-1, -1);
 
 PoissonDiskSampler::PoissonDiskSampler(uint32_t width, uint32_t height, float radius, uint32_t amount)
-    : m_Width(width), m_Height(height), m_Radius(radius), m_Amount(amount),
-      m_RandomGenEngine(m_RD())
+    : m_Width(width), m_Height(height), m_Radius(radius), m_Amount(amount), m_Seed(5489),
+      m_RandomGenEngine(m_Seed)
 {
+
     InitGrid();
 }
 
@@ -97,6 +98,15 @@ void PoissonDiskSampler::SetRadius(float radius)
 void PoissonDiskSampler::SetAmount(uint32_t amount)
 {
     m_Amount = amount;
+    ResetValues();
+    InitGrid();
+    CalculatePoints();
+}
+
+void PoissonDiskSampler::SetSeed(uint32_t seed)
+{
+    m_Seed = seed;
+    m_RandomGenEngine.seed(m_Seed);
     ResetValues();
     InitGrid();
     CalculatePoints();

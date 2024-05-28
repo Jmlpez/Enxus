@@ -11,10 +11,11 @@ void ModelPlacementPanel::Init()
         modelData.Radius = 8.0f;
         modelData.Scale = 0.1f;
         modelData.OffsetHeight = 0.0f;
-        modelData.Amount = 250;
-        modelData.ModelIndex = 0;
         modelData.HeightRangeBegin = 0.0f;
         modelData.HeightRangeEnd = 1.0f;
+        modelData.Amount = 250;
+        modelData.ModelIndex = 0;
+        modelData.RandomGeneratorSeed = 5489;
     }
 }
 
@@ -49,6 +50,7 @@ void ModelPlacementPanel::OnImGuiRender()
             ImGui::SeparatorText(layer.c_str());
             ImGui::PushID(layer.c_str());
             {
+                ImGui::DragInt("Seed", &s_Props.ModelsData[i].RandomGeneratorSeed);
                 ImGui::SliderFloat("Radius", &s_Props.ModelsData[i].Radius, 2.0f, 25.0f);
                 ImGui::SliderInt("Amount", &s_Props.ModelsData[i].Amount, 1, 1000);
                 ImGui::DragFloat("Scale", &s_Props.ModelsData[i].Scale, 0.001f);

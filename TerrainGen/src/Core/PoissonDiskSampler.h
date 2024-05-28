@@ -14,6 +14,7 @@ public:
     inline uint32_t GetAmount() const { return m_Amount; }
     inline const std::vector<glm::vec2> &GetSampledPoints() const { return m_FinalPointsList; }
 
+    void SetSeed(uint32_t seed);
     void SetRadius(float radius);
     void SetAmount(uint32_t amount);
     void CalculatePoints();
@@ -36,7 +37,9 @@ private:
     uint32_t m_GridRows, m_GridCols;
     std::vector<std::vector<glm::vec2>> m_Grid;
 
-    std::random_device m_RD;
+    // uint32_fast m_Seed;
+    uint32_t m_Seed;
+    // uint_fas
     std::mt19937 m_RandomGenEngine;
 };
 

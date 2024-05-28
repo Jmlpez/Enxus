@@ -432,6 +432,13 @@ void TerrainScene::UpdateModelPlacement(const ModelPlacementPanelProps &props)
     {
         auto &currentModelData = s_Data.ModelPlacementData.ModelsData[i];
         auto &propsModelData = props.ModelsData[i];
+        if (currentModelData.RandomGeneratorSeed != propsModelData.RandomGeneratorSeed)
+        {
+            currentModelData.RandomGeneratorSeed = propsModelData.RandomGeneratorSeed;
+            s_Data.ModelPositions[i].RandomSampler->SetSeed(propsModelData.RandomGeneratorSeed);
+            s_Data.ModelPositions[i].Positions = s_Data.ModelPositions[i].RandomSampler->GetSampledPoints();
+            UpdateModelPositions();
+        }
         if (currentModelData.Radius != propsModelData.Radius)
         {
             currentModelData.Radius = propsModelData.Radius;
