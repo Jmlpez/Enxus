@@ -124,7 +124,7 @@ namespace Enxus
                 break;
             }
         }
-        m_VertexBuffers.push_back(vertexBuffer);
+        m_VertexBuffers.emplace_back(vertexBuffer);
     }
 
     void VertexArray::SetIndexBuffer(const Ref<IndexBuffer> &indexBuffer)

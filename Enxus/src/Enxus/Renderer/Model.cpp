@@ -18,7 +18,7 @@ namespace Enxus
     {
         Assimp::Importer importer;
 
-        auto importerStepsFlags = aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_OptimizeMeshes;
+        auto importerStepsFlags = aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_OptimizeMeshes | aiProcess_OptimizeGraph;
         // (check about flips uvs later)
         // auto importerStepsFlags = aiProcess_Triangulate;
         /*
@@ -55,7 +55,7 @@ namespace Enxus
         for (unsigned int i = 0; i < node->mNumMeshes; i++)
         {
             aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
-            m_Meshes.push_back(ProcessMesh(mesh, scene));
+            m_Meshes.emplace_back(ProcessMesh(mesh, scene));
         }
         // recursively process the node childrens in a DFS-fashion (if any)
         for (unsigned int i = 0; i < node->mNumChildren; i++)
@@ -106,7 +106,7 @@ namespace Enxus
             { // does not has textures...
                 vertex.TexCoords = glm::vec2(0.0f, 0.0f);
             }
-            vertices.push_back(vertex);
+            vertices.emplace_back(vertex);
         }
         return vertices;
     }
@@ -120,7 +120,7 @@ namespace Enxus
             aiFace &face = mesh->mFaces[i];
             for (unsigned int j = 0; j < face.mNumIndices; j++)
             {
-                indices.push_back(face.mIndices[j]);
+                indices.emplace_back(face.mIndices[j]);
             }
         }
         return indices;
@@ -160,7 +160,7 @@ namespace Enxus
 
                 if (tex->GetPath() == fullTexturePath)
                 {
-                    textures.push_back(tex);
+                    textures.emplace_back(tex);
                     isTextureLoaded = true;
                     break;
                 }
@@ -174,8 +174,8 @@ namespace Enxus
 
             Ref<TextureMesh2D>
                 texture = CreateRef<TextureMesh2D>(textureData);
-            textures.push_back(texture);
-            m_LoadedTextures.push_back(texture);
+            textures.emplace_back(texture);
+            m_LoadedTextures.emplace_back(texture);
         }
         return textures;
     }

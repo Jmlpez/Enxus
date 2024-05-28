@@ -68,7 +68,7 @@ namespace Enxus
     {
         for (auto &[path, type] : m_MeshTexturesData)
         {
-            m_Textures.push_back(CreateRef<TextureMesh2D>(path, type));
+            m_Textures.emplace_back(CreateRef<TextureMesh2D>(path, type));
         }
     }
 }

@@ -52,8 +52,8 @@ void PoissonDiskSampler::CalculatePoints()
 
 void PoissonDiskSampler::AddPoint(glm::vec2 point)
 {
-    m_PointsQueue.push_back(point);
-    m_FinalPointsList.push_back(point);
+    m_PointsQueue.emplace_back(point);
+    m_FinalPointsList.emplace_back(point);
 
     int col = (int)(point.x / m_CellSize);
     int row = (int)(point.y / m_CellSize);
