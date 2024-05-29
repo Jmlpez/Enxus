@@ -59,7 +59,18 @@ void TerrainBiomePanel::OnImGuiRender()
                 ImGui::DragFloat("Texture Scale", &s_Props.BiomeLayers[i].TextureScale, 0.001f, 0.0f, 1.0f);
 
                 const std::string dragDropPayloadName = "Terrain Texture Index";
-                ImGui::Button(enumTerrainTexturesArray[s_Props.BiomeLayers[i].TextureIndex]);
+                ImGui::BeginGroup();
+                if (s_Props.BiomeLayers[i].TextureIndex == 0)
+                {
+                    ImGui::Button(enumTerrainTexturesArray[s_Props.BiomeLayers[i].TextureIndex], ImVec2(80, 80));
+                }
+                else
+                {
+                    const intptr_t textureId = texturesList[s_Props.BiomeLayers[i].TextureIndex - 1]->GetRendererId();
+                    ImGui::Image((void *)textureId, ImVec2(80, 80));
+                }
+                ImGui::EndGroup();
+
                 if (ImGui::BeginDragDropTarget())
                 {
                     if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload(dragDropPayloadName.c_str()))
@@ -68,6 +79,11 @@ void TerrainBiomePanel::OnImGuiRender()
                         s_Props.BiomeLayers[i].TextureIndex = payloadIndex;
                         ImGui::EndDragDropTarget();
                     }
+                }
+                ImGui::SameLine();
+                if (ImGui::Button("X", ImVec2(20, 20)))
+                {
+                    s_Props.BiomeLayers[i].TextureIndex = 0;
                 }
             }
 
@@ -121,44 +137,3 @@ void TerrainBiomePanel::OnImGuiRender()
         ImGui::End();
     }
 }
-
-/*
-ImGui::Begin("Terrain Textures");
-        static const std::string buttonsLabels[] = {"Hello", "Hola", "Hallo"};
-        static int value = 0;
-        for (int i = 0; i < 3; i++)
-        {
-            ImGui::PushID(i);
-            ImGui::Button(buttonsLabels[i].c_str(), ImVec2(60, 60));
-            if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None))
-            {
-                ImGui::SetDragDropPayload("DND_DEMO_CELL", &i, sizeof(int));
-                std::string name = "Dragging" + buttonsLabels[i];
-                ImGui::Text(name.c_str());
-                // Display preview (could be anything, e.g. when dragging an image we could decide to display
-                // the filename and a small preview of the image, etc.)
-
-                ImGui::EndDragDropSource();
-            }
-            ImGui::PopID();
-        }
-        ImGui::End();
-
-        for (int i = 0; i < 2; i++)
-        {
-
-            ImGui::Button(buttonsLabels[value].c_str());
-            //   ImGui::Button(buttonsLabels[value].c_str());
-            if (ImGui::BeginDragDropTarget())
-            {
-                if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload("DND_DEMO_CELL"))
-                {
-                    IM_ASSERT(payload->DataSize == sizeof(int));
-                    int payload_n = *(const int *)payload->Data;
-                    value = payload_n;
-                    std::cout << value << std::endl;
-                }
-                ImGui::EndDragDropTarget();
-            }
-        }
-*/
