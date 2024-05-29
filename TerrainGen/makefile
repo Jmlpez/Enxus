@@ -26,10 +26,19 @@ IMGUI_FLAGS = -I$(ENXUS_VENDOR_DIR)/imgui
 
 OPENGL_FLAGS = -lglfw -lGL -lGLEW -lX11 -lpthread -lassimp -lXrandr -lXi -ldl
 
-# Compiler
+
 CXX = g++
-DEBUG_FLAGS = -g
 CXXFLAGS = -std=gnu++17 $(DEBUG_FLAGS) -Wall -Wextra
+# Compiler
+CONFIG ?= RELEASE
+# Set CXXFLAGS based on the value of config
+ifeq ($(CONFIG), DEBUG)
+    CXXFLAGS += -g
+else ifeq ($(CONFIG), RELEASE)
+    CXXFLAGS += -O2
+else
+    $(error Unknown CONFIG $(CONFIG))
+endif
 
 #------------------ TerrainGen ------------------
 

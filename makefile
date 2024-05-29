@@ -37,8 +37,17 @@ PCH_FLAGS = -include $(PCH_SRC)
 
 # Compiler
 CXX = g++
-DEBUG_FLAGS = -g
 CXXFLAGS = -std=gnu++17 $(DEBUG_FLAGS) -Wall -Wextra
+CONFIG ?= RELEASE
+
+# Set CXXFLAGS based on the value of config
+ifeq ($(CONFIG), DEBUG)
+    CXXFLAGS += -g
+else ifeq ($(CONFIG), RELEASE)
+    CXXFLAGS += -O2
+else
+    $(error Unknown CONFIG $(CONFIG))
+endif
 
 # OBJ Files
 #OBJS = $(addprefix $(BIN_DIR)/, $(addsuffix .o, $(basename $(notdir $(SOURCES)))))
@@ -51,7 +60,7 @@ sandbox-app:
 	$(MAKE) $(SANDBOX_TARGET)
 
 terrain-app: 
-	$(MAKE) -C $(TERRAIN_GEN_DIR)
+	$(MAKE) -C $(TERRAIN_GEN_DIR) CONFIG=$(CONFIG)
 	$(MAKE) $(TERRAIN_GEN_TARGET)
 
 # Build sandbox target
@@ -67,7 +76,7 @@ enxus:
 sandbox:
 	$(MAKE) -C $(SANDBOX_DIR) build
 terrain:
-	$(MAKE) -C $(TERRAIN_GEN_DIR) build
+	$(MAKE) -C $(TERRAIN_GEN_DIR) build CONFIG=$(CONFIG)
 
 rebuild:
 	@echo "\n---------------------- RE-BUILDING THE ENTIRE PROJECT -----------------------\n"
