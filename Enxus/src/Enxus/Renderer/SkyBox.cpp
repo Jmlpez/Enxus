@@ -71,6 +71,7 @@ namespace Enxus
 
     void SkyBox::Bind() const
     {
+        m_SkyBoxVAO->Bind();
         GLCall(glActiveTexture(GL_TEXTURE0));
         GLCall(glBindTexture(GL_TEXTURE_CUBE_MAP, m_RendererID));
     }
