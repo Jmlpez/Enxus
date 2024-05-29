@@ -1,4 +1,5 @@
 #include "TerrainBiomePanel.h"
+#include "ResourceManager.h"
 #include "imgui/imgui.h"
 
 static TerrainBiomePanelProps s_Props;
@@ -31,9 +32,10 @@ void TerrainBiomePanel::OnImGuiRender()
     static const char *enumTerrainTexturesArray[] = {"None", "Water", "Grass", "Rocks1", "Rocks2", "Sandy Grass", "Stony Ground", "Snow"};
     static const int arrSize = IM_ARRAYSIZE(enumTerrainTexturesArray);
 
+    const auto &texturesList = ResourceManager::GetTexturesList();
+
     if (ImGui::BeginTabItem("Biome"))
     {
-
         ImGui::SliderInt("Layers", &s_Props.NumOfBiomeLayers, 0, 8);
 
         for (int i = 0; i < s_Props.NumOfBiomeLayers; i++)
@@ -55,7 +57,6 @@ void TerrainBiomePanel::OnImGuiRender()
                 ImGui::SliderFloat("Start Height", &s_Props.BiomeLayers[i].StartHeight, prevStartHeight, 1.0f);
                 ImGui::SliderFloat("Blend Strength", &s_Props.BiomeLayers[i].BlendStrength, 0.0f, 1.0f);
                 ImGui::DragFloat("Texture Scale", &s_Props.BiomeLayers[i].TextureScale, 0.001f, 0.0f, 1.0f);
-                // ImGui::Combo("Texture", &s_Props.BiomeLayers[i].TextureIndex, enumTerrainTexturesArray, IM_ARRAYSIZE(enumTerrainTexturesArray));
 
                 const std::string dragDropPayloadName = "Terrain Texture Index";
                 ImGui::Button(enumTerrainTexturesArray[s_Props.BiomeLayers[i].TextureIndex]);
@@ -73,27 +74,51 @@ void TerrainBiomePanel::OnImGuiRender()
             ImGui::PopID();
         }
 
+        ImGui::EndTabItem();
+    }
+
+    {
+        ImGui::Begin("Terrain Textures");
+
+        const float itemHorizontalSpacing = 15;
+        ImGuiStyle &style = ImGui::GetStyle();
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(itemHorizontalSpacing, style.ItemSpacing.y));
+
+        ImVec2 buttonSize(80, 80);
+        float windowVisibleX = ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMax().x;
+        for (int i = 1, count = 0; i < arrSize; i++, count++)
         {
-            ImGui::Begin("Terrain Textures");
-            for (int i = 1; i < arrSize; i++)
+            const Enxus::Ref<Enxus::TextureMesh2D> texture = texturesList[i - 1];
+
+            const std::string dragDropPayloadName = "Terrain Texture Index";
+            ImGui::PushID(i);
+
             {
-                const std::string dragDropPayloadName = "Terrain Texture Index";
-                ImGui::PushID(i);
-                ImGui::Button(enumTerrainTexturesArray[i]);
-                if (ImGui::BeginDragDropSource())
+                ImGui::BeginGroup();
+                {
+                    intptr_t textureId = texture->GetRendererId();
+                    ImGui::Image((void *)textureId, buttonSize);
+                    ImGui::Text(enumTerrainTexturesArray[i]);
+                }
+                ImGui::EndGroup();
+
+                float lastButtonX = ImGui::GetItemRectMax().x;
+                float nextButtonX = lastButtonX + itemHorizontalSpacing + buttonSize.x;
+                if (count + 1 < arrSize && nextButtonX < windowVisibleX)
+                    ImGui::SameLine();
+
+                if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
                 {
                     ImGui::SetDragDropPayload(dragDropPayloadName.c_str(), &i, sizeof(int));
                     ImGui::Text(enumTerrainTexturesArray[i]);
                     ImGui::EndDragDropSource();
                 }
-                ImGui::PopID();
             }
 
-            ImGui::End();
+            ImGui::PopID();
         }
-
-        ImGui::Dummy(ImVec2(0.0f, 15.0f));
-        ImGui::EndTabItem();
+        ImGui::PopStyleVar();
+        ImGui::End();
     }
 }
 
