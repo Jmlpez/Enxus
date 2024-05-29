@@ -52,6 +52,7 @@ namespace Enxus
 
         // Setup Dear ImGui style
         ImGui::StyleColorsDark();
+
         // ImGui::StyleColorsClassic();
 
         // When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
@@ -61,6 +62,12 @@ namespace Enxus
             style.WindowRounding = 0.0f;
             style.Colors[ImGuiCol_WindowBg].w = 1.0f;
         }
+        style.WindowRounding = 5.0f;
+        style.ChildRounding = 5.0f;
+        style.FrameRounding = 5.0f;
+        style.PopupRounding = 5.0f;
+        style.GrabRounding = 5.0f;
+        style.TabRounding = 5.0f;
 
         Application &app = Application::Get();
         GLFWwindow *window = static_cast<GLFWwindow *>(app.GetWindow().GetNativeWindow());
