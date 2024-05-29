@@ -1,5 +1,6 @@
 #include "TerrainScene.h"
 #include "PoissonDiskSampler.h"
+#include "ResourceManager.h"
 
 struct TerrainSceneData
 {
@@ -18,20 +19,9 @@ struct TerrainSceneData
     ModelPlacementPanelProps ModelPlacementData;
     TerrainBiomePanelProps TerrainBiomeData;
 
-    // SkyBox
-    Enxus::Ref<Enxus::SkyBox> SkyBox;
-    Enxus::Ref<Enxus::Shader> SkyBoxShader;
-
     // Shaders
     Enxus::Ref<Enxus::Shader> TerrainShader;
     Enxus::Ref<Enxus::Shader> ModelShader;
-
-    struct ResourcesData
-    {
-        static std::string s_AssetsPath;
-        std::array<Enxus::Ref<Enxus::TextureMesh2D>, 7> TerrainTextureList;
-        std::array<Enxus::Ref<Enxus::Model>, 7> ModelList;
-    } Resources;
 
     struct CameraData
     {
@@ -42,7 +32,6 @@ struct TerrainSceneData
 };
 
 static TerrainSceneData s_Data;
-std::string TerrainSceneData::ResourcesData::s_AssetsPath = "TerrainGen/assets/";
 
 void TerrainScene::SubmitCamera(const Enxus::Camera &camera)
 {
@@ -60,45 +49,10 @@ void TerrainScene::Init()
     // usually source factor is the alpha channel of the source_color
     // and destination factor 1 - the alpha channel of the source_color
     GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
-    //----------------- TERRAIN TEXTURES -------------------//
-    // For now must be in the same order as the ImGui enum array in TerrainBiomePanel
-    static const std::string texturesPaths[7] = {
-        s_Data.Resources.s_AssetsPath + "images/materials-debug/water.png",
-        s_Data.Resources.s_AssetsPath + "images/materials-debug/grass.png",
-        s_Data.Resources.s_AssetsPath + "images/materials-debug/rocks1.png",
-        s_Data.Resources.s_AssetsPath + "images/materials-debug/rocks2.png",
-        s_Data.Resources.s_AssetsPath + "images/materials-debug/sandy-grass.png",
-        s_Data.Resources.s_AssetsPath + "images/materials-debug/stony-ground.png",
-        s_Data.Resources.s_AssetsPath + "images/materials-debug/snow.png",
-    };
-
-    for (int i = 0; i < 7; i++)
-    {
-        s_Data.Resources.TerrainTextureList[i] = Enxus::CreateRef<Enxus::TextureMesh2D>(texturesPaths[i], Enxus::TextureType::DIFFUSE);
-    }
-
-    //----------------- MODELS -------------------//
-    // For now must be in the same order as the ImGui enum array in ModelPlacementPanel
-    static const std::string modelsPaths[7] = {
-        s_Data.Resources.s_AssetsPath + "models/box/box.obj",
-        s_Data.Resources.s_AssetsPath + "models/trees/BirchTree_1.obj",
-        s_Data.Resources.s_AssetsPath + "models/trees/DeadTree_2.obj",
-        s_Data.Resources.s_AssetsPath + "models/trees/MapleTree_1.obj",
-        s_Data.Resources.s_AssetsPath + "models/trees/NormalTree_2.obj",
-        s_Data.Resources.s_AssetsPath + "models/trees/PalmTree_2.obj",
-        s_Data.Resources.s_AssetsPath + "models/trees/PineTree_1.obj",
-    };
-    for (int i = 0; i < 7; i++)
-    {
-        s_Data.Resources.ModelList[i] = Enxus::CreateRef<Enxus::Model>(modelsPaths[i]);
-    }
-    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
     // [TODO] Use Uniform Buffer Objects for things like camera and lighting
     InitTerrain();
     InitModels();
-    InitSkyBox();
 }
 
 void TerrainScene::ShutDown()
@@ -153,7 +107,7 @@ void TerrainScene::InitModels()
         s_Data.ModelPositions[i].Positions = s_Data.ModelPositions[i].RandomSampler->GetSampledPoints();
     }
 
-    for (auto &model : s_Data.Resources.ModelList)
+    for (auto &model : ResourceManager::GetModelsList())
     {
         // if the model has not been loaded, ignore it
         if (!model)
@@ -173,23 +127,6 @@ void TerrainScene::InitModels()
             mesh->GetVertexArray()->AddVertexBuffer(instanceBuffer);
         }
     }
-}
-
-void TerrainScene::InitSkyBox()
-{
-    //----------------- Sky Box -------------------//
-    s_Data.SkyBox = Enxus::CreateRef<Enxus::SkyBox>();
-    s_Data.SkyBox->SetCubeMapFaces(
-        {"TerrainGen/assets/images/skybox/right.tga",
-         "TerrainGen/assets/images/skybox/left.tga",
-         "TerrainGen/assets/images/skybox/top.tga",
-         "TerrainGen/assets/images/skybox/bottom.tga",
-         "TerrainGen/assets/images/skybox/back.tga",
-         "TerrainGen/assets/images/skybox/front.tga"});
-
-    s_Data.SkyBoxShader = Enxus::CreateRef<Enxus::Shader>(
-        "TerrainGen/assets/shaders/skybox/skybox.vert",
-        "TerrainGen/assets/shaders/skybox/skybox.frag");
 }
 
 void TerrainScene::UpdateModelPositions()
@@ -255,6 +192,7 @@ void TerrainScene::OnUpdate()
         s_Data.TerrainShader->SetFloat("uMaxHeight", s_Data.Terrain->GetMaxHeight());
         s_Data.TerrainShader->SetInt("uNumOfLayers", s_Data.TerrainBiomeData.NumOfBiomeLayers);
 
+        const auto &terrainTextureList = ResourceManager::GetTexturesList();
         for (int i = 0; i < s_Data.TerrainBiomeData.NumOfBiomeLayers; i++)
         {
             bool textureUsed = false;
@@ -265,7 +203,7 @@ void TerrainScene::OnUpdate()
                 s_Data.TerrainShader->SetFloat("uTexturesScale[" + index + "]", s_Data.TerrainBiomeData.BiomeLayers[i].TextureScale);
                 s_Data.TerrainShader->SetInt("uTerrainTextures[" + index + "]", i);
 
-                s_Data.Resources.TerrainTextureList[s_Data.TerrainBiomeData.BiomeLayers[i].TextureIndex - 1]->Bind(i);
+                terrainTextureList[s_Data.TerrainBiomeData.BiomeLayers[i].TextureIndex - 1]->Bind(i);
 
                 textureUsed = true;
             }
@@ -300,6 +238,7 @@ void TerrainScene::OnUpdate()
         s_Data.ModelShader->SetVec3("uCameraPos", s_Data.CameraData.Position);
         s_Data.ModelShader->SetVec3("uDirLight.direction", s_Data.SceneCompositionData.LightDirection);
 
+        const auto &modelsList = ResourceManager::GetModelsList();
         for (int i = 0; i < s_Data.ModelPlacementData.NumOfModels; i++)
         {
             const uint32_t modelIndex = s_Data.ModelPlacementData.ModelsData[i].ModelIndex;
@@ -309,7 +248,7 @@ void TerrainScene::OnUpdate()
             if (modelIndex == 0)
                 continue;
 
-            const auto &model = s_Data.Resources.ModelList[modelIndex - 1];
+            const auto &model = modelsList[modelIndex - 1];
             for (auto &mesh : model->GetMeshes())
             {
                 const auto &meshTextures = mesh->GetTextures();
@@ -355,15 +294,16 @@ void TerrainScene::OnUpdate()
 
         glm::mat4 viewMatrix = glm::mat4(glm::mat3(s_Data.CameraData.ViewMatrix));
 
-        s_Data.SkyBoxShader->Bind();
-        s_Data.SkyBoxShader->SetMat4("uView", viewMatrix);
-        s_Data.SkyBoxShader->SetMat4("uProj", s_Data.CameraData.ProjectionMatrix);
+        const auto &skybox = ResourceManager::GetSkyBox();
+        const auto &skyboxShader = ResourceManager::GetSkyBoxShader();
 
-        s_Data.SkyBoxShader->SetInt("uSkyBoxTexture", 0);
-        s_Data.SkyBox->Bind();
+        skyboxShader->Bind();
+        skyboxShader->SetMat4("uView", viewMatrix);
+        skyboxShader->SetMat4("uProj", s_Data.CameraData.ProjectionMatrix);
 
-        s_Data.SkyBox->GetVertexArray()->Bind();
+        skyboxShader->SetInt("uSkyBoxTexture", 0);
 
+        skybox->Bind();
         GLCall(glDrawArrays(GL_TRIANGLES, 0, 36));
 
         GLCall(glDepthMask(GL_TRUE)); // Restoring state

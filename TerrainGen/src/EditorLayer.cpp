@@ -6,6 +6,7 @@
 #include "TerrainBiomePanel.h"
 #include "ModelPlacementPanel.h"
 #include "TerrainScene.h"
+#include "ResourceManager.h"
 #include "imgui/imgui.h"
 #include "imgui/imgui_internal.h"
 
@@ -34,15 +35,19 @@ void EditorLayer::OnAttach()
     fbspec.Height = 600;
     m_Framebuffer = Enxus::CreateScope<Enxus::Framebuffer>(fbspec);
 
-    // Terrain Panels initialization
+    //-----------------  Resource Manager Initialization -------------------//
+    ResourceManager::Init();
+
+    //----------------- Terrain Panels Initialization -------------------//
+
     TerrainDimensionPanel::Init();
     TerrainBiomePanel::Init();
     SceneCompositionPanel::Init();
     ModelPlacementPanel::Init();
-
     NoiseEditorPanel::Init();
 
-    // Terrain Scene initialization
+    //----------------- Terrain Scene Initialization -------------------//
+
     TerrainScene::Init();
 
     // Initial values
@@ -53,6 +58,23 @@ void EditorLayer::OnAttach()
     TerrainScene::UpdateModelPlacement(ModelPlacementPanel::GetPanelProps());
 
     ImGui::SetWindowFocus("Viewport");
+}
+
+void EditorLayer::OnDetach()
+{
+    //----------------- Terrain Scene ShutDown -------------------//
+    TerrainScene::ShutDown();
+
+    //----------------- Terrain Panels ShutDown -------------------//
+
+    TerrainDimensionPanel::ShutDown();
+    TerrainBiomePanel::ShutDown();
+    SceneCompositionPanel::ShutDown();
+    ModelPlacementPanel::ShutDown();
+    NoiseEditorPanel::ShutDown();
+
+    //----------------- Resource Manager ShutDown -------------------//
+    ResourceManager::ShutDown();
 }
 
 void EditorLayer::OnUpdate(Enxus::Timestep ts)
@@ -165,11 +187,8 @@ void EditorLayer::OnImGuiRender()
     // FPS window sidebar
     {
 
-        ImGui::BeginViewportSideBar("status", ImGui::GetMainViewport(), ImGuiDir_Down, 32, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
-        float textOffset = 0;
-        ImGui::Text("App average %.3f ms/frame", Enxus::Application::Get().GetTimestep().GetMiliseconds());
-        ImGui::SameLine(textOffset += 500);
-        ImGui::Text("App average (%.1f FPS)", 1.0f / Enxus::Application::Get().GetTimestep());
+        ImGui::BeginViewportSideBar("status", ImGui::GetMainViewport(), ImGuiDir_Up, 24, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+        ImGui::Text("App average %.3f ms/frame (%.1f FPS)", Enxus::Application::Get().GetTimestep().GetMiliseconds(), 1.0f / Enxus::Application::Get().GetTimestep());
         ImGui::End();
     }
     // The Noise is updated separately

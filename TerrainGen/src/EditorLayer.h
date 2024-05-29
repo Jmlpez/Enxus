@@ -10,6 +10,7 @@ public:
     ~EditorLayer();
 
     void OnAttach() override;
+    void OnDetach() override;
     void OnUpdate(Enxus::Timestep ts) override;
     void OnEvent(Enxus::Event &event) override;
     void OnImGuiRender() override;
@@ -23,7 +24,6 @@ private:
     glm::vec2 m_ViewportSize;
     bool m_IsViewportFocused = false;
     bool m_IsViewportHovered = false;
-
 
     Enxus::Scope<Enxus::FreeCameraController> m_CameraController;
     // Framebuffers

@@ -26,7 +26,6 @@ public:
 private:
     static void InitTerrain();
     static void InitModels();
-    static void InitSkyBox();
 
     static void UpdateModelPositions();
 };
