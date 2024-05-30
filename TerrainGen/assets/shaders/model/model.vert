@@ -6,8 +6,7 @@ layout(location = 2) in vec3 aNormal;
 layout(location = 3) in mat4 aInstanceMatrix;
 
 uniform float uOffsetY;
-uniform mat4 uView;
-uniform mat4 uProj;
+uniform mat4 uViewProj;
 
 out VS_OUT {
     vec2 vTexCoord;
@@ -19,7 +18,7 @@ void main() {
 
     vec3 position = aPos;
     position.y += uOffsetY;
-    gl_Position = uProj * uView * aInstanceMatrix * vec4(position, 1.0);
+    gl_Position = uViewProj * aInstanceMatrix * vec4(position, 1.0);
 
     vs_out.vTexCoord = aTexCoord;
     vs_out.vNormal = mat3(transpose(inverse(aInstanceMatrix))) * aNormal;

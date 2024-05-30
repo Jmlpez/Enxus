@@ -27,6 +27,7 @@ struct TerrainSceneData
     {
         glm::mat4 ViewMatrix;
         glm::mat4 ProjectionMatrix;
+        glm::mat4 ViewProjectionMatrix;
         glm::vec3 Position;
     } CameraData;
 };
@@ -37,6 +38,7 @@ void TerrainScene::SubmitCamera(const Enxus::Camera &camera)
 {
     s_Data.CameraData.ViewMatrix = camera.GetViewMatrix();
     s_Data.CameraData.ProjectionMatrix = camera.GetProjectionMatrix();
+    s_Data.CameraData.ViewProjectionMatrix = camera.GetViewProjectionMatrix();
     s_Data.CameraData.Position = camera.GetPos();
 }
 
@@ -67,10 +69,6 @@ void TerrainScene::InitTerrain()
     s_Data.TerrainShader = Enxus::CreateRef<Enxus::Shader>("TerrainGen/assets/shaders/terrain/terrain.vert",
                                                            "TerrainGen/assets/shaders/terrain/terrain.frag");
     s_Data.TerrainShader->Bind();
-    glm::mat4 terrainModel = glm::mat4(1.0f);
-    // terrainModel = glm::translate(terrainModel, glm::vec3(7.8325f, 0.0f, 0.0f));
-    s_Data.TerrainShader->SetMat4("uModel", terrainModel);
-
     s_Data.TerrainShader->SetVec3("uDirLight.direction", s_Data.SceneCompositionData.LightDirection);
     s_Data.TerrainShader->SetFloat3("uDirLight.ambient", 0.1f, 0.1f, 0.1f);
     s_Data.TerrainShader->SetFloat3("uDirLight.diffuse", 1.0f, 1.0f, 1.0f);
@@ -109,10 +107,6 @@ void TerrainScene::InitModels()
 
     for (auto &model : ResourceManager::GetModelsList())
     {
-        // if the model has not been loaded, ignore it
-        if (!model)
-            continue;
-
         Enxus::Ref<Enxus::VertexBuffer>
             instanceBuffer = Enxus::CreateRef<Enxus::VertexBuffer>(s_Data.ModelPlacementData.MaxAmount * sizeof(glm::mat4));
 
@@ -183,8 +177,7 @@ void TerrainScene::OnUpdate()
 
     {
         s_Data.TerrainShader->Bind();
-        s_Data.TerrainShader->SetMat4("uView", s_Data.CameraData.ViewMatrix);
-        s_Data.TerrainShader->SetMat4("uProj", s_Data.CameraData.ProjectionMatrix);
+        s_Data.TerrainShader->SetMat4("uViewProj", s_Data.CameraData.ViewProjectionMatrix);
         s_Data.TerrainShader->SetVec3("uCameraPos", s_Data.CameraData.Position);
         s_Data.TerrainShader->SetVec3("uDirLight.direction", s_Data.SceneCompositionData.LightDirection);
 
@@ -233,8 +226,7 @@ void TerrainScene::OnUpdate()
     //----------------- Draw the models using instancing -------------------//
     {
         s_Data.ModelShader->Bind();
-        s_Data.ModelShader->SetMat4("uView", s_Data.CameraData.ViewMatrix);
-        s_Data.ModelShader->SetMat4("uProj", s_Data.CameraData.ProjectionMatrix);
+        s_Data.ModelShader->SetMat4("uViewProj", s_Data.CameraData.ViewProjectionMatrix);
         s_Data.ModelShader->SetVec3("uCameraPos", s_Data.CameraData.Position);
         s_Data.ModelShader->SetVec3("uDirLight.direction", s_Data.SceneCompositionData.LightDirection);
 

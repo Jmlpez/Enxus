@@ -27,7 +27,7 @@ namespace Enxus
         // get Camera Matrices
         const glm::mat4 &GetProjectionMatrix() const { return m_Proj; }
         const glm::mat4 &GetViewMatrix() const { return m_View; }
-        glm::mat4 GetViewProjectionMatrix() { return m_Proj * m_View; }
+        const glm::mat4 GetViewProjectionMatrix() const { return m_Proj * m_View; }
 
         // get Camera Vectors
         inline glm::vec3 GetPos() const { return m_Pos; }
@@ -35,7 +35,7 @@ namespace Enxus
         inline glm::vec3 GetFront() const { return m_Front; }
 
         // get Camera Attributes
-        inline float GetAspectRatio(){return m_AspectRatio;}
+        inline float GetAspectRatio() { return m_AspectRatio; }
         inline float GetFOV() { return m_FOV; }
         inline float GetNearPlane() { return m_NearPlane; }
         inline float GetFarPlane() { return m_FarPlane; }

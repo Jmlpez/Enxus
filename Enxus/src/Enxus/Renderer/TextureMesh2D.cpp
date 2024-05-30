@@ -53,7 +53,7 @@ namespace Enxus
             return;
         }
         // specify textures attributes
-        GLenum format;
+        GLenum format = GL_RGB;
         if (m_NrChannels == 1)
             format = GL_RED;
         else if (m_NrChannels == 3)
