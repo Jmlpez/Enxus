@@ -4,19 +4,20 @@
 
 namespace OpenGLTest
 {
+    const uint32_t g_RenderedAmount = 50;
     TestInstancingV2::TestInstancingV2()
     {
 
-        m_Box = Enxus::CreateRef<Enxus::Model>("Sandbox/res/models/box/box.obj");
+        m_Box = Enxus::CreateRef<Enxus::Model>("Sandbox/res/models/backpack/backpack.obj");
 
         srand(static_cast<unsigned int>(glfwGetTime())); // initialize random seed
-        float radius = 50.0;
+        float radius = 12.0;
         float offset = 2.5f;
-        for (unsigned int i = 0; i < m_BoxInstanceMatrix.size(); i++)
+        for (unsigned int i = 0; i < g_RenderedAmount; i++)
         {
             glm::mat4 model = glm::mat4(1.0f);
             // 1. translation: displace along circle with 'radius' in range [-offset, offset]
-            float angle = (float)i / (float)m_BoxInstanceMatrix.size() * 360.0f;
+            float angle = (float)i / (float)g_RenderedAmount * 360.0f;
             float displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
             float x = sin(angle) * radius + displacement;
             displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
@@ -41,7 +42,7 @@ namespace OpenGLTest
         Enxus::Ref<Enxus::VertexBuffer> instanceBuffer =
             Enxus::CreateRef<Enxus::VertexBuffer>(
                 &m_BoxInstanceMatrix[0],
-                m_BoxInstanceMatrix.size() * sizeof(glm::mat4));
+                g_RenderedAmount * sizeof(glm::mat4));
 
         Enxus::BufferLayout layout = {
             {Enxus::ShaderDataType::Mat4, "aInstanceMatrix"},
@@ -66,8 +67,10 @@ namespace OpenGLTest
 
     void TestInstancingV2::OnUpdate(Enxus::Camera &camera)
     {
-        m_Shader->SetMat4("uView", camera.GetViewMatrix());
-        m_Shader->SetMat4("uProj", camera.GetProjectionMatrix());
+
+        // m_Shader->SetMat4("uView", camera.GetViewMatrix());
+        // m_Shader->SetMat4("uProj", camera.GetProjectionMatrix());
+        m_Shader->SetMat4("uViewProj", camera.GetViewProjectionMatrix());
 
         for (const auto &mesh : m_Box->GetMeshes())
         {
@@ -81,7 +84,7 @@ namespace OpenGLTest
             m_Shader->SetInt("material.texture_diffuse1", 0);
 
             mesh->GetVertexArray()->Bind();
-            GLCall(glDrawElementsInstanced(GL_TRIANGLES, mesh->GetVertexArray()->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, 0, 1000));
+            GLCall(glDrawElementsInstanced(GL_TRIANGLES, mesh->GetVertexArray()->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, 0, g_RenderedAmount));
         }
 
         // Enxus::Renderer::DrawModel(m_Box, m_Shader);

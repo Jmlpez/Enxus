@@ -148,9 +148,9 @@ namespace OpenGLTest
     void TestPoissonSamplingDisk::OnUpdate(Enxus::Camera &camera)
     {
 
-        m_Shader->SetMat4("uView", camera.GetViewMatrix());
-        m_Shader->SetMat4("uProj", camera.GetProjectionMatrix());
-
+        // m_Shader->SetMat4("uView", camera.GetViewMatrix());
+        // m_Shader->SetMat4("uProj", camera.GetProjectionMatrix());
+        m_Shader->SetMat4("uViewProj", camera.GetViewProjectionMatrix());
         for (const auto &mesh : m_Box->GetMeshes())
         {
             // int textureIndex

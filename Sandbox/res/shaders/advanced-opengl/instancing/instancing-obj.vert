@@ -5,8 +5,8 @@ layout(location = 1) in vec2 aTexCoord;
 // (location 2) --> normals omitted
 layout(location = 3) in mat4 aInstanceMatrix;
 
-uniform mat4 uView;
-uniform mat4 uProj;
+uniform mat4 uViewProj;
+//uniform mat4 uProj;
 
 out VS_OUT {
     vec2 vTexCoord;
@@ -14,7 +14,7 @@ out VS_OUT {
 
 void main() {
 
-    gl_Position = uProj * uView * aInstanceMatrix * vec4(aPos, 1.0);
+    gl_Position = uViewProj * aInstanceMatrix * vec4(aPos, 1.0);
     vs_out.vTexCoord = aTexCoord;
 
 }
