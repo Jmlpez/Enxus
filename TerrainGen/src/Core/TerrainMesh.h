@@ -19,6 +19,8 @@ public:
     TerrainMesh(uint32_t width, uint32_t height);
     ~TerrainMesh();
 
+    void Draw() const;
+
     void SetNoiseMap(const std::vector<float> &noiseMap);
     void SetHeightElevationCurve(AnimationCurve curve);
     void SetElevation(float elevation);
@@ -40,9 +42,9 @@ public:
 
     inline Enxus::Ref<Enxus::VertexArray> GetVertexArray() const { return m_VertexArrayObject; }
 
-    glm::vec3 GetVertexFromCoords(uint32_t x, uint32_t y);
-    uint32_t GetSimplifiedWidth();
-    uint32_t GetSimplifiedHeight();
+    glm::vec3 GetVertexFromCoords(uint32_t x, uint32_t y) const;
+    uint32_t GetSimplifiedWidth() const;
+    uint32_t GetSimplifiedHeight() const;
 
 private:
     void CreateTerrain();
@@ -54,8 +56,8 @@ private:
     std::vector<uint32_t> CreateIndices();
 
     float Evaluate(float t);
-    uint32_t GetMeshSimplificationStep();
-    uint32_t GetSimplifiedSize(uint32_t size, uint8_t step);
+    uint32_t GetMeshSimplificationStep() const;
+    uint32_t GetSimplifiedSize(uint32_t size, uint8_t step) const;
 
     glm::vec3 GetNormalFromIndices(uint32_t indexA, uint32_t indexB, uint32_t indexC, bool flipDir);
 

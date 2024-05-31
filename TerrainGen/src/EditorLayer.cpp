@@ -91,12 +91,17 @@ void EditorLayer::OnUpdate(Enxus::Timestep ts)
     TerrainScene::SubmitCamera(m_CameraController->GetCamera());
 
     {
-        // Rendering
+        // Shadow pass
+        TerrainScene::OnShadowPass();
+        Enxus::Renderer::SetViewport(0, 0, m_ViewportSize.x, m_ViewportSize.y);
+    }
+
+    {
+        // Main Render Pass
         m_Framebuffer->Bind();
         Enxus::Renderer::ClearColor(0.13f, 0.13f, 0.14f, 1.0f);
         Enxus::Renderer::Clear();
-
-        TerrainScene::OnUpdate();
+        TerrainScene::OnRenderPass();
 
         m_Framebuffer->Unbind();
     }

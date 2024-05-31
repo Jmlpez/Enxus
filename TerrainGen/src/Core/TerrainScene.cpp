@@ -165,7 +165,13 @@ void TerrainScene::UpdateModelPositions()
     }
 }
 
-void TerrainScene::OnUpdate()
+void TerrainScene::OnShadowPass()
+{
+    // implement shadow mapping
+    return;
+}
+
+void TerrainScene::OnRenderPass()
 {
 
     if (s_Data.SceneCompositionData.IsWireframe)
@@ -207,20 +213,7 @@ void TerrainScene::OnUpdate()
             s_Data.TerrainShader->SetFloat("uBiomeColorStrength[" + index + "]", s_Data.TerrainBiomeData.BiomeLayers[i].ColorStrength);
             s_Data.TerrainShader->SetVec3("uBiomeColors[" + index + "]", s_Data.TerrainBiomeData.BiomeLayers[i].Color);
         }
-        // pass the index of the textures used
-
-        s_Data.Terrain->GetVertexArray()->Bind();
-
-        uint32_t simplifiedWidth = s_Data.Terrain->GetSimplifiedWidth();
-        uint32_t simplifiedHeight = s_Data.Terrain->GetSimplifiedHeight();
-
-        const uint32_t numOfStrips = simplifiedHeight - 1;
-        const uint32_t numOfVertPerStrip = simplifiedWidth * 2;
-        for (unsigned int strip = 0; strip < numOfStrips; strip++)
-        {
-            size_t stripOffset = strip * numOfVertPerStrip * sizeof(unsigned int);
-            GLCall(glDrawElements(GL_TRIANGLE_STRIP, numOfVertPerStrip, GL_UNSIGNED_INT, (void *)stripOffset));
-        }
+        s_Data.Terrain->Draw();
     }
 
     //----------------- Draw the models using instancing -------------------//

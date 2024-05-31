@@ -62,12 +62,12 @@ void ResourceManager::Init()
         // For now must be in the same order as the ImGui enum array in ModelPlacementPanel
         static const std::array<std::string, 7> modelsPaths{
             s_Data.Paths.Models + "box/box.obj",
-            s_Data.Paths.Models + "trees/BirchTree_1.obj",
-            s_Data.Paths.Models + "trees/DeadTree_2.obj",
-            s_Data.Paths.Models + "trees/MapleTree_1.obj",
-            s_Data.Paths.Models + "trees/NormalTree_2.obj",
-            s_Data.Paths.Models + "trees/PalmTree_2.obj",
-            s_Data.Paths.Models + "trees/PineTree_1.obj",
+            s_Data.Paths.Models + "ignore/trees/BirchTree_1.obj",
+            s_Data.Paths.Models + "ignore/trees/DeadTree_2.obj",
+            s_Data.Paths.Models + "ignore/trees/MapleTree_1.obj",
+            s_Data.Paths.Models + "ignore/trees/NormalTree_2.obj",
+            s_Data.Paths.Models + "ignore/trees/PalmTree_2.obj",
+            s_Data.Paths.Models + "ignore/trees/PineTree_1.obj",
         };
 
         for (uint32_t i = 0; i < modelsPaths.size(); i++)

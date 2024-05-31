@@ -21,6 +21,23 @@ TerrainMesh::~TerrainMesh()
 {
 }
 
+void TerrainMesh::Draw() const
+{
+    // Draw the terrain using triangle strips
+    m_VertexArrayObject->Bind();
+
+    uint32_t simplifiedWidth = GetSimplifiedWidth();
+    uint32_t simplifiedHeight = GetSimplifiedHeight();
+
+    const uint32_t numOfStrips = simplifiedHeight - 1;
+    const uint32_t numOfVertPerStrip = simplifiedWidth * 2;
+    for (unsigned int strip = 0; strip < numOfStrips; strip++)
+    {
+        size_t stripOffset = strip * numOfVertPerStrip * sizeof(unsigned int);
+        GLCall(glDrawElements(GL_TRIANGLE_STRIP, numOfVertPerStrip, GL_UNSIGNED_INT, (void *)stripOffset));
+    }
+}
+
 void TerrainMesh::CreateTerrain()
 {
     m_VertexArrayObject = Enxus::CreateRef<Enxus::VertexArray>();
@@ -270,7 +287,7 @@ void TerrainMesh::SetLevelOfDetail(int levelOfDetail)
     CalculateNoiseMap();
 }
 
-glm::vec3 TerrainMesh::GetVertexFromCoords(uint32_t x, uint32_t y)
+glm::vec3 TerrainMesh::GetVertexFromCoords(uint32_t x, uint32_t y) const
 {
     if (x > m_Width || y > m_Height)
     {
@@ -323,26 +340,26 @@ float TerrainMesh::Evaluate(float t)
     return AnimationCurve::Linear;
 }
 
-uint32_t TerrainMesh::GetSimplifiedWidth()
+uint32_t TerrainMesh::GetSimplifiedWidth() const
 {
     uint32_t step = GetMeshSimplificationStep();
     return GetSimplifiedSize(m_Width, step);
 }
 
-uint32_t TerrainMesh::GetSimplifiedHeight()
+uint32_t TerrainMesh::GetSimplifiedHeight() const
 {
     uint32_t step = GetMeshSimplificationStep();
     return GetSimplifiedSize(m_Height, step);
 }
 
-uint32_t TerrainMesh::GetMeshSimplificationStep()
+uint32_t TerrainMesh::GetMeshSimplificationStep() const
 {
     // there is no simplification
     if (m_LevelOfDetail == 0)
         return 1;
     return m_LevelOfDetail << 1; // 2x
 }
-uint32_t TerrainMesh::GetSimplifiedSize(uint32_t size, uint8_t step)
+uint32_t TerrainMesh::GetSimplifiedSize(uint32_t size, uint8_t step) const
 {
     if (step <= 0)
     {

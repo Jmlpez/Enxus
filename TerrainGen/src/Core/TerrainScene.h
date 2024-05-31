@@ -13,7 +13,8 @@ class TerrainScene
 public:
     static void Init();
     static void ShutDown();
-    static void OnUpdate();
+    static void OnShadowPass();
+    static void OnRenderPass();
 
     static void UpdateTerrainNoiseMap(const std::vector<float> &noiseMap);
     static void UpdateTerrainDimensions(const TerrainDimensionPanelProps &props);
