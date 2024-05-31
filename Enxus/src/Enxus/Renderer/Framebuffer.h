@@ -7,7 +7,11 @@ namespace Enxus
     struct FramebufferSpecification
     {
         uint32_t Width, Height;
-        unsigned Samples = 1;
+        // unsigned Samples = 1;
+        FramebufferSpecification()
+            : Width(1), Height(1) {}
+        FramebufferSpecification(uint32_t width, uint32_t height)
+            : Width(width), Height(height) {}
     };
 
     class Framebuffer

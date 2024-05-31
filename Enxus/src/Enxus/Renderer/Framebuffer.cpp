@@ -47,7 +47,7 @@ namespace Enxus
         //                     GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, NULL));
         // GLCall(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, m_DepthAttachment, 0));
 
-        // Using Render Buffer Objects for Depth/Stencil attachment (problems with ImGUI, I'm still figuring out the origin of the problem)
+        // Using Render Buffer Objects for Depth/Stencil attachment
         GLCall(glGenRenderbuffers(1, &m_DepthAttachment));
         GLCall(glBindRenderbuffer(GL_RENDERBUFFER, m_DepthAttachment));
         GLCall(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, m_Specification.Width, m_Specification.Height));

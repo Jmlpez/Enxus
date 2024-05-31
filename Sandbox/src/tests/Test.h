@@ -11,6 +11,7 @@ namespace OpenGLTest
         Test(){};
         virtual ~Test(){};
         virtual void OnUpdate(Enxus::Camera &camera) { (void)camera; }
+        virtual void OnShadowPass() {};
         virtual void OnImGuiRender() {}
     };
 }

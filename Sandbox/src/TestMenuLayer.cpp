@@ -14,6 +14,7 @@
 #include "TestInstancingV2.h"
 #include "TestPoissonSamplingDisk.h"
 #include "TestBlinnPhong.h"
+#include "TestShadowMapping.h"
 #include "imgui/imgui.h"
 
 TestMenuLayer::TestMenuLayer()
@@ -56,8 +57,9 @@ void TestMenuLayer::OnAttach()
     RegisterTest<OpenGLTest::TestInstancingV2>("Instancing 2.0");
     RegisterTest<OpenGLTest::TestPoissonSamplingDisk>("Poisson Sampling Disk");
     RegisterTest<OpenGLTest::TestBlinnPhong>("Blinn-Phong Lighting model");
+    RegisterTest<OpenGLTest::TestShadowMapping>("Shadow Mapping with Dir Light");
 
-    m_CurrentTest = new OpenGLTest::TestBlinnPhong();
+    m_CurrentTest = new OpenGLTest::TestShadowMapping();
 }
 
 void TestMenuLayer::OnUpdate(Enxus::Timestep ts)
@@ -70,6 +72,14 @@ void TestMenuLayer::OnUpdate(Enxus::Timestep ts)
 
     HandleViewportResize();
 
+    if (m_CurrentTest)
+    {
+        Enxus::Renderer::ClearColor(0.13f, 0.13f, 0.15f, 1.0f);
+        Enxus::Renderer::Clear();
+        m_CurrentTest->OnShadowPass();
+    }
+
+    Enxus::Renderer::SetViewport(0, 0, m_ViewportSize.x, m_ViewportSize.y);
     m_Framebuffer->Bind();
     {
         Enxus::Renderer::ClearColor(0.13f, 0.13f, 0.15f, 1.0f);
@@ -136,7 +146,6 @@ void TestMenuLayer::OnImGuiRender()
             // Disabling fullscreen would allow the window to be moved to the front of other windows,
             // which we can't undo at the moment without finer window depth/z control.
             // ImGui::MenuItem("Fullscreen", NULL, &opt_fullscreen_persistant);
-
             if (ImGui::MenuItem("Exit"))
                 Enxus::Application::Get().Close();
             ImGui::EndMenu();
