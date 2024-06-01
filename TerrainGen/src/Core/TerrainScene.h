@@ -23,10 +23,12 @@ public:
     static void UpdateModelPlacement(const ModelPlacementPanelProps &props);
 
     static void SubmitCamera(const Enxus::Camera &camera);
+    static Enxus::Ref<Enxus::ShadowMapFBO> GetShadowFramebuffer();
 
 private:
     static void InitTerrain();
     static void InitModels();
+    static void InitShadowMapping();
 
     static void UpdateModelPositions();
 };

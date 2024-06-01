@@ -30,6 +30,13 @@ struct TerrainSceneData
         glm::mat4 ViewProjectionMatrix;
         glm::vec3 Position;
     } CameraData;
+
+    // Shadow Mapping
+    Enxus::Ref<Enxus::ShadowMapFBO> ShadowMapFramebuffer;
+    Enxus::Ref<Enxus::Shader> ShadowMapShader;
+    glm::mat4 LightSpaceMatrix, LightOrthoProjectionMatrix, LightViewMatrix;
+
+    // float FarPlane, NearPlane;
 };
 
 static TerrainSceneData s_Data;
@@ -40,6 +47,11 @@ void TerrainScene::SubmitCamera(const Enxus::Camera &camera)
     s_Data.CameraData.ProjectionMatrix = camera.GetProjectionMatrix();
     s_Data.CameraData.ViewProjectionMatrix = camera.GetViewProjectionMatrix();
     s_Data.CameraData.Position = camera.GetPos();
+}
+
+Enxus::Ref<Enxus::ShadowMapFBO> TerrainScene::GetShadowFramebuffer()
+{
+    return s_Data.ShadowMapFramebuffer;
 }
 
 void TerrainScene::Init()
@@ -55,6 +67,7 @@ void TerrainScene::Init()
     // [TODO] Use Uniform Buffer Objects for things like camera and lighting
     InitTerrain();
     InitModels();
+    InitShadowMapping();
 }
 
 void TerrainScene::ShutDown()
@@ -69,7 +82,7 @@ void TerrainScene::InitTerrain()
     s_Data.TerrainShader = Enxus::CreateRef<Enxus::Shader>("TerrainGen/assets/shaders/terrain/terrain.vert",
                                                            "TerrainGen/assets/shaders/terrain/terrain.frag");
     s_Data.TerrainShader->Bind();
-    s_Data.TerrainShader->SetVec3("uDirLight.direction", s_Data.SceneCompositionData.LightDirection);
+    s_Data.TerrainShader->SetVec3("uDirLight.position", s_Data.SceneCompositionData.LightPosition);
     s_Data.TerrainShader->SetFloat3("uDirLight.ambient", 0.1f, 0.1f, 0.1f);
     s_Data.TerrainShader->SetFloat3("uDirLight.diffuse", 1.0f, 1.0f, 1.0f);
     s_Data.TerrainShader->SetFloat3("uDirLight.specular", 1.0f, 1.0f, 1.0f);
@@ -83,7 +96,7 @@ void TerrainScene::InitModels()
         "TerrainGen/assets/shaders/model/model.frag");
 
     s_Data.ModelShader->Bind();
-    s_Data.ModelShader->SetVec3("uDirLight.direction", s_Data.SceneCompositionData.LightDirection);
+    s_Data.ModelShader->SetVec3("uDirLight.position", s_Data.SceneCompositionData.LightPosition);
     s_Data.ModelShader->SetFloat3("uDirLight.ambient", 0.1f, 0.1f, 0.1f);
     s_Data.ModelShader->SetFloat3("uDirLight.diffuse", 1.0f, 1.0f, 1.0f);
     s_Data.ModelShader->SetFloat3("uDirLight.specular", 1.0f, 1.0f, 1.0f);
@@ -121,6 +134,27 @@ void TerrainScene::InitModels()
             mesh->GetVertexArray()->AddVertexBuffer(instanceBuffer);
         }
     }
+}
+
+void TerrainScene::InitShadowMapping()
+{
+    Enxus::ShadowMapSpecification spec(2048, 2048);
+    s_Data.ShadowMapFramebuffer = Enxus::CreateRef<Enxus::ShadowMapFBO>(spec);
+    s_Data.ShadowMapShader = Enxus::CreateRef<Enxus::Shader>(
+        ResourceManager::GetResourcesPath().Shaders + "shadow-map/shadow-map.vert",
+        ResourceManager::GetResourcesPath().Shaders + "shadow-map/shadow-map.frag");
+
+    // float nearPlane = 0.0f, farPlane = 25.0f;
+    s_Data.LightOrthoProjectionMatrix = glm::ortho(-15.0f,
+                                                   15.0f,
+                                                   -15.0f,
+                                                   15.0f,
+                                                   0.1f,
+                                                   45.0f);
+
+    s_Data.LightViewMatrix = glm::lookAt(s_Data.SceneCompositionData.LightPosition, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+
+    s_Data.LightSpaceMatrix = s_Data.LightOrthoProjectionMatrix * s_Data.LightViewMatrix;
 }
 
 void TerrainScene::UpdateModelPositions()
@@ -168,7 +202,45 @@ void TerrainScene::UpdateModelPositions()
 void TerrainScene::OnShadowPass()
 {
     // implement shadow mapping
-    return;
+    s_Data.ShadowMapFramebuffer->Bind();
+    {
+        s_Data.ShadowMapShader->Bind();
+        s_Data.ShadowMapShader->SetMat4("uLightSpaceMatrix", s_Data.LightSpaceMatrix);
+        {
+            // Draw Terrain
+
+            s_Data.ShadowMapShader->SetBool("uUseInstancing", 0);
+            s_Data.Terrain->Draw();
+        }
+        // Draw Models
+        {
+            s_Data.ShadowMapShader->SetBool("uUseInstancing", 1);
+            const auto &modelsList = ResourceManager::GetModelsList();
+            for (int i = 0; i < s_Data.ModelPlacementData.NumOfModels; i++)
+            {
+                const uint32_t modelIndex = s_Data.ModelPlacementData.ModelsData[i].ModelIndex;
+                // If no model are selected, ignore it
+                // The 0 index is reserverd for the NoneModel value
+                if (modelIndex == 0)
+                    continue;
+
+                const auto &model = modelsList[modelIndex - 1];
+                for (auto &mesh : model->GetMeshes())
+                {
+                    s_Data.ShadowMapShader->SetFloat("uOffsetY", s_Data.ModelPlacementData.ModelsData[i].OffsetHeight);
+                    mesh->GetVertexArray()->Bind();
+                    const uint32_t renderedAmount = s_Data.ModelPositions[i].InstanceMatrix.size();
+
+                    // Thas last added buffer is the instance buffer which was created in InitModels method
+                    auto &instanceBuffer = mesh->GetVertexArray()->GetVertexBuffers().back();
+                    instanceBuffer->SetData(&s_Data.ModelPositions[i].InstanceMatrix[0], renderedAmount * sizeof(glm::mat4));
+                    GLCall(glDrawElementsInstanced(GL_TRIANGLES, mesh->GetVertexArray()->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr, renderedAmount));
+                }
+            }
+        }
+    }
+    // The skybox is not needed
+    s_Data.ShadowMapFramebuffer->Unbind();
 }
 
 void TerrainScene::OnRenderPass()
@@ -180,19 +252,24 @@ void TerrainScene::OnRenderPass()
         Enxus::Renderer::SetPolygonMode(Enxus::PolygonMode::FILL);
 
     //----------------- Draw Terrain -------------------//
-
     {
         s_Data.TerrainShader->Bind();
         s_Data.TerrainShader->SetMat4("uViewProj", s_Data.CameraData.ViewProjectionMatrix);
         s_Data.TerrainShader->SetVec3("uCameraPos", s_Data.CameraData.Position);
-        s_Data.TerrainShader->SetVec3("uDirLight.direction", s_Data.SceneCompositionData.LightDirection);
+        s_Data.TerrainShader->SetVec3("uDirLight.position", s_Data.SceneCompositionData.LightPosition);
 
         s_Data.TerrainShader->SetFloat("uMinHeight", s_Data.Terrain->GetMinHeight());
         s_Data.TerrainShader->SetFloat("uMaxHeight", s_Data.Terrain->GetMaxHeight());
         s_Data.TerrainShader->SetInt("uNumOfLayers", s_Data.TerrainBiomeData.NumOfBiomeLayers);
 
+        s_Data.TerrainShader->SetMat4("uLightSpaceMatrix", s_Data.LightSpaceMatrix);
+
+        // Bind the shadow map
+        s_Data.TerrainShader->SetInt("uShadowMap", 0);
+        s_Data.ShadowMapFramebuffer->BindShadowTexture(0);
+
         const auto &terrainTextureList = ResourceManager::GetTexturesList();
-        for (int i = 0; i < s_Data.TerrainBiomeData.NumOfBiomeLayers; i++)
+        for (int i = 0, textureSlot = 1; i < s_Data.TerrainBiomeData.NumOfBiomeLayers; i++, textureSlot++)
         {
             bool textureUsed = false;
             // Bind Textures
@@ -200,9 +277,9 @@ void TerrainScene::OnRenderPass()
             if (s_Data.TerrainBiomeData.BiomeLayers[i].TextureIndex != 0)
             {
                 s_Data.TerrainShader->SetFloat("uTexturesScale[" + index + "]", s_Data.TerrainBiomeData.BiomeLayers[i].TextureScale);
-                s_Data.TerrainShader->SetInt("uTerrainTextures[" + index + "]", i);
+                s_Data.TerrainShader->SetInt("uTerrainTextures[" + index + "]", textureSlot);
 
-                terrainTextureList[s_Data.TerrainBiomeData.BiomeLayers[i].TextureIndex - 1]->Bind(i);
+                terrainTextureList[s_Data.TerrainBiomeData.BiomeLayers[i].TextureIndex - 1]->Bind(textureSlot);
 
                 textureUsed = true;
             }
@@ -221,7 +298,7 @@ void TerrainScene::OnRenderPass()
         s_Data.ModelShader->Bind();
         s_Data.ModelShader->SetMat4("uViewProj", s_Data.CameraData.ViewProjectionMatrix);
         s_Data.ModelShader->SetVec3("uCameraPos", s_Data.CameraData.Position);
-        s_Data.ModelShader->SetVec3("uDirLight.direction", s_Data.SceneCompositionData.LightDirection);
+        s_Data.ModelShader->SetVec3("uDirLight.position", s_Data.SceneCompositionData.LightPosition);
 
         const auto &modelsList = ResourceManager::GetModelsList();
         for (int i = 0; i < s_Data.ModelPlacementData.NumOfModels; i++)
@@ -237,7 +314,7 @@ void TerrainScene::OnRenderPass()
             for (auto &mesh : model->GetMeshes())
             {
                 const auto &meshTextures = mesh->GetTextures();
-                for (uint8_t i = 0; i < meshTextures.size(); i++)
+                for (uint8_t i = 0, textureSlot = 0; i < meshTextures.size(); i++, textureSlot++)
                 {
                     const Enxus::Ref<Enxus::TextureMesh2D> &texture = meshTextures[i];
                     std::string textureName;
@@ -253,8 +330,8 @@ void TerrainScene::OnRenderPass()
                     default:
                         break;
                     }
-                    s_Data.ModelShader->SetInt(("uMaterial." + textureName).c_str(), i);
-                    texture->Bind(i);
+                    s_Data.ModelShader->SetInt(("uMaterial." + textureName).c_str(), textureSlot);
+                    texture->Bind(textureSlot);
                 }
 
                 s_Data.ModelShader->SetFloat("uOffsetY", s_Data.ModelPlacementData.ModelsData[i].OffsetHeight);
@@ -341,6 +418,27 @@ void TerrainScene::UpdateTerrainBiome(const TerrainBiomePanelProps &props)
 
 void TerrainScene::UpdateSceneComposition(const SceneCompositionPanelProps &props)
 {
+
+    //----------------- DEBUGGINF PURPOSES -------------------//
+    if (props.OrthoProj.IsDebugging)
+    {
+        std::cout << "DEBUGGIN" << std::endl;
+        s_Data.LightOrthoProjectionMatrix = glm::ortho(-props.OrthoProj.WidthLimit,
+                                                       props.OrthoProj.WidthLimit,
+                                                       -props.OrthoProj.HeightLimit,
+                                                       props.OrthoProj.HeightLimit,
+                                                       props.OrthoProj.NearPlane,
+                                                       props.OrthoProj.FarPlane);
+
+        s_Data.LightSpaceMatrix = s_Data.LightOrthoProjectionMatrix * s_Data.LightViewMatrix;
+    }
+
+    if (s_Data.SceneCompositionData.LightPosition != props.LightPosition)
+    {
+        s_Data.LightViewMatrix = glm::lookAt(props.LightPosition, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        s_Data.LightSpaceMatrix = s_Data.LightOrthoProjectionMatrix * s_Data.LightViewMatrix;
+    }
+
     s_Data.SceneCompositionData = props;
 }
 

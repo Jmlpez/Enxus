@@ -94,6 +94,7 @@ void EditorLayer::OnUpdate(Enxus::Timestep ts)
         // Shadow pass
         TerrainScene::OnShadowPass();
         Enxus::Renderer::SetViewport(0, 0, m_ViewportSize.x, m_ViewportSize.y);
+        Enxus::Renderer::Clear();
     }
 
     {
@@ -208,28 +209,36 @@ void EditorLayer::OnImGuiRender()
 
 void EditorLayer::TerrainMenuUI()
 {
+    // Shadow Map Texture
+    {
+        ImGui::Begin("Shadow Map Debug Menu");
+        const intptr_t textureId = TerrainScene::GetShadowFramebuffer()->GetDepthMapRendererId();
+        ImVec2 windowSize = ImGui::GetContentRegionAvail();
+        ImGui::Image((void *)textureId, windowSize);
+        ImGui::End();
+    }
 
     // Menu
-    ImGui::Begin("Terrain Menu");
+    {
+        ImGui::Begin("Terrain Menu");
+        ImGui::BeginTabBar("Terrain Menu TabBar");
 
-    ImGui::BeginTabBar("Terrain Menu TabBar");
+        TerrainDimensionPanel::OnImGuiRender();
+        auto dimensionProps = TerrainDimensionPanel::GetPanelProps();
+        TerrainScene::UpdateTerrainDimensions(dimensionProps);
 
-    TerrainDimensionPanel::OnImGuiRender();
-    auto dimensionProps = TerrainDimensionPanel::GetPanelProps();
-    TerrainScene::UpdateTerrainDimensions(dimensionProps);
+        TerrainBiomePanel::OnImGuiRender();
+        TerrainScene::UpdateTerrainBiome(TerrainBiomePanel::GetPanelProps());
 
-    TerrainBiomePanel::OnImGuiRender();
-    TerrainScene::UpdateTerrainBiome(TerrainBiomePanel::GetPanelProps());
+        SceneCompositionPanel::OnImGuiRender();
+        TerrainScene::UpdateSceneComposition(SceneCompositionPanel::GetPanelProps());
 
-    SceneCompositionPanel::OnImGuiRender();
-    TerrainScene::UpdateSceneComposition(SceneCompositionPanel::GetPanelProps());
+        ModelPlacementPanel::OnImGuiRender();
+        TerrainScene::UpdateModelPlacement(ModelPlacementPanel::GetPanelProps());
 
-    ModelPlacementPanel::OnImGuiRender();
-    TerrainScene::UpdateModelPlacement(ModelPlacementPanel::GetPanelProps());
-
-    ImGui::EndTabBar();
-
-    ImGui::End();
+        ImGui::EndTabBar();
+        ImGui::End();
+    }
 }
 
 void EditorLayer::HandleViewportResize()

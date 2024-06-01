@@ -21,6 +21,6 @@ void main() {
     gl_Position = uViewProj * aInstanceMatrix * vec4(position, 1.0);
 
     vs_out.vTexCoord = aTexCoord;
-    vs_out.vNormal = mat3(transpose(inverse(aInstanceMatrix))) * aNormal;
+    vs_out.vNormal = mat3(aInstanceMatrix) * aNormal;
     vs_out.vFragPos = vec3(aInstanceMatrix * vec4(position, 1.0));
 }

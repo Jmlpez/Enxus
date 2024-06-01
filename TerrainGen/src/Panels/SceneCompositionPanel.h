@@ -6,7 +6,16 @@
 struct SceneCompositionPanelProps
 {
     bool IsWireframe;
-    glm::vec3 LightDirection;
+    glm::vec3 LightPosition;
+
+    struct OrthoProjData
+    {
+        bool IsDebugging = false;
+        float NearPlane;
+        float FarPlane;
+        float WidthLimit;
+        float HeightLimit;
+    } OrthoProj;
 };
 
 class SceneCompositionPanel

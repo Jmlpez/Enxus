@@ -7,10 +7,11 @@ in VS_OUT {
     vec2 vTexCoord;
     vec3 vNormal;
     vec3 vFragPos;
+    vec4 vFragPosLightSpace;
 } fs_in;
 
 struct DirLight {
-    vec3 direction;
+    vec3 position;
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
@@ -33,15 +34,15 @@ uniform bool uBiomeTextureUsed[MAX_NUM_OF_LAYERS];
 uniform float uMinHeight;
 uniform float uMaxHeight;
 
-//uniform sampler2D uSnow;
-uniform sampler2D uTerrainTextures[8];
+uniform sampler2D uShadowMap; // slot 0
+uniform sampler2D uTerrainTextures[8]; // slot from 1-8
 uniform float uTexturesScale[8];
-//uniform sampler2D uGrass;
 
 uniform vec3 uCameraPos;
 
 float InverseLerp(float a, float b, float value);
 vec4 Triplanar(vec3 vertexPos, float scale, vec3 blendAxes, int textureIndex);
+float CalculateShadow(vec4 fragPosLightSpace, float bias);
 
 void main() {
 
@@ -73,15 +74,9 @@ void main() {
     vec3 viewDir = normalize(uCameraPos - fs_in.vFragPos);
 
     vec3 lighting = CalcDirLight(uDirLight, normal, viewDir);
-    vec3 result = albedoColor * lighting;
+    vec3 result = lighting * albedoColor;
 
     FragColor = vec4(result, 1.0);
-
-    // vec3 scaledWorldPos = fs_in.vVertexPos / uTexScale;
-
-    // vec4 xProjection = texture2D(uTerrainTextures[0], scaledWorldPos.yz) * blendAxes.x;
-    // vec4 yProjection = texture2D(uTerrainTextures[0], scaledWorldPos.xz) * blendAxes.y;
-    // vec4 zProjection = texture2D(uTerrainTextures[0], scaledWorldPos.xy) * blendAxes.z;
 
 }
 
@@ -147,8 +142,7 @@ vec4 Triplanar(vec3 vertexPos, float scale, vec3 blendAxes, int textureIndex) {
 
 vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir) {
 
-    vec3 lightDir = normalize(-light.direction);
-
+    vec3 lightDir = normalize(light.position - fs_in.vFragPos);
     float diff = max(0.0, dot(lightDir, normal));
 
     //vec3 reflectDir = reflect(-lightDir, normal);
@@ -157,13 +151,44 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir) {
     vec3 halfwayDir = normalize(lightDir + viewDir);
     float spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0);
 
-    //vec3 ambient = light.ambient * vec3(texture2D(uObjectMaterial.diffuse, vTexCoord));
-    //vec3 diffuse = light.diffuse * diff * vec3(texture2D(uObjectMaterial.diffuse, vTexCoord));
-    //vec3 specular = light.specular * spec * vec3(texture2D(uObjectMaterial.specular, vTexCoord));
-
     vec3 ambient = light.ambient;
     vec3 diffuse = light.diffuse * diff;
     vec3 specular = light.specular * spec * specularStrength;
 
-    return ambient + diffuse + specular;
+    // add shadow calculation
+    //float bias = mix(0.005, 0.0, diff);
+    // In case of this terrain this value for bias works fine
+    float bias = 0.025;
+    float shadow = CalculateShadow(fs_in.vFragPosLightSpace, bias);
+
+    return ambient + ((1 - shadow) * (diffuse + specular));
+}
+
+float CalculateShadow(vec4 fragPosLightSpace, float bias) {
+
+    // using orthographic projection this step is not really necessary, but I will leave it here 
+    vec3 uvCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+
+    // Transform from [-1, 1] to [0, 1]
+    uvCoords = uvCoords * 0.5 + 0.5;
+
+    float currentDepth = uvCoords.z;
+
+    float shadow = 0;
+
+    vec2 texelSize = 1.0 / textureSize(uShadowMap, 0);
+    for(int y = -1; y <= 1; y++) {
+        for(int x = -1; x <= 1; x++) {
+            float pcfDepth = texture2D(uShadowMap, uvCoords.xy + vec2(x, y) * texelSize).r;
+            shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;
+        }
+    }
+
+    shadow /= 9.0;
+
+    if(currentDepth > 1.0)
+        shadow = 0;
+
+    return shadow;
+
 }

@@ -3,7 +3,7 @@
 out vec4 FragColor;
 
 struct DirLight {
-    vec3 direction;
+    vec3 position;
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
@@ -28,6 +28,8 @@ uniform Material uMaterial;
 
 uniform vec3 uCameraPos;
 
+float CalculateShadow(vec4 fragPosLightSpace, float bias);
+
 void main() {
 
     vec3 normal = normalize(fs_in.vNormal);
@@ -41,7 +43,7 @@ void main() {
 
 vec4 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir) {
 
-    vec3 lightDir = normalize(-light.direction);
+    vec3 lightDir = normalize(light.position - fs_in.vFragPos);
 
     float diff = max(0.0, dot(lightDir, normal));
 

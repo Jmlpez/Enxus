@@ -6,7 +6,13 @@ static SceneCompositionPanelProps s_Props;
 void SceneCompositionPanel::Init()
 {
     s_Props.IsWireframe = false;
-    s_Props.LightDirection = glm::vec3(-0.2f, -1.0f, -0.3f);
+    s_Props.LightPosition = glm::vec3(6.0f, 4.0f, 9.0f);
+
+    s_Props.OrthoProj.IsDebugging = false;
+    s_Props.OrthoProj.NearPlane = 0.0f;
+    s_Props.OrthoProj.FarPlane = 45.0f;
+    s_Props.OrthoProj.WidthLimit = 15.0f;
+    s_Props.OrthoProj.HeightLimit = 15.0f;
 }
 
 void SceneCompositionPanel::ShutDown()
@@ -24,7 +30,16 @@ void SceneCompositionPanel::OnImGuiRender()
     {
 
         ImGui::Checkbox("Wireframe Mode", &s_Props.IsWireframe);
-        ImGui::DragFloat3("Light Direction", glm::value_ptr(s_Props.LightDirection), 0.01f);
+        ImGui::DragFloat3("Light Position", glm::value_ptr(s_Props.LightPosition), 0.01f);
+        ImGui::Checkbox("Debug Ortho Projection", &s_Props.OrthoProj.IsDebugging);
+        if (s_Props.OrthoProj.IsDebugging)
+        {
+            // For debugging purposes
+            ImGui::DragFloat("Near Plane", &s_Props.OrthoProj.NearPlane, 0.01f);
+            ImGui::DragFloat("Far Plane", &s_Props.OrthoProj.FarPlane, 0.01f);
+            ImGui::DragFloat("Width", &s_Props.OrthoProj.WidthLimit, 0.01f);
+            ImGui::DragFloat("Height", &s_Props.OrthoProj.HeightLimit, 0.01f);
+        }
         ImGui::EndTabItem();
     }
 }
