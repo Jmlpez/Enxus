@@ -4,6 +4,11 @@
 
 namespace Enxus
 {
+    ImVec2 AnimationCurveEditor::s_ResultsTable[1025]{ImVec2(0, 0)};
+    float AnimationCurveEditor::s_HelperTable[1025 * 4];
+
+    const uint32_t AnimationCurveEditor::s_Steps = 1024;
+
     AnimationCurveEditor::AnimationCurveEditor(AnimationCurveType initialType)
         : m_CurveType(initialType)
     {
@@ -36,17 +41,70 @@ namespace Enxus
             /*InOutBack*/ {0.680f, -0.55f, 0.265f, 1.550f},
         };
         m_BezierPoints = s_BezierPointsFromCurveType[(int)m_CurveType];
+
+        BuildHelperTable();
+        RecalculateTable();
     }
     AnimationCurveEditor::~AnimationCurveEditor()
     {
     }
 
+    void AnimationCurveEditor::BuildHelperTable()
+    {
+        for (unsigned step = 0; step <= s_Steps; ++step)
+        {
+            float t = (float)step / (float)s_Steps;
+            const uint32_t stepIndex = step * 4;
+            s_HelperTable[stepIndex + 0] = (1 - t) * (1 - t) * (1 - t); // * P0
+            s_HelperTable[stepIndex + 1] = 3 * (1 - t) * (1 - t) * t;   // * P1
+            s_HelperTable[stepIndex + 2] = 3 * (1 - t) * t * t;         // * P2
+            s_HelperTable[stepIndex + 3] = t * t * t;                   // * P3
+        }
+    }
+
+    void AnimationCurveEditor::RecalculateTable()
+    {
+        ImVec2 Points[4] = {{0, 0}, {m_BezierPoints[0], m_BezierPoints[1]}, {m_BezierPoints[2], m_BezierPoints[3]}, {1, 1}};
+        // ImGui::bezier_table<1024>(Points, s_ResultsTable);
+        for (unsigned step = 0; step <= s_Steps; ++step)
+        {
+            // step * 4
+            const int stepIndex = step << 2;
+            ImVec2 point = {
+                s_HelperTable[stepIndex] * Points[0].x +
+                    s_HelperTable[stepIndex + 1] * Points[1].x +
+                    s_HelperTable[stepIndex + 2] * Points[2].x +
+                    s_HelperTable[stepIndex + 3] * Points[3].x,
+                s_HelperTable[stepIndex] * Points[0].y +
+                    s_HelperTable[stepIndex + 1] * Points[1].y +
+                    s_HelperTable[stepIndex + 2] * Points[2].y +
+                    s_HelperTable[stepIndex + 3] * Points[3].y,
+            };
+            s_ResultsTable[step] = point;
+        }
+    }
+
     float AnimationCurveEditor::Evaluate(float point)
     {
-        return ImGui::BezierValue(point, m_BezierPoints.data());
+        if (
+            m_BezierPoints[0] == m_BezierPoints[1] &&
+            m_BezierPoints[1] == m_BezierPoints[2] &&
+            m_BezierPoints[2] == m_BezierPoints[3] &&
+            m_BezierPoints[3] == 0.0f)
+            return point;
+
+        if (point < 0.0f)
+            point = 0.0f;
+        if (point > 1.0f)
+            point = 1.0f;
+
+        return s_ResultsTable[(int)(point * s_Steps)].y;
     }
     void AnimationCurveEditor::OnImGuiRender()
     {
-        ImGui::Bezier("Bezier Values", m_BezierPoints.data());
+        if (ImGui::Bezier("Bezier Values", m_BezierPoints.data()))
+        {
+            RecalculateTable();
+        }
     }
 }

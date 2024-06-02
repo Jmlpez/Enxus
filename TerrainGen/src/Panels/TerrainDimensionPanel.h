@@ -9,7 +9,6 @@ struct TerrainDimensionPanelProps
     float Elevation;
     int Width;
     int Height;
-    int ElevationCurve;
     int LevelOfDetail;
     Enxus::AnimationCurveEditor HeightCurve;
 };

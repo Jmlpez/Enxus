@@ -9,7 +9,7 @@ namespace ImGui
     float BezierValue(float dt01, float P[4])
     {
         // The None value
-        if (P[0] == P[1] && P[1] == P[2] && P[2] == P[3] && P[3] == 0.000f)
+        if (P[0] == P[1] && P[1] == P[2] && P[2] == P[3] && P[3] == 0.0f)
             return dt01;
 
         enum
@@ -19,10 +19,13 @@ namespace ImGui
         ImVec2 Q[4] = {{0, 0}, {P[0], P[1]}, {P[2], P[3]}, {1, 1}};
         ImVec2 results[STEPS + 1];
         bezier_table<STEPS>(Q, results);
-        return results[(int)((dt01 < 0 ? 0 : dt01 > 1 ? 1
-                                                      : dt01) *
-                             STEPS)]
-            .y;
+
+        if (dt01 < 0)
+            dt01 = 0;
+        if (dt01 > 1)
+            dt01 = 1;
+
+        return results[(int)(dt01 * STEPS)].y;
     }
 
     int Bezier(const char *label, float P[5])
@@ -63,7 +66,7 @@ namespace ImGui
             const char *name;
             float points[4];
         } presets[] = {
-            {"None", 0.000f, 0.000f, 0.000f, 0.000f},
+            {"None", 0.0f, 0.0f, 0.0f, 0.0f},
             {"Linear", 0.000f, 0.000f, 1.000f, 1.000f},
 
             {"In Sine", 0.470f, 0.000f, 0.745f, 0.715f},

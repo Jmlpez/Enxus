@@ -10,9 +10,6 @@ void TerrainDimensionPanel::Init()
     s_Props.Elevation = 1.5f;
     s_Props.Width = 241;
     s_Props.Height = 241;
-
-    // AnimationCurve::Linear = 0
-    s_Props.ElevationCurve = 0;
     s_Props.LevelOfDetail = 0;
 }
 
@@ -40,7 +37,6 @@ void TerrainDimensionPanel::OnImGuiRender()
         ImGui::SliderInt("Terrain Height", &s_Props.Height, 50, 500);
         ImGui::EndDisabled();
 
-        // ImGui::Combo("Elevation Curve", &s_Props.ElevationCurve, enumTerrainAnimationCurve, IM_ARRAYSIZE(enumTerrainAnimationCurve));
         {
             // Animation Curve
             if (ImGui::Button("Animation Curve"))
