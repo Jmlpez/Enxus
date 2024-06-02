@@ -13,7 +13,6 @@
 
 namespace Enxus
 {
-
     ImGuiLayer::ImGuiLayer()
         : Layer("ImGuiLayer")
     {
@@ -102,7 +101,5 @@ namespace Enxus
     }
     void ImGuiLayer::OnImGuiRender()
     {
-        // ImGui::ShowDemoWindow();
     }
-
 }
