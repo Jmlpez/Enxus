@@ -3,15 +3,6 @@
 
 #include "Enxus.h"
 
-enum AnimationCurve
-{
-    Linear = 0,
-    EaseInQuad,
-    EaseInCubic,
-    EaseInQuart,
-    EaseInQuint,
-};
-
 class TerrainMesh
 {
 public:
@@ -22,7 +13,6 @@ public:
     void Draw() const;
 
     void SetNoiseMap(const std::vector<float> &noiseMap);
-    void SetHeightElevationCurve(AnimationCurve curve);
     void SetHeightCurve(Enxus::AnimationCurveEditor curve);
     void SetElevation(float elevation);
     void SetVertexDistance(float distance);
@@ -33,7 +23,6 @@ public:
     inline int GetLevelOfDetail() const { return m_LevelOfDetail; }
     inline float GetElevation() const { return m_Elevation; }
     inline float GetVertexDistance() const { return m_VertexDistance; }
-    inline AnimationCurve GetHeightElevationCurve() const { return m_ElevationCurve; }
     inline const Enxus::AnimationCurveEditor &GetHeightCurve() const { return m_HeightCurve; }
 
     inline float GetMinHeight() const { return m_MinHeight; }
@@ -71,7 +60,6 @@ private:
     float m_MaxHeight = 1.0f;
     int m_LevelOfDetail;
 
-    AnimationCurve m_ElevationCurve = AnimationCurve::EaseInQuad;
     Enxus::AnimationCurveEditor m_HeightCurve;
 
     std::vector<float> m_NoiseMap;

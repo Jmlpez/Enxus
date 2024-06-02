@@ -209,15 +209,6 @@ void EditorLayer::OnImGuiRender()
 
 void EditorLayer::TerrainMenuUI()
 {
-    // Shadow Map Texture
-    {
-        ImGui::Begin("Shadow Map Debug Menu");
-        const intptr_t textureId = TerrainScene::GetShadowFramebuffer()->GetDepthMapRendererId();
-        ImVec2 windowSize = ImGui::GetContentRegionAvail();
-        ImGui::Image((void *)textureId, windowSize);
-        ImGui::End();
-    }
-
     // Menu
     {
         ImGui::Begin("Terrain Menu");

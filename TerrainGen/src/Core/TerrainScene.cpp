@@ -404,16 +404,10 @@ void TerrainScene::UpdateTerrainDimensions(const TerrainDimensionPanelProps &pro
         s_Data.Terrain->SetVertexDistance(props.VertexScale);
         UpdateModelPositions();
     }
-    if (props.ElevationCurve != (int)s_Data.Terrain->GetHeightElevationCurve())
-    {
-        s_Data.Terrain->SetHeightElevationCurve((AnimationCurve)props.ElevationCurve);
-        UpdateModelPositions();
-    }
     if (props.HeightCurve != s_Data.Terrain->GetHeightCurve())
     {
         s_Data.Terrain->SetHeightCurve(props.HeightCurve);
     }
-    // s_Data.Terrain->SetHeightCurve()
 }
 
 void TerrainScene::UpdateTerrainBiome(const TerrainBiomePanelProps &props)
@@ -424,7 +418,7 @@ void TerrainScene::UpdateTerrainBiome(const TerrainBiomePanelProps &props)
 void TerrainScene::UpdateSceneComposition(const SceneCompositionPanelProps &props)
 {
 
-    //----------------- DEBUGGINF PURPOSES -------------------//
+    //----------------- DEBUGGING PURPOSES -------------------//
     if (props.OrthoProj.IsDebugging)
     {
         s_Data.LightOrthoProjectionMatrix = glm::ortho(-props.OrthoProj.WidthLimit,

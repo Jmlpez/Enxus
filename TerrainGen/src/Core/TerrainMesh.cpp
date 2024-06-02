@@ -165,12 +165,6 @@ void TerrainMesh::CalculateNormals()
         vertex.Normal = glm::normalize(vertex.Normal);
 }
 
-void TerrainMesh::SetHeightElevationCurve(AnimationCurve curve)
-{
-    m_ElevationCurve = curve;
-    CalculateNoiseMap();
-}
-
 void TerrainMesh::SetHeightCurve(Enxus::AnimationCurveEditor curve)
 {
     m_HeightCurve = curve;
@@ -328,24 +322,6 @@ glm::vec3 TerrainMesh::GetNormalFromIndices(uint32_t indexA, uint32_t indexB, ui
 float TerrainMesh::Evaluate(float t)
 {
     return m_HeightCurve.Evaluate(t);
-
-    switch (m_ElevationCurve)
-    {
-    case AnimationCurve::Linear:
-        return t;
-    case AnimationCurve::EaseInQuad:
-        return Enxus::Math::easeInQuad(t);
-    case AnimationCurve::EaseInCubic:
-        return Enxus::Math::easeInCubic(t);
-    case AnimationCurve::EaseInQuart:
-        return Enxus::Math::easeInQuart(t);
-    case AnimationCurve::EaseInQuint:
-        return Enxus::Math::easeInQuint(t);
-    }
-    std::cout << "[AnimationCurve Error] Unknown Animation Curve";
-    ASSERT(false);
-    // to avoid warning
-    return AnimationCurve::Linear;
 }
 
 uint32_t TerrainMesh::GetSimplifiedWidth() const
