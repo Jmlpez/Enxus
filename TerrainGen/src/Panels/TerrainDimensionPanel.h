@@ -1,6 +1,8 @@
 #ifndef TERRAIN_DIMENSION_PANEL_H
 #define TERRAIN_DIMENSION_PANEL_H
 
+#include "Enxus.h"
+
 struct TerrainDimensionPanelProps
 {
     float VertexScale;
@@ -9,6 +11,7 @@ struct TerrainDimensionPanelProps
     int Height;
     int ElevationCurve;
     int LevelOfDetail;
+    Enxus::AnimationCurveEditor HeightCurve;
 };
 
 class TerrainDimensionPanel
@@ -20,8 +23,6 @@ public:
     static const TerrainDimensionPanelProps &GetPanelProps();
 
     static void OnImGuiRender();
-
-    // TerrainDimensionPanelProps m_Props;
 };
 
 #endif

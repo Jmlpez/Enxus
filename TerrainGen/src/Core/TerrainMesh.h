@@ -23,6 +23,7 @@ public:
 
     void SetNoiseMap(const std::vector<float> &noiseMap);
     void SetHeightElevationCurve(AnimationCurve curve);
+    void SetHeightCurve(Enxus::AnimationCurveEditor curve);
     void SetElevation(float elevation);
     void SetVertexDistance(float distance);
     void SetLevelOfDetail(int levelOfDetail);
@@ -33,6 +34,7 @@ public:
     inline float GetElevation() const { return m_Elevation; }
     inline float GetVertexDistance() const { return m_VertexDistance; }
     inline AnimationCurve GetHeightElevationCurve() const { return m_ElevationCurve; }
+    inline const Enxus::AnimationCurveEditor &GetHeightCurve() const { return m_HeightCurve; }
 
     inline float GetMinHeight() const { return m_MinHeight; }
     inline float GetMaxHeight() const { return m_MaxHeight; }
@@ -70,6 +72,7 @@ private:
     int m_LevelOfDetail;
 
     AnimationCurve m_ElevationCurve = AnimationCurve::EaseInQuad;
+    Enxus::AnimationCurveEditor m_HeightCurve;
 
     std::vector<float> m_NoiseMap;
 

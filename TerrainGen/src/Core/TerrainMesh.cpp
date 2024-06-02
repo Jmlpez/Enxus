@@ -3,7 +3,7 @@
 const uint32_t TerrainMesh::s_MaxTerrainSize = 500;
 
 TerrainMesh::TerrainMesh(uint32_t width, uint32_t height)
-    : m_Width(width), m_Height(height)
+    : m_Width(width), m_Height(height), m_HeightCurve(Enxus::AnimationCurveType::Linear)
 {
     if (m_Width >= s_MaxTerrainSize || m_Height >= s_MaxTerrainSize)
     {
@@ -171,6 +171,12 @@ void TerrainMesh::SetHeightElevationCurve(AnimationCurve curve)
     CalculateNoiseMap();
 }
 
+void TerrainMesh::SetHeightCurve(Enxus::AnimationCurveEditor curve)
+{
+    m_HeightCurve = curve;
+    CalculateNoiseMap();
+}
+
 void TerrainMesh::SetVertexDistance(float distance)
 {
     if (distance == m_VertexDistance)
@@ -321,6 +327,8 @@ glm::vec3 TerrainMesh::GetNormalFromIndices(uint32_t indexA, uint32_t indexB, ui
 
 float TerrainMesh::Evaluate(float t)
 {
+    return m_HeightCurve.Evaluate(t);
+
     switch (m_ElevationCurve)
     {
     case AnimationCurve::Linear:

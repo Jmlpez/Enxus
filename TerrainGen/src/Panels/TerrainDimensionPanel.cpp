@@ -28,6 +28,7 @@ const TerrainDimensionPanelProps &TerrainDimensionPanel::GetPanelProps()
 void TerrainDimensionPanel::OnImGuiRender()
 {
     static const char *enumTerrainAnimationCurve[] = {"Linear", "EaseInQuad", "EaseInCubic", "EaseInQuart", "EaseInQuint"};
+    static bool showAnimationCurveWindow = true;
 
     if (ImGui::BeginTabItem("Terrain Dimensions"))
     {
@@ -39,7 +40,21 @@ void TerrainDimensionPanel::OnImGuiRender()
         ImGui::SliderInt("Terrain Height", &s_Props.Height, 50, 500);
         ImGui::EndDisabled();
 
-        ImGui::Combo("Elevation Curve", &s_Props.ElevationCurve, enumTerrainAnimationCurve, IM_ARRAYSIZE(enumTerrainAnimationCurve));
+        // ImGui::Combo("Elevation Curve", &s_Props.ElevationCurve, enumTerrainAnimationCurve, IM_ARRAYSIZE(enumTerrainAnimationCurve));
+        {
+            // Animation Curve
+            if (ImGui::Button("Animation Curve"))
+            {
+                showAnimationCurveWindow = !showAnimationCurveWindow;
+            }
+
+            if (showAnimationCurveWindow)
+            {
+                ImGui::Begin("Height Curve");
+                s_Props.HeightCurve.OnImGuiRender();
+                ImGui::End();
+            }
+        }
         ImGui::EndTabItem();
     }
 }
