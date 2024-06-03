@@ -163,7 +163,7 @@ namespace ImGui
             return false;
 
         // header and spacing
-        int changed = SliderFloat4(label, P, 0, 1, "%.3f", 1.0f);
+        int changed = DragFloat4(label, P, 0.001f, 0.0f, 1.0f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
         int hovered = IsItemActive() || IsItemHovered(); // IsItemDragged() ?
         Dummy(ImVec2(0, 3));
 

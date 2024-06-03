@@ -4,10 +4,8 @@
 
 namespace Enxus
 {
-    ImVec2 AnimationCurveEditor::s_ResultsTable[1025]{ImVec2(0, 0)};
-    float AnimationCurveEditor::s_HelperTable[1025 * 4];
-
-    const uint32_t AnimationCurveEditor::s_Steps = 1024;
+    glm::vec2 AnimationCurveEditor::s_ResultsTable[AnimationCurveEditor::s_Steps + 1]{glm::vec2(0, 0)};
+    float AnimationCurveEditor::s_HelperTable[(AnimationCurveEditor::s_Steps + 1) * 4];
 
     AnimationCurveEditor::AnimationCurveEditor(AnimationCurveType initialType)
         : m_CurveType(initialType)
@@ -54,7 +52,7 @@ namespace Enxus
         for (unsigned step = 0; step <= s_Steps; ++step)
         {
             float t = (float)step / (float)s_Steps;
-            const uint32_t stepIndex = step * 4;
+            const uint32_t stepIndex = step << 2;                       // step *4
             s_HelperTable[stepIndex + 0] = (1 - t) * (1 - t) * (1 - t); // * P0
             s_HelperTable[stepIndex + 1] = 3 * (1 - t) * (1 - t) * t;   // * P1
             s_HelperTable[stepIndex + 2] = 3 * (1 - t) * t * t;         // * P2
@@ -64,13 +62,13 @@ namespace Enxus
 
     void AnimationCurveEditor::RecalculateTable()
     {
-        ImVec2 Points[4] = {{0, 0}, {m_BezierPoints[0], m_BezierPoints[1]}, {m_BezierPoints[2], m_BezierPoints[3]}, {1, 1}};
+        glm::vec2 Points[4] = {{0, 0}, {m_BezierPoints[0], m_BezierPoints[1]}, {m_BezierPoints[2], m_BezierPoints[3]}, {1, 1}};
         // ImGui::bezier_table<1024>(Points, s_ResultsTable);
         for (unsigned step = 0; step <= s_Steps; ++step)
         {
             // step * 4
             const int stepIndex = step << 2;
-            ImVec2 point = {
+            glm::vec2 point = {
                 s_HelperTable[stepIndex] * Points[0].x +
                     s_HelperTable[stepIndex + 1] * Points[1].x +
                     s_HelperTable[stepIndex + 2] * Points[2].x +

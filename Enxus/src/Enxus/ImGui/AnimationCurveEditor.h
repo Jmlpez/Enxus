@@ -2,8 +2,7 @@
 #define ANIMATION_CURVE_EDITOR_H
 
 #include "Base.h"
-#define IMGUI_DEFINE_MATH_OPERATORS
-#include "imgui/imgui.h"
+#include "glm/glm.hpp"
 
 namespace Enxus
 {
@@ -54,17 +53,17 @@ namespace Enxus
 
     private:
         void RecalculateTable();
-        void BuildHelperTable();
+        static void BuildHelperTable();
 
     private:
         // initial values --> is in group of two ([0], [1]), ([2],[3])
         std::array<float, 4> m_BezierPoints;
 
-        // The arrays size must be 1 + s_Steps.
-        static ImVec2 s_ResultsTable[1025];
-        static float s_HelperTable[1025 * 4];
+        static const uint32_t s_Steps = 4096;
 
-        static const uint32_t s_Steps;
+        static glm::vec2 s_ResultsTable[s_Steps + 1];
+        static float s_HelperTable[(s_Steps + 1) * 4];
+
         AnimationCurveType m_CurveType;
     };
 }
