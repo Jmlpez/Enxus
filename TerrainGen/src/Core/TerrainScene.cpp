@@ -145,12 +145,7 @@ void TerrainScene::InitShadowMapping()
         ResourceManager::GetResourcesPath().Shaders + "shadow-map/shadow-map.frag");
 
     // float nearPlane = 0.0f, farPlane = 25.0f;
-    s_Data.LightOrthoProjectionMatrix = glm::ortho(-15.0f,
-                                                   15.0f,
-                                                   -15.0f,
-                                                   15.0f,
-                                                   0.1f,
-                                                   45.0f);
+    s_Data.LightOrthoProjectionMatrix = glm::ortho(-15.0f, 15.0f, -15.0f, 15.0f, 0.1f, 45.0f);
 
     s_Data.LightViewMatrix = glm::lookAt(s_Data.SceneCompositionData.LightPosition, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
@@ -201,6 +196,11 @@ void TerrainScene::UpdateModelPositions()
 
 void TerrainScene::OnShadowPass()
 {
+    // Avoid shadows calculation in case the checkbox is unset in the panel
+    if (!s_Data.SceneCompositionData.UseShadows)
+    {
+        return;
+    }
     // implement shadow mapping
     s_Data.ShadowMapFramebuffer->Bind();
     {
@@ -265,6 +265,7 @@ void TerrainScene::OnRenderPass()
         s_Data.TerrainShader->SetMat4("uLightSpaceMatrix", s_Data.LightSpaceMatrix);
 
         // Bind the shadow map
+        s_Data.TerrainShader->SetBool("uUseShadows", s_Data.SceneCompositionData.UseShadows);
         s_Data.TerrainShader->SetInt("uShadowMap", 0);
         s_Data.ShadowMapFramebuffer->BindShadowTexture(0);
 

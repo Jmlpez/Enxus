@@ -14,7 +14,6 @@ EditorLayer::EditorLayer()
     : Layer("Terrain Generator Editor Layer"),
       m_ViewportSize(0.0f, 0.0f)
 {
-
     //----------------- CAMERA -------------------//
     auto &window = Enxus::Application::Get().GetWindow();
     uint32_t width = window.GetWidth();

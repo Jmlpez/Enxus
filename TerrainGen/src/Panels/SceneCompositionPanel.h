@@ -6,6 +6,7 @@
 struct SceneCompositionPanelProps
 {
     bool IsWireframe;
+    bool UseShadows;
     glm::vec3 LightPosition;
 
     struct OrthoProjData

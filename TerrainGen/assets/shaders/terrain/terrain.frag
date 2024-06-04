@@ -34,6 +34,7 @@ uniform bool uBiomeTextureUsed[MAX_NUM_OF_LAYERS];
 uniform float uMinHeight;
 uniform float uMaxHeight;
 
+uniform bool uUseShadows;
 uniform sampler2D uShadowMap; // slot 0
 uniform sampler2D uTerrainTextures[8]; // slot from 1-8
 uniform float uTexturesScale[8];
@@ -158,8 +159,11 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir) {
     // add shadow calculation
     //float bias = mix(0.005, 0.0, diff);
     // In case of this terrain this value for bias works fine
-    float bias = 0.025;
-    float shadow = CalculateShadow(fs_in.vFragPosLightSpace, bias);
+    float shadow = 0;
+    if(uUseShadows) {
+        float bias = 0.025;
+        shadow = CalculateShadow(fs_in.vFragPosLightSpace, bias);
+    }
 
     return ambient + ((1 - shadow) * (diffuse + specular));
 }

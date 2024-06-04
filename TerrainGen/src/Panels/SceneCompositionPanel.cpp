@@ -6,6 +6,7 @@ static SceneCompositionPanelProps s_Props;
 void SceneCompositionPanel::Init()
 {
     s_Props.IsWireframe = false;
+    s_Props.UseShadows = true;
     s_Props.LightPosition = glm::vec3(6.0f, 4.0f, 9.0f);
 
     s_Props.OrthoProj.IsDebugging = false;
@@ -30,7 +31,12 @@ void SceneCompositionPanel::OnImGuiRender()
     {
 
         ImGui::Checkbox("Wireframe Mode", &s_Props.IsWireframe);
-        ImGui::DragFloat3("Light Position", glm::value_ptr(s_Props.LightPosition), 0.01f);
+        {
+            ImGui::SeparatorText("Lighting");
+            ImGui::DragFloat3("Light Position", glm::value_ptr(s_Props.LightPosition), 0.01f);
+            ImGui::Checkbox("Use Shadows", &s_Props.UseShadows);
+            ImGui::Separator();
+        }
         ImGui::Checkbox("Debug Ortho Projection", &s_Props.OrthoProj.IsDebugging);
         if (s_Props.OrthoProj.IsDebugging)
         {
