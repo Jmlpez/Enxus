@@ -415,6 +415,7 @@ void TerrainScene::UpdateTerrainDimensions(const TerrainDimensionPanelProps &pro
     if (props.HeightCurve != s_Data.Terrain->GetHeightCurve())
     {
         s_Data.Terrain->SetHeightCurve(props.HeightCurve);
+        UpdateModelPositions();
     }
 }
 
