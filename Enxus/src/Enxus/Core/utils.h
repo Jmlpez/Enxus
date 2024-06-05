@@ -12,10 +12,16 @@
 #define LOG_LINE() \
     debugLine(__LINE__, __FILE__);
 
+#define DEBUG
+
+#ifdef DEBUG
 #define GLCall(x)   \
     GLClearError(); \
     x;              \
     ASSERT(GLLogCall(#x, __FILE__, __LINE__))
+#else
+#define GLCall(x) x;
+#endif
 
 void GLClearError();
 void debugLine(int line, const char *file);

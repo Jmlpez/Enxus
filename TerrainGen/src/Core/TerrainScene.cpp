@@ -64,6 +64,10 @@ void TerrainScene::Init()
     // and destination factor 1 - the alpha channel of the source_color
     GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
+    //----------------- FACE CULLING -------------------//
+    GLCall(glCullFace(GL_FRONT));
+    GLCall(glFrontFace(GL_CW));
+
     // [TODO] Use Uniform Buffer Objects for things like camera and lighting
     InitTerrain();
     InitModels();
@@ -296,6 +300,8 @@ void TerrainScene::OnRenderPass()
 
     //----------------- Draw the models using instancing -------------------//
     {
+        GLCall(glEnable(GL_CULL_FACE));
+
         s_Data.ModelShader->Bind();
         s_Data.ModelShader->SetMat4("uViewProj", s_Data.CameraData.ViewProjectionMatrix);
         s_Data.ModelShader->SetVec3("uCameraPos", s_Data.CameraData.Position);
@@ -346,6 +352,7 @@ void TerrainScene::OnRenderPass()
                 GLCall(glDrawElementsInstanced(GL_TRIANGLES, mesh->GetVertexArray()->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr, renderedAmount));
             }
         }
+        GLCall(glDisable(GL_CULL_FACE));
     }
 
     // Draw Skybox at last
