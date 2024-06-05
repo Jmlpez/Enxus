@@ -17,7 +17,7 @@ struct DirLight {
     vec3 diffuse;
     vec3 specular;
 };
-vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir);
+vec4 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir);
 
 uniform Material material;
 uniform DirLight uDirLight;
@@ -38,9 +38,9 @@ void main() {
     // vTexCoord = FlipTextureUVs(uFlipsUVs);
 
     // phase 1: Directional lighting
-    vec3 result = CalcDirLight(uDirLight, normal, viewDir);
+    vec4 result = CalcDirLight(uDirLight, normal, viewDir);
 
-    FragColor = vec4(result, 1.0);
+    FragColor = result;
     //FragColor = texture2D(material.texture_diffuse1, vTexCoord);
 }
 
@@ -51,7 +51,7 @@ vec2 FlipTextureUVs(vec2 texCoords, bool flip) {
     return texCoords;
 }
 
-vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir) {
+vec4 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir) {
 
     vec3 lightDir = normalize(-light.direction);
 
@@ -62,14 +62,14 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir) {
 
     vec2 coords = FlipTextureUVs(vTexCoord, uFlipsUVs);
 
-    vec3 ambient = light.ambient * vec3(texture2D(material.texture_diffuse1, coords));
-    vec3 diffuse = light.diffuse * diff * vec3(texture2D(material.texture_diffuse1, coords));
+    vec4 ambient = vec4(light.ambient, 1.0) * vec4(texture2D(material.texture_diffuse1, coords));
+    vec4 diffuse = vec4(light.diffuse, 1.0) * diff * vec4(texture2D(material.texture_diffuse1, coords));
 
-    vec3 specularTextureFulLColor = vec3(texture2D(material.texture_specular1, coords));
+    vec4 specularTextureFulLColor = vec4(texture2D(material.texture_specular1, coords));
     // specularTextureFulLColor.y = specularTextureFulLColor.x;
     // specularTextureFulLColor.z = specularTextureFulLColor.x;
     //vec3 specular = light.specular * spec * specularTextureFulLColor;
-    vec3 specular = light.specular * spec * specularTextureFulLColor;
+    vec4 specular = vec4(light.specular, 1.0) * spec * specularTextureFulLColor;
 
     return ambient + diffuse + specular;
 }

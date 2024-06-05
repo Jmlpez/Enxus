@@ -17,8 +17,8 @@ namespace OpenGLTest
         void OnImGuiRender() override;
 
     private:
-        Enxus::Ref<Enxus::Model> m_Backpack;
-        Enxus::Ref<Enxus::Model> m_Box;
+        std::vector<Enxus::Ref<Enxus::Model>> m_ModelsList;
+
         Enxus::Ref<Enxus::Shader> m_Shader;
 
         glm::vec3 m_LightDirection;

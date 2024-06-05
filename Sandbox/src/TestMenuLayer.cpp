@@ -27,7 +27,6 @@ TestMenuLayer::TestMenuLayer()
     uint32_t height = window.GetHeight();
 
     m_CameraController = Enxus::CreateScope<Enxus::FreeCameraController>((float)width / (float)height, 0.01f, 100.0f);
-
     //----------------- FRAMEBUFFER -------------------//
     Enxus::FramebufferSpecification fbspec;
     fbspec.Width = 800;
