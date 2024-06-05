@@ -28,7 +28,7 @@ uniform Material uMaterial;
 
 uniform vec3 uCameraPos;
 
-float CalculateShadow(vec4 fragPosLightSpace, float bias);
+//float CalculateShadow(vec4 fragPosLightSpace, float bias);
 
 void main() {
 
@@ -47,12 +47,8 @@ vec4 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir) {
 
     float diff = max(0.0, dot(lightDir, normal));
 
-    vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 256.0);
-
-    //vec3 ambient = light.ambient * vec3(texture2D(uObjectMaterial.diffuse, vTexCoord));
-    //vec3 diffuse = light.diffuse * diff * vec3(texture2D(uObjectMaterial.diffuse, vTexCoord));
-    //vec3 specular = light.specular * spec * vec3(texture2D(uObjectMaterial.specular, vTexCoord));
+    vec3 halfwayDir = normalize(lightDir + viewDir);
+    float spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0);
 
     vec4 diffuseColor = vec4(texture2D(uMaterial.diffuseMap, fs_in.vTexCoord));
     vec4 specularColor = vec4(texture2D(uMaterial.specularMap, fs_in.vTexCoord));

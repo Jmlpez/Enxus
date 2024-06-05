@@ -157,10 +157,10 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir) {
     vec3 specular = light.specular * spec * specularStrength;
 
     // add shadow calculation
-    //float bias = mix(0.005, 0.0, diff);
     // In case of this terrain this value for bias works fine
     float shadow = 0;
     if(uUseShadows) {
+        //float bias = mix(0.005, 0.0, diff);
         float bias = 0.025;
         shadow = CalculateShadow(fs_in.vFragPosLightSpace, bias);
     }
