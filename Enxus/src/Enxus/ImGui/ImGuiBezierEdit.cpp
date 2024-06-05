@@ -266,6 +266,6 @@ namespace ImGui
         DrawList->AddCircleFilled(p2, GRAB_RADIUS, ImColor(white));
         DrawList->AddCircleFilled(p2, GRAB_RADIUS - GRAB_BORDER, ImColor(cyan));
 
-        return changed;
+        return changed || reload;
     }
 }
