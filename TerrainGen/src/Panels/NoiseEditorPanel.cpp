@@ -362,13 +362,17 @@ void NoiseEditorPanel::UpdateNoiseMap(bool newMap)
                 float falloffValue = std::max(std::abs(nPosX), std::abs(nPosY));
                 float smoothValue = Enxus::Math::blend(falloffValue, s_Props.FalloffMap.Beta);
 
-                uint8_t falloffColor = smoothValue * 255;
+                float normalizedPosX = (float)x / (float)s_Props.NoiseWidth;
+                float smoothNormalizedPosX = Enxus::Math::blend(normalizedPosX, s_Props.FalloffMap.Beta);
+                float interp = Enxus::Math::lerp(0, 1, smoothNormalizedPosX);
+
+                uint8_t falloffColor = interp * 255;
                 falloffMapPixelArray[pixelArrayIndex] = falloffColor;
                 falloffMapPixelArray[pixelArrayIndex + 1] = falloffColor;
                 falloffMapPixelArray[pixelArrayIndex + 2] = falloffColor;
                 falloffMapPixelArray[pixelArrayIndex + 3] = 255;
 
-                normalizedNoise = std::clamp(normalizedNoise - smoothValue, 0.0f, 1.0f);
+                normalizedNoise = std::clamp(normalizedNoise - interp, 0.0f, 1.0f);
             }
 
             s_Props.NoiseMapArray[noiseMapIndex] = normalizedNoise;
