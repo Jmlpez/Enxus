@@ -29,7 +29,7 @@ const TerrainBiomePanelProps &TerrainBiomePanel::GetPanelProps()
 
 void TerrainBiomePanel::OnImGuiRender()
 {
-    static const char *enumTerrainTexturesArray[] = {"None", "Water", "Grass", "Rocks1", "Rocks2", "Sandy Grass", "Stony Ground", "Snow"};
+    static const std::string enumTerrainTexturesArray[] = {"None", "Water", "Grass", "Rocks1", "Rocks2", "Sandy Grass", "Stony Ground", "Snow"};
     static const int arrSize = IM_ARRAYSIZE(enumTerrainTexturesArray);
 
     const auto &texturesList = ResourceManager::GetTexturesList();
@@ -62,7 +62,7 @@ void TerrainBiomePanel::OnImGuiRender()
                 ImGui::BeginGroup();
                 if (s_Props.BiomeLayers[i].TextureIndex == 0)
                 {
-                    ImGui::Button(enumTerrainTexturesArray[s_Props.BiomeLayers[i].TextureIndex], ImVec2(80, 80));
+                    ImGui::Button(enumTerrainTexturesArray[s_Props.BiomeLayers[i].TextureIndex].c_str(), ImVec2(80, 80));
                 }
                 else
                 {
@@ -114,7 +114,7 @@ void TerrainBiomePanel::OnImGuiRender()
                 {
                     intptr_t textureId = texture->GetRendererId();
                     ImGui::Image((void *)textureId, buttonSize);
-                    ImGui::Text(enumTerrainTexturesArray[i]);
+                    ImGui::Text("%s", enumTerrainTexturesArray[i].c_str());
                 }
                 ImGui::EndGroup();
 
@@ -126,7 +126,7 @@ void TerrainBiomePanel::OnImGuiRender()
                 if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
                 {
                     ImGui::SetDragDropPayload(dragDropPayloadName.c_str(), &i, sizeof(int));
-                    ImGui::Text(enumTerrainTexturesArray[i]);
+                    ImGui::Text("%s", enumTerrainTexturesArray[i].c_str());
                     ImGui::EndDragDropSource();
                 }
             }
