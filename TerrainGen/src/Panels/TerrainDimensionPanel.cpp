@@ -24,7 +24,6 @@ const TerrainDimensionPanelProps &TerrainDimensionPanel::GetPanelProps()
 
 void TerrainDimensionPanel::OnImGuiRender()
 {
-    static const char *enumTerrainAnimationCurve[] = {"Linear", "EaseInQuad", "EaseInCubic", "EaseInQuart", "EaseInQuint"};
     static bool showAnimationCurveWindow = true;
 
     if (ImGui::BeginTabItem("Terrain Dimensions"))
