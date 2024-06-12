@@ -384,6 +384,13 @@ void TerrainScene::OnRenderPass()
 void TerrainScene::UpdateTerrainNoiseMap(const std::vector<float> &noiseMap)
 {
     s_Data.Terrain->SetNoiseMap(noiseMap);
+    // {
+    // Erosion::ErosionManager erosionManager(noiseMap, s_Data.Terrain->GetWidth(), s_Data.Terrain->GetHeight());
+    // erosionManager.Simulate(70000);
+    // s_Data.Terrain->SetNoiseMap(erosionManager.GetHeightMap());
+    // //  s_Data.Terrain->SetVertices(erosionManager.GetTerrainVertices());
+    // }
+
     UpdateModelPositions();
 }
 

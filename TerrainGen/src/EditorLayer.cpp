@@ -5,6 +5,7 @@
 #include "SceneCompositionPanel.h"
 #include "TerrainBiomePanel.h"
 #include "ModelPlacementPanel.h"
+#include "ErosionPanel.h"
 #include "TerrainScene.h"
 #include "ResourceManager.h"
 #include "imgui/imgui.h"
@@ -44,6 +45,7 @@ void EditorLayer::OnAttach()
     SceneCompositionPanel::Init();
     ModelPlacementPanel::Init();
     NoiseEditorPanel::Init();
+    ErosionPanel::Init();
 
     //----------------- Terrain Scene Initialization -------------------//
 
@@ -56,6 +58,9 @@ void EditorLayer::OnAttach()
     TerrainScene::UpdateTerrainBiome(TerrainBiomePanel::GetPanelProps());
     TerrainScene::UpdateModelPlacement(ModelPlacementPanel::GetPanelProps());
 
+    m_ErosionManager.SetMapSize(NoiseEditorPanel::GetNoiseWidth(), NoiseEditorPanel::GetNoiseHeight());
+    m_ErosionManager.SetHeightMap(NoiseEditorPanel::GetNoiseMap());
+
     ImGui::SetWindowFocus("Viewport");
 }
 
@@ -63,7 +68,6 @@ void EditorLayer::OnDetach()
 {
     //----------------- Terrain Scene ShutDown -------------------//
     TerrainScene::ShutDown();
-
     //----------------- Terrain Panels ShutDown -------------------//
 
     TerrainDimensionPanel::ShutDown();
@@ -71,6 +75,7 @@ void EditorLayer::OnDetach()
     SceneCompositionPanel::ShutDown();
     ModelPlacementPanel::ShutDown();
     NoiseEditorPanel::ShutDown();
+    ErosionPanel::ShutDown();
 
     //----------------- Resource Manager ShutDown -------------------//
     ResourceManager::ShutDown();
@@ -196,11 +201,42 @@ void EditorLayer::OnImGuiRender()
         ImGui::Text("App average %.3f ms/frame (%.1f FPS)", Enxus::Application::Get().GetTimestep().GetMiliseconds(), 1.0f / Enxus::Application::Get().GetTimestep());
         ImGui::End();
     }
-    // The Noise is updated separately
-    NoiseEditorPanel::OnImGuiRender();
-    if (NoiseEditorPanel::HasUpdated())
+
+    // // Erosion is updated separately
+    const auto &erosionPanelProps = ErosionPanel::GetPanelProps();
     {
-        TerrainScene::UpdateTerrainNoiseMap(NoiseEditorPanel::GetNoiseMap());
+        ErosionPanel::OnImGuiRender();
+        if (erosionPanelProps.RevertErosion)
+        {
+            m_ErosionManager.SetHeightMap(NoiseEditorPanel::GetNoiseMap());
+            TerrainScene::UpdateTerrainNoiseMap(NoiseEditorPanel::GetNoiseMap());
+        }
+        if (erosionPanelProps.IsErosionOn)
+        {
+            if (m_ErosionManager.GetCurrentIterations() <= (uint32_t)erosionPanelProps.Iterations)
+            {
+                m_ErosionManager.Simulate(1000);
+                TerrainScene::UpdateTerrainNoiseMap(m_ErosionManager.GetHeightMap());
+            }
+        }
+    }
+
+    // // The Noise is updated separately
+    {
+        NoiseEditorPanel::OnImGuiRender();
+        if (NoiseEditorPanel::HasUpdated())
+        {
+            m_ErosionManager.SetHeightMap(NoiseEditorPanel::GetNoiseMap());
+            if (erosionPanelProps.IsErosionOn)
+            {
+                m_ErosionManager.Simulate(1000);
+                TerrainScene::UpdateTerrainNoiseMap(m_ErosionManager.GetHeightMap());
+            }
+            else
+            {
+                TerrainScene::UpdateTerrainNoiseMap(NoiseEditorPanel::GetNoiseMap());
+            }
+        }
     }
 
     ImGui::End();
