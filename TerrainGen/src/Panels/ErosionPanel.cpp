@@ -29,7 +29,7 @@ void ErosionPanel::OnImGuiRender()
         {
             s_Props.RevertErosion = true;
         }
-        ImGui::DragInt("Iterations", &s_Props.Iterations, 100, 1, 200000, "%d", ImGuiSliderFlags_AlwaysClamp);
+        ImGui::DragInt("Iterations", &s_Props.Iterations, 100, 1, 1000000, "%d", ImGuiSliderFlags_AlwaysClamp);
         ImGui::End();
     }
 }

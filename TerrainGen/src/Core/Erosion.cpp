@@ -23,6 +23,8 @@ namespace Erosion
     {
         m_Width = width;
         m_Height = height;
+        m_ErosionAreaIndices.clear();
+        m_ErosionAreaWeight.clear();
         InitErosionWeight();
     }
 

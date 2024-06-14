@@ -20,8 +20,7 @@ void NoiseEditorPanel::Init()
                                              s_Props.NoiseHeight);
 
     // Just one memory allocation
-    s_Props.NoiseMapArray.reserve(s_Props.NoiseWidth * s_Props.NoiseHeight);
-    s_Props.NoiseMapArray.assign(s_Props.NoiseWidth * s_Props.NoiseHeight, 0.0f);
+    s_Props.NoiseMapArray.resize(s_Props.NoiseWidth * s_Props.NoiseHeight);
 
     // Generate the first image
     UpdateNoiseMap(true);
@@ -49,23 +48,34 @@ const std::vector<float> &NoiseEditorPanel::GetNoiseMap()
 
 void NoiseEditorPanel::SetNoiseWidth(uint32_t width)
 {
-    (void)width;
-    std::cout << "[NoiseEditorPanel Error] : SetNoiseWidth Currently not supported" << std::endl;
-    return;
-    // if ((int)width == s_Props.GeneralNoise.Width)
-    //     return;
-    // s_Props.GeneralNoise.Width = width;
-    // UpdateNoiseMap(true);
+    if (width == s_Props.NoiseWidth)
+        return;
+    s_Props.NoiseWidth = width;
+    s_Props.NoiseMapArray.resize(s_Props.NoiseWidth * s_Props.NoiseHeight);
+    s_Props.NoisePreviewData.Texture->Resize(s_Props.NoiseWidth, s_Props.NoiseHeight);
+    s_Props.FalloffMap.Texture->Resize(s_Props.NoiseWidth, s_Props.NoiseHeight);
+    UpdateNoiseMap(true);
 }
 void NoiseEditorPanel::SetNoiseHeight(uint32_t height)
 {
-    (void)height;
-    std::cout << "[NoiseEditorPanel Error] : SetNoiseHeight Currently not supported" << std::endl;
-    return;
-    // if ((int)height == s_Props.GeneralNoise.Height)
-    //     return;
-    // s_Props.GeneralNoise.Height = height;
-    // UpdateNoiseMap(true);
+    if (height == s_Props.NoiseHeight)
+        return;
+    s_Props.NoiseHeight = height;
+    s_Props.NoiseMapArray.resize(s_Props.NoiseWidth * s_Props.NoiseHeight);
+    s_Props.NoisePreviewData.Texture->Resize(s_Props.NoiseWidth, s_Props.NoiseHeight);
+    s_Props.FalloffMap.Texture->Resize(s_Props.NoiseWidth, s_Props.NoiseHeight);
+    UpdateNoiseMap(true);
+}
+void NoiseEditorPanel::SetNoiseSize(uint32_t width, uint32_t height)
+{
+    if (height == s_Props.NoiseHeight && width == s_Props.NoiseWidth)
+        return;
+    s_Props.NoiseWidth = width;
+    s_Props.NoiseHeight = height;
+    s_Props.NoiseMapArray.resize(s_Props.NoiseWidth * s_Props.NoiseHeight);
+    s_Props.NoisePreviewData.Texture->Resize(s_Props.NoiseWidth, s_Props.NoiseHeight);
+    s_Props.FalloffMap.Texture->Resize(s_Props.NoiseWidth, s_Props.NoiseHeight);
+    UpdateNoiseMap(true);
 }
 
 void NoiseEditorPanel::OnImGuiRender()

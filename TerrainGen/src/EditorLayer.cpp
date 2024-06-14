@@ -54,8 +54,8 @@ void EditorLayer::OnAttach()
     // Initial values
     TerrainScene::UpdateTerrainNoiseMap(NoiseEditorPanel::GetNoiseMap());
     TerrainScene::UpdateSceneComposition(SceneCompositionPanel::GetPanelProps());
-    TerrainScene::UpdateTerrainDimensions(TerrainMeshPanel::GetPanelProps());
-    TerrainScene::UpdateTerrainBiome(TerrainTexturePanel::GetPanelProps());
+    TerrainScene::UpdateTerrainMesh(TerrainMeshPanel::GetPanelProps());
+    TerrainScene::UpdateTerrainTextures(TerrainTexturePanel::GetPanelProps());
     TerrainScene::UpdateModelPlacement(ModelPlacementPanel::GetPanelProps());
 
     m_ErosionManager.SetMapSize(NoiseEditorPanel::GetNoiseWidth(), NoiseEditorPanel::GetNoiseHeight());
@@ -250,11 +250,20 @@ void EditorLayer::TerrainMenuUI()
         ImGui::BeginTabBar("Terrain Menu TabBar");
 
         TerrainMeshPanel::OnImGuiRender();
-        auto dimensionProps = TerrainMeshPanel::GetPanelProps();
-        TerrainScene::UpdateTerrainDimensions(dimensionProps);
+        auto &meshProps = TerrainMeshPanel::GetPanelProps();
+
+        TerrainScene::UpdateTerrainMesh(meshProps);
+        // In case of any change in size update the NoiseEditor and the ErosionManager
+        if (meshProps.Width != NoiseEditorPanel::GetNoiseWidth() || meshProps.Height != NoiseEditorPanel::GetNoiseHeight())
+        {
+            NoiseEditorPanel::SetNoiseSize(meshProps.Width, meshProps.Height);
+            m_ErosionManager.SetMapSize(meshProps.Width, meshProps.Height);
+            m_ErosionManager.SetHeightMap(NoiseEditorPanel::GetNoiseMap());
+            TerrainScene::UpdateTerrainNoiseMap(NoiseEditorPanel::GetNoiseMap());
+        }
 
         TerrainTexturePanel::OnImGuiRender();
-        TerrainScene::UpdateTerrainBiome(TerrainTexturePanel::GetPanelProps());
+        TerrainScene::UpdateTerrainTextures(TerrainTexturePanel::GetPanelProps());
 
         SceneCompositionPanel::OnImGuiRender();
         TerrainScene::UpdateSceneComposition(SceneCompositionPanel::GetPanelProps());

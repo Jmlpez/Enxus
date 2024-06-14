@@ -17,8 +17,8 @@ public:
     static void OnRenderPass();
 
     static void UpdateTerrainNoiseMap(const std::vector<float> &noiseMap);
-    static void UpdateTerrainDimensions(const TerrainMeshPanelProps &props);
-    static void UpdateTerrainBiome(const TerrainTexturePanelProps &props);
+    static void UpdateTerrainMesh(const TerrainMeshPanelProps &props);
+    static void UpdateTerrainTextures(const TerrainTexturePanelProps &props);
     static void UpdateSceneComposition(const SceneCompositionPanelProps &props);
     static void UpdateModelPlacement(const ModelPlacementPanelProps &props);
 

@@ -390,7 +390,7 @@ void TerrainScene::UpdateTerrainNoiseMap(const std::vector<float> &noiseMap)
     UpdateModelPositions();
 }
 
-void TerrainScene::UpdateTerrainDimensions(const TerrainMeshPanelProps &props)
+void TerrainScene::UpdateTerrainMesh(const TerrainMeshPanelProps &props)
 {
     // update the terrain according to the new panel props...
     if ((uint32_t)props.Width != s_Data.Terrain->GetWidth())
@@ -422,7 +422,7 @@ void TerrainScene::UpdateTerrainDimensions(const TerrainMeshPanelProps &props)
     }
 }
 
-void TerrainScene::UpdateTerrainBiome(const TerrainTexturePanelProps &props)
+void TerrainScene::UpdateTerrainTextures(const TerrainTexturePanelProps &props)
 {
     s_Data.TerrainBiomeData = props;
 }

@@ -7,8 +7,8 @@ struct TerrainMeshPanelProps
 {
     float VertexScale;
     float Elevation;
-    int Width;
-    int Height;
+    uint32_t Width;
+    uint32_t Height;
     int LevelOfDetail;
     Enxus::AnimationCurveEditor HeightCurve;
 };
