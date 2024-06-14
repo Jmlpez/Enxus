@@ -227,15 +227,7 @@ void EditorLayer::OnImGuiRender()
         if (NoiseEditorPanel::HasUpdated())
         {
             m_ErosionManager.SetHeightMap(NoiseEditorPanel::GetNoiseMap());
-            if (erosionPanelProps.IsErosionOn)
-            {
-                m_ErosionManager.Simulate(1000);
-                TerrainScene::UpdateTerrainNoiseMap(m_ErosionManager.GetHeightMap());
-            }
-            else
-            {
-                TerrainScene::UpdateTerrainNoiseMap(NoiseEditorPanel::GetNoiseMap());
-            }
+            TerrainScene::UpdateTerrainNoiseMap(NoiseEditorPanel::GetNoiseMap());
         }
     }
 

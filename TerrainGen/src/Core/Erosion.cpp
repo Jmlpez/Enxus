@@ -44,8 +44,8 @@ namespace Erosion
             std::cout << "[ErosionManager Error]: The width or the weight cannot be 0" << std::endl;
             ASSERT(false);
         }
-        static std::uniform_int_distribution<int> randX(1, m_Width - 2);
-        static std::uniform_int_distribution<int> randY(1, m_Height - 2);
+        std::uniform_int_distribution<int> randX(1, m_Width - 2);
+        std::uniform_int_distribution<int> randY(1, m_Height - 2);
         for (uint32_t iterations = 0; iterations < numOfIterations; iterations++)
         {
             uint32_t randPosX = randX(m_RandomGen);
