@@ -41,14 +41,24 @@ void ResourceManager::Init()
     }
     //----------------- TEXTURES -------------------//
     {
-        static const std::array<std::string, 7> texturesPaths{
-            s_Data.Paths.Images + "materials-debug/water.png",
-            s_Data.Paths.Images + "materials-debug/grass.png",
-            s_Data.Paths.Images + "materials-debug/rocks1.png",
-            s_Data.Paths.Images + "materials-debug/rocks2.png",
-            s_Data.Paths.Images + "materials-debug/sandy-grass.png",
-            s_Data.Paths.Images + "materials-debug/stony-ground.png",
-            s_Data.Paths.Images + "materials-debug/snow.png",
+        static const std::vector<std::string> texturesPaths{
+            s_Data.Paths.Images + "materials-debug/" + "dirt.png",
+            s_Data.Paths.Images + "materials-debug/" + "grass-2.png",
+            s_Data.Paths.Images + "materials-debug/" + "grass-2.png",
+            s_Data.Paths.Images + "materials-debug/" + "grass.png",
+            s_Data.Paths.Images + "materials-debug/" + "rock-snow-ice-.png",
+            s_Data.Paths.Images + "materials-debug/" + "rocks1.png",
+            s_Data.Paths.Images + "materials-debug/" + "rocks2.png",
+            s_Data.Paths.Images + "materials-debug/" + "rough-wet-cobble-albedo.png",
+            s_Data.Paths.Images + "materials-debug/" + "sandy-grass.png",
+            s_Data.Paths.Images + "materials-debug/" + "sandy-rocks.png",
+            s_Data.Paths.Images + "materials-debug/" + "sandyground.png",
+            s_Data.Paths.Images + "materials-debug/" + "snow-packed.png",
+            s_Data.Paths.Images + "materials-debug/" + "snow.png",
+            s_Data.Paths.Images + "materials-debug/" + "stony-ground.png",
+            s_Data.Paths.Images + "materials-debug/" + "water.png",
+            s_Data.Paths.Images + "materials-debug/" + "worn-bumpy-rock.png",
+
         };
 
         for (uint32_t i = 0; i < texturesPaths.size(); i++)

@@ -34,9 +34,26 @@ const TerrainTexturePanelProps &TerrainTexturePanel::GetPanelProps()
 
 void TerrainTexturePanel::OnImGuiRender()
 {
-    static const std::string texturesNameList[] = {"None", "Water", "Grass", "Rocks1", "Rocks2", "Sandy Grass", "Stony Ground", "Snow"};
-    static const int arrSize = IM_ARRAYSIZE(texturesNameList);
+    // static const std::string texturesNameList[] = {"None", "Water", "Grass", "Rocks1", "Rocks2", "Sandy Grass", "Stony Ground", "Snow"};
+    static const std::string texturesNameList[] = {"None",
+                                                   "dirt",
+                                                   "grass-2",
+                                                   "grass-2",
+                                                   "grass",
+                                                   "rock-snow-ice-",
+                                                   "rocks1",
+                                                   "rocks2",
+                                                   "rough-wet-cobble-albedo",
+                                                   "sandy-grass",
+                                                   "sandy-rocks",
+                                                   "sandyground",
+                                                   "snow-packed",
+                                                   "snow",
+                                                   "stony-ground",
+                                                   "water",
+                                                   "worn-bumpy-rock"};
 
+    static const int arrSize = IM_ARRAYSIZE(texturesNameList);
     const auto &texturesList = ResourceManager::GetTexturesList();
 
     if (ImGui::BeginTabItem("Colors"))
