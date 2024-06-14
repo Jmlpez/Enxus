@@ -3,7 +3,7 @@
 
 #include "Enxus.h"
 #include "TerrainDimensionPanel.h"
-#include "TerrainBiomePanel.h"
+#include "TerrainTexturePanel.h"
 #include "SceneCompositionPanel.h"
 #include "ModelPlacementPanel.h"
 #include "TerrainMesh.h"
@@ -18,7 +18,7 @@ public:
 
     static void UpdateTerrainNoiseMap(const std::vector<float> &noiseMap);
     static void UpdateTerrainDimensions(const TerrainDimensionPanelProps &props);
-    static void UpdateTerrainBiome(const TerrainBiomePanelProps &props);
+    static void UpdateTerrainBiome(const TerrainTexturePanelProps &props);
     static void UpdateSceneComposition(const SceneCompositionPanelProps &props);
     static void UpdateModelPlacement(const ModelPlacementPanelProps &props);
 

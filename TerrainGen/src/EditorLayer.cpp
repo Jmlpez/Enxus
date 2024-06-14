@@ -3,7 +3,7 @@
 #include "NoiseEditorPanel.h"
 #include "TerrainDimensionPanel.h"
 #include "SceneCompositionPanel.h"
-#include "TerrainBiomePanel.h"
+#include "TerrainTexturePanel.h"
 #include "ModelPlacementPanel.h"
 #include "ErosionPanel.h"
 #include "TerrainScene.h"
@@ -41,7 +41,7 @@ void EditorLayer::OnAttach()
     //----------------- Terrain Panels Initialization -------------------//
 
     TerrainDimensionPanel::Init();
-    TerrainBiomePanel::Init();
+    TerrainTexturePanel::Init();
     SceneCompositionPanel::Init();
     ModelPlacementPanel::Init();
     NoiseEditorPanel::Init();
@@ -55,7 +55,7 @@ void EditorLayer::OnAttach()
     TerrainScene::UpdateTerrainNoiseMap(NoiseEditorPanel::GetNoiseMap());
     TerrainScene::UpdateSceneComposition(SceneCompositionPanel::GetPanelProps());
     TerrainScene::UpdateTerrainDimensions(TerrainDimensionPanel::GetPanelProps());
-    TerrainScene::UpdateTerrainBiome(TerrainBiomePanel::GetPanelProps());
+    TerrainScene::UpdateTerrainBiome(TerrainTexturePanel::GetPanelProps());
     TerrainScene::UpdateModelPlacement(ModelPlacementPanel::GetPanelProps());
 
     m_ErosionManager.SetMapSize(NoiseEditorPanel::GetNoiseWidth(), NoiseEditorPanel::GetNoiseHeight());
@@ -71,7 +71,7 @@ void EditorLayer::OnDetach()
     //----------------- Terrain Panels ShutDown -------------------//
 
     TerrainDimensionPanel::ShutDown();
-    TerrainBiomePanel::ShutDown();
+    TerrainTexturePanel::ShutDown();
     SceneCompositionPanel::ShutDown();
     ModelPlacementPanel::ShutDown();
     NoiseEditorPanel::ShutDown();
@@ -253,8 +253,8 @@ void EditorLayer::TerrainMenuUI()
         auto dimensionProps = TerrainDimensionPanel::GetPanelProps();
         TerrainScene::UpdateTerrainDimensions(dimensionProps);
 
-        TerrainBiomePanel::OnImGuiRender();
-        TerrainScene::UpdateTerrainBiome(TerrainBiomePanel::GetPanelProps());
+        TerrainTexturePanel::OnImGuiRender();
+        TerrainScene::UpdateTerrainBiome(TerrainTexturePanel::GetPanelProps());
 
         SceneCompositionPanel::OnImGuiRender();
         TerrainScene::UpdateSceneComposition(SceneCompositionPanel::GetPanelProps());

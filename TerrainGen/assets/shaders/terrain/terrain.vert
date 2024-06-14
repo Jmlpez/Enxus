@@ -10,7 +10,6 @@ uniform mat4 uLightSpaceMatrix;
 
 out VS_OUT {
     vec3 vVertexPos;
-    vec2 vTexCoord;
     vec3 vNormal;
     vec3 vBlendAxes;
     vec3 vFragPos;
@@ -21,7 +20,6 @@ void main() {
 
     gl_Position = uViewProj * vec4(aPos, 1.0);
     vs_out.vVertexPos = aPos;
-    vs_out.vTexCoord = aTexCoord;
 
     vs_out.vFragPos = aPos;
     vs_out.vNormal = aNormal;

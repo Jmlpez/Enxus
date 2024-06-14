@@ -17,7 +17,7 @@ struct TerrainSceneData
 
     SceneCompositionPanelProps SceneCompositionData;
     ModelPlacementPanelProps ModelPlacementData;
-    TerrainBiomePanelProps TerrainBiomeData;
+    TerrainTexturePanelProps TerrainBiomeData;
 
     // Shaders
     Enxus::Ref<Enxus::Shader> TerrainShader;
@@ -264,7 +264,7 @@ void TerrainScene::OnRenderPass()
 
         s_Data.TerrainShader->SetFloat("uMinHeight", s_Data.Terrain->GetMinHeight());
         s_Data.TerrainShader->SetFloat("uMaxHeight", s_Data.Terrain->GetMaxHeight());
-        s_Data.TerrainShader->SetInt("uNumOfLayers", s_Data.TerrainBiomeData.NumOfBiomeLayers);
+        s_Data.TerrainShader->SetInt("uNumOfLayers", s_Data.TerrainBiomeData.NumOfTextureLayers);
 
         s_Data.TerrainShader->SetMat4("uLightSpaceMatrix", s_Data.LightSpaceMatrix);
 
@@ -274,31 +274,38 @@ void TerrainScene::OnRenderPass()
         s_Data.ShadowMapFramebuffer->BindShadowTexture(0);
 
         const auto &terrainTextureList = ResourceManager::GetTexturesList();
-        for (int i = 0, textureSlot = 1; i < s_Data.TerrainBiomeData.NumOfBiomeLayers; i++, textureSlot++)
+        for (int i = 0, textureSlot = 1; i < s_Data.TerrainBiomeData.NumOfTextureLayers; i++, textureSlot++)
         {
             bool textureUsed = false;
             // Bind Textures
             std::string index = std::to_string(i);
-            if (s_Data.TerrainBiomeData.BiomeLayers[i].TextureIndex != 0)
+            if (s_Data.TerrainBiomeData.TextureLayers[i].TextureIndex != 0)
             {
-                s_Data.TerrainShader->SetFloat("uTexturesScale[" + index + "]", s_Data.TerrainBiomeData.BiomeLayers[i].TextureScale);
+                s_Data.TerrainShader->SetFloat("uTexturesScale[" + index + "]", s_Data.TerrainBiomeData.TextureLayers[i].TextureScale);
                 s_Data.TerrainShader->SetInt("uTerrainTextures[" + index + "]", textureSlot);
 
-                terrainTextureList[s_Data.TerrainBiomeData.BiomeLayers[i].TextureIndex - 1]->Bind(textureSlot);
+                terrainTextureList[s_Data.TerrainBiomeData.TextureLayers[i].TextureIndex - 1]->Bind(textureSlot);
 
                 textureUsed = true;
             }
-            s_Data.TerrainShader->SetBool("uBiomeTextureUsed[" + index + "]", textureUsed);
-
-            s_Data.TerrainShader->SetFloat("uBiomeStartHeight[" + index + "]", s_Data.TerrainBiomeData.BiomeLayers[i].StartHeight);
-            s_Data.TerrainShader->SetFloat("uBiomeBlends[" + index + "]", s_Data.TerrainBiomeData.BiomeLayers[i].BlendStrength);
-            s_Data.TerrainShader->SetFloat("uBiomeColorStrength[" + index + "]", s_Data.TerrainBiomeData.BiomeLayers[i].ColorStrength);
-            s_Data.TerrainShader->SetVec3("uBiomeColors[" + index + "]", s_Data.TerrainBiomeData.BiomeLayers[i].Color);
-            s_Data.TerrainShader->SetFloat("uBiomeSlopeHeightBegin[" + index + "]", s_Data.TerrainBiomeData.BiomeLayers[i].SlopeHeightBegin);
-            s_Data.TerrainShader->SetFloat("uBiomeSlopeHeightEnd[" + index + "]", s_Data.TerrainBiomeData.BiomeLayers[i].SlopeHeightEnd);
-            s_Data.TerrainShader->SetFloat("uBiomeSlopeThreshold[" + index + "]", s_Data.TerrainBiomeData.BiomeLayers[i].SlopeThreshold);
-            s_Data.TerrainShader->SetFloat("uBiomeSlopeBlend[" + index + "]", s_Data.TerrainBiomeData.BiomeLayers[i].SlopeBlend);
-            s_Data.TerrainShader->SetFloat("uBiomeSlopeBlendLayer[" + index + "]", s_Data.TerrainBiomeData.BiomeLayers[i].SlopeBlendLayer);
+            // uBlendBoundaries
+            // uColorStrength
+            // uSlopeHeightBegin
+            // uSlopeHeightEnd
+            // uSlopeThreshold
+            // uSlopeBlend
+            // uBlendLayer
+            // uColors
+            // uTextureUsed
+            s_Data.TerrainShader->SetBool("uTextureUsed[" + index + "]", textureUsed);
+            s_Data.TerrainShader->SetFloat("uBlendBoundaries[" + index + "]", s_Data.TerrainBiomeData.TextureLayers[i].BlendBoundaries);
+            s_Data.TerrainShader->SetFloat("uColorStrength[" + index + "]", s_Data.TerrainBiomeData.TextureLayers[i].ColorStrength);
+            s_Data.TerrainShader->SetVec3("uColors[" + index + "]", s_Data.TerrainBiomeData.TextureLayers[i].Color);
+            s_Data.TerrainShader->SetFloat("uSlopeHeightBegin[" + index + "]", s_Data.TerrainBiomeData.TextureLayers[i].SlopeHeightBegin);
+            s_Data.TerrainShader->SetFloat("uSlopeHeightEnd[" + index + "]", s_Data.TerrainBiomeData.TextureLayers[i].SlopeHeightEnd);
+            s_Data.TerrainShader->SetFloat("uSlopeThreshold[" + index + "]", s_Data.TerrainBiomeData.TextureLayers[i].SlopeThreshold);
+            s_Data.TerrainShader->SetFloat("uBlendSlope[" + index + "]", s_Data.TerrainBiomeData.TextureLayers[i].BlendSlope);
+            s_Data.TerrainShader->SetFloat("uBlendLayer[" + index + "]", s_Data.TerrainBiomeData.TextureLayers[i].BlendLayer);
         }
         s_Data.Terrain->Draw();
     }
@@ -424,7 +431,7 @@ void TerrainScene::UpdateTerrainDimensions(const TerrainDimensionPanelProps &pro
     }
 }
 
-void TerrainScene::UpdateTerrainBiome(const TerrainBiomePanelProps &props)
+void TerrainScene::UpdateTerrainBiome(const TerrainTexturePanelProps &props)
 {
     s_Data.TerrainBiomeData = props;
 }
