@@ -6,6 +6,7 @@ in VS_OUT {
     vec3 vVertexPos;
     vec2 vTexCoord;
     vec3 vNormal;
+    vec3 vBlendAxes;
     vec3 vFragPos;
     vec4 vFragPosLightSpace;
 } fs_in;
@@ -28,6 +29,11 @@ uniform int uNumOfLayers;
 uniform float uBiomeStartHeight[MAX_NUM_OF_LAYERS];
 uniform float uBiomeBlends[MAX_NUM_OF_LAYERS];
 uniform float uBiomeColorStrength[MAX_NUM_OF_LAYERS];
+uniform float uBiomeSlopeHeightBegin[MAX_NUM_OF_LAYERS];
+uniform float uBiomeSlopeHeightEnd[MAX_NUM_OF_LAYERS];
+uniform float uBiomeSlopeThreshold[MAX_NUM_OF_LAYERS];
+uniform float uBiomeSlopeBlend[MAX_NUM_OF_LAYERS];
+uniform float uBiomeSlopeBlendLayer[MAX_NUM_OF_LAYERS];
 uniform vec3 uBiomeColors[MAX_NUM_OF_LAYERS];
 uniform bool uBiomeTextureUsed[MAX_NUM_OF_LAYERS];
 
@@ -48,27 +54,31 @@ float CalculateShadow(vec4 fragPosLightSpace, float bias);
 void main() {
 
     float heightPercent = InverseLerp(uMinHeight, uMaxHeight, fs_in.vVertexPos.y);
+    vec3 defaultColor = vec3(heightPercent);
     // initially as gray
-    vec3 albedoColor = vec3(heightPercent);
+    vec3 albedoColor = defaultColor;
 
-    // Blend axes for triplanar mappgin
-    vec3 blendAxes = abs(fs_in.vNormal);
-    blendAxes /= blendAxes.x + blendAxes.y + blendAxes.z;
-
+    float slope = 1.0 - fs_in.vNormal.y;
     for(int i = 0; i < uNumOfLayers; i++) {
-        // blending the colors
-        float drawStrength = InverseLerp(-uBiomeBlends[i] / 2 - EPSILON, uBiomeBlends[i] / 2, heightPercent - uBiomeStartHeight[i]);
-
-        vec4 textureColor = vec4(0);
 
         vec3 baseColor = uBiomeColors[i] * uBiomeColorStrength[i];
+        vec4 textureColor = vec4(0.0);
         if(uBiomeTextureUsed[i]) {
-            textureColor = Triplanar(fs_in.vVertexPos, uTexturesScale[i], blendAxes, i) * (1 - uBiomeColorStrength[i]);
+            textureColor = Triplanar(fs_in.vVertexPos, uTexturesScale[i], fs_in.vBlendAxes, i) * (1.0 - uBiomeColorStrength[i]);
         }
+        vec3 layerColor = baseColor + textureColor.xyz;
 
-        vec3 color = textureColor.xyz + baseColor;
+        // Calculate the min value for the slope  to be interpolated based on the blending factor
+        float minSlopeThreshold = uBiomeSlopeThreshold[i] * (1.0 - uBiomeSlopeBlend[i]);
+        float slopeWeight = 1.0 - InverseLerp(minSlopeThreshold, uBiomeSlopeThreshold[i], slope);
 
-        albedoColor = mix(albedoColor, color, drawStrength);
+        vec3 slopeColor = mix(albedoColor, layerColor, slopeWeight * uBiomeSlopeBlendLayer[i]);
+
+        float drawStrength = InverseLerp(-uBiomeBlends[i] / 2 - EPSILON, uBiomeBlends[i] / 2, heightPercent - uBiomeSlopeHeightEnd[i]);
+        vec3 upHeightColor = mix(slopeColor, albedoColor, drawStrength);
+
+        drawStrength = InverseLerp(-uBiomeBlends[i] / 2 - EPSILON, uBiomeBlends[i] / 2, uBiomeSlopeHeightBegin[i] - heightPercent);
+        albedoColor = mix(upHeightColor, albedoColor, drawStrength);
     }
 
     vec3 normal = normalize(fs_in.vNormal);

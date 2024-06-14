@@ -12,6 +12,7 @@ out VS_OUT {
     vec3 vVertexPos;
     vec2 vTexCoord;
     vec3 vNormal;
+    vec3 vBlendAxes;
     vec3 vFragPos;
     vec4 vFragPosLightSpace;
 } vs_out;
@@ -26,4 +27,7 @@ void main() {
     vs_out.vNormal = aNormal;
 
     vs_out.vFragPosLightSpace = uLightSpaceMatrix * vec4(aPos, 1.0);
+
+    vs_out.vBlendAxes = abs(aNormal);
+    vs_out.vBlendAxes /= vs_out.vBlendAxes.x + vs_out.vBlendAxes.y + vs_out.vBlendAxes.z;
 }

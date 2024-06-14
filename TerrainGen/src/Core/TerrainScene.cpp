@@ -294,6 +294,11 @@ void TerrainScene::OnRenderPass()
             s_Data.TerrainShader->SetFloat("uBiomeBlends[" + index + "]", s_Data.TerrainBiomeData.BiomeLayers[i].BlendStrength);
             s_Data.TerrainShader->SetFloat("uBiomeColorStrength[" + index + "]", s_Data.TerrainBiomeData.BiomeLayers[i].ColorStrength);
             s_Data.TerrainShader->SetVec3("uBiomeColors[" + index + "]", s_Data.TerrainBiomeData.BiomeLayers[i].Color);
+            s_Data.TerrainShader->SetFloat("uBiomeSlopeHeightBegin[" + index + "]", s_Data.TerrainBiomeData.BiomeLayers[i].SlopeHeightBegin);
+            s_Data.TerrainShader->SetFloat("uBiomeSlopeHeightEnd[" + index + "]", s_Data.TerrainBiomeData.BiomeLayers[i].SlopeHeightEnd);
+            s_Data.TerrainShader->SetFloat("uBiomeSlopeThreshold[" + index + "]", s_Data.TerrainBiomeData.BiomeLayers[i].SlopeThreshold);
+            s_Data.TerrainShader->SetFloat("uBiomeSlopeBlend[" + index + "]", s_Data.TerrainBiomeData.BiomeLayers[i].SlopeBlend);
+            s_Data.TerrainShader->SetFloat("uBiomeSlopeBlendLayer[" + index + "]", s_Data.TerrainBiomeData.BiomeLayers[i].SlopeBlendLayer);
         }
         s_Data.Terrain->Draw();
     }
@@ -384,13 +389,6 @@ void TerrainScene::OnRenderPass()
 void TerrainScene::UpdateTerrainNoiseMap(const std::vector<float> &noiseMap)
 {
     s_Data.Terrain->SetNoiseMap(noiseMap);
-    // {
-    // Erosion::ErosionManager erosionManager(noiseMap, s_Data.Terrain->GetWidth(), s_Data.Terrain->GetHeight());
-    // erosionManager.Simulate(70000);
-    // s_Data.Terrain->SetNoiseMap(erosionManager.GetHeightMap());
-    // //  s_Data.Terrain->SetVertices(erosionManager.GetTerrainVertices());
-    // }
-
     UpdateModelPositions();
 }
 

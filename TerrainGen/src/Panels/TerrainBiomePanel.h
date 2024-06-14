@@ -14,6 +14,13 @@ struct TerrainBiomePanelProps
         float StartHeight;
         float BlendStrength;
         float TextureScale;
+
+        float SlopeHeightBegin;
+        float SlopeHeightEnd;
+        float SlopeThreshold;
+        float SlopeBlend;
+        float SlopeBlendLayer;
+
         // This the index in the full array of textures
         int TextureIndex;
     };

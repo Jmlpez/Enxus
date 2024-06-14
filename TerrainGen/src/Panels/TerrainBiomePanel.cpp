@@ -15,6 +15,11 @@ void TerrainBiomePanel::Init()
         biomeData.BlendStrength = 0.15f;
         biomeData.TextureScale = 0.1f;
         biomeData.TextureIndex = 0;
+        biomeData.SlopeHeightBegin = 0.0f;
+        biomeData.SlopeHeightEnd = 1.0f;
+        biomeData.SlopeThreshold = 0.2f;
+        biomeData.SlopeBlend = 0.1f;
+        biomeData.SlopeBlendLayer = 0.1f;
     }
 }
 
@@ -58,6 +63,14 @@ void TerrainBiomePanel::OnImGuiRender()
                 ImGui::SliderFloat("Blend Strength", &s_Props.BiomeLayers[i].BlendStrength, 0.0f, 1.0f);
                 ImGui::DragFloat("Texture Scale", &s_Props.BiomeLayers[i].TextureScale, 0.001f, 0.0f, 1.0f);
 
+                {
+                    // Slope options
+                    ImGui::DragFloatRange2("Slope Height Range", &s_Props.BiomeLayers[i].SlopeHeightBegin, &s_Props.BiomeLayers[i].SlopeHeightEnd, 0.001f, 0.0f, 1.0f, "Min: %.3f", "Max: %.3f", ImGuiSliderFlags_AlwaysClamp);
+                    ImGui::SliderFloat("Slope Threshold", &s_Props.BiomeLayers[i].SlopeThreshold, 0.0f, 1.0f);
+                    ImGui::SliderFloat("Slope Blend", &s_Props.BiomeLayers[i].SlopeBlend, 0.0f, 1.0f);
+                    ImGui::SliderFloat("Slope Blend Layer", &s_Props.BiomeLayers[i].SlopeBlendLayer, 0.0f, 1.0f);
+                }
+
                 const std::string dragDropPayloadName = "Terrain Texture Index";
                 ImGui::BeginGroup();
                 if (s_Props.BiomeLayers[i].TextureIndex == 0)
@@ -77,8 +90,8 @@ void TerrainBiomePanel::OnImGuiRender()
                     {
                         int payloadIndex = *(const int *)payload->Data;
                         s_Props.BiomeLayers[i].TextureIndex = payloadIndex;
-                        ImGui::EndDragDropTarget();
                     }
+                    ImGui::EndDragDropTarget();
                 }
                 ImGui::SameLine();
                 if (ImGui::Button("X", ImVec2(20, 20)))
