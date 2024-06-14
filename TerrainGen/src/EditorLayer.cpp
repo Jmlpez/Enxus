@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "EditorLayer.h"
 #include "NoiseEditorPanel.h"
-#include "TerrainDimensionPanel.h"
+#include "TerrainMeshPanel.h"
 #include "SceneCompositionPanel.h"
 #include "TerrainTexturePanel.h"
 #include "ModelPlacementPanel.h"
@@ -40,7 +40,7 @@ void EditorLayer::OnAttach()
 
     //----------------- Terrain Panels Initialization -------------------//
 
-    TerrainDimensionPanel::Init();
+    TerrainMeshPanel::Init();
     TerrainTexturePanel::Init();
     SceneCompositionPanel::Init();
     ModelPlacementPanel::Init();
@@ -54,7 +54,7 @@ void EditorLayer::OnAttach()
     // Initial values
     TerrainScene::UpdateTerrainNoiseMap(NoiseEditorPanel::GetNoiseMap());
     TerrainScene::UpdateSceneComposition(SceneCompositionPanel::GetPanelProps());
-    TerrainScene::UpdateTerrainDimensions(TerrainDimensionPanel::GetPanelProps());
+    TerrainScene::UpdateTerrainDimensions(TerrainMeshPanel::GetPanelProps());
     TerrainScene::UpdateTerrainBiome(TerrainTexturePanel::GetPanelProps());
     TerrainScene::UpdateModelPlacement(ModelPlacementPanel::GetPanelProps());
 
@@ -70,7 +70,7 @@ void EditorLayer::OnDetach()
     TerrainScene::ShutDown();
     //----------------- Terrain Panels ShutDown -------------------//
 
-    TerrainDimensionPanel::ShutDown();
+    TerrainMeshPanel::ShutDown();
     TerrainTexturePanel::ShutDown();
     SceneCompositionPanel::ShutDown();
     ModelPlacementPanel::ShutDown();
@@ -249,8 +249,8 @@ void EditorLayer::TerrainMenuUI()
         ImGui::Begin("Terrain Menu");
         ImGui::BeginTabBar("Terrain Menu TabBar");
 
-        TerrainDimensionPanel::OnImGuiRender();
-        auto dimensionProps = TerrainDimensionPanel::GetPanelProps();
+        TerrainMeshPanel::OnImGuiRender();
+        auto dimensionProps = TerrainMeshPanel::GetPanelProps();
         TerrainScene::UpdateTerrainDimensions(dimensionProps);
 
         TerrainTexturePanel::OnImGuiRender();

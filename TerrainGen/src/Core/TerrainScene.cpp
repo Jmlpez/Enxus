@@ -288,15 +288,6 @@ void TerrainScene::OnRenderPass()
 
                 textureUsed = true;
             }
-            // uBlendBoundaries
-            // uColorStrength
-            // uSlopeHeightBegin
-            // uSlopeHeightEnd
-            // uSlopeThreshold
-            // uSlopeBlend
-            // uBlendLayer
-            // uColors
-            // uTextureUsed
             s_Data.TerrainShader->SetBool("uTextureUsed[" + index + "]", textureUsed);
             s_Data.TerrainShader->SetFloat("uBlendBoundaries[" + index + "]", s_Data.TerrainBiomeData.TextureLayers[i].BlendBoundaries);
             s_Data.TerrainShader->SetFloat("uColorStrength[" + index + "]", s_Data.TerrainBiomeData.TextureLayers[i].ColorStrength);
@@ -399,7 +390,7 @@ void TerrainScene::UpdateTerrainNoiseMap(const std::vector<float> &noiseMap)
     UpdateModelPositions();
 }
 
-void TerrainScene::UpdateTerrainDimensions(const TerrainDimensionPanelProps &props)
+void TerrainScene::UpdateTerrainDimensions(const TerrainMeshPanelProps &props)
 {
     // update the terrain according to the new panel props...
     if ((uint32_t)props.Width != s_Data.Terrain->GetWidth())

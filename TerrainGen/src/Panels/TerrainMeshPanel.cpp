@@ -1,10 +1,10 @@
-#include "TerrainDimensionPanel.h"
+#include "TerrainMeshPanel.h"
 #include "TerrainMesh.h"
 #include "imgui/imgui.h"
 
-static TerrainDimensionPanelProps s_Props;
+static TerrainMeshPanelProps s_Props;
 
-void TerrainDimensionPanel::Init()
+void TerrainMeshPanel::Init()
 {
     s_Props.VertexScale = 0.065f;
     s_Props.Elevation = 1.5f;
@@ -13,16 +13,16 @@ void TerrainDimensionPanel::Init()
     s_Props.LevelOfDetail = 0;
 }
 
-void TerrainDimensionPanel::ShutDown()
+void TerrainMeshPanel::ShutDown()
 {
 }
 
-const TerrainDimensionPanelProps &TerrainDimensionPanel::GetPanelProps()
+const TerrainMeshPanelProps &TerrainMeshPanel::GetPanelProps()
 {
     return s_Props;
 }
 
-void TerrainDimensionPanel::OnImGuiRender()
+void TerrainMeshPanel::OnImGuiRender()
 {
     static bool showAnimationCurveWindow = true;
 

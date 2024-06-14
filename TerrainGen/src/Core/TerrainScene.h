@@ -2,7 +2,7 @@
 #define TERRAIN_SCENE_H
 
 #include "Enxus.h"
-#include "TerrainDimensionPanel.h"
+#include "TerrainMeshPanel.h"
 #include "TerrainTexturePanel.h"
 #include "SceneCompositionPanel.h"
 #include "ModelPlacementPanel.h"
@@ -17,7 +17,7 @@ public:
     static void OnRenderPass();
 
     static void UpdateTerrainNoiseMap(const std::vector<float> &noiseMap);
-    static void UpdateTerrainDimensions(const TerrainDimensionPanelProps &props);
+    static void UpdateTerrainDimensions(const TerrainMeshPanelProps &props);
     static void UpdateTerrainBiome(const TerrainTexturePanelProps &props);
     static void UpdateSceneComposition(const SceneCompositionPanelProps &props);
     static void UpdateModelPlacement(const ModelPlacementPanelProps &props);
