@@ -1,5 +1,5 @@
 #include "TerrainScene.h"
-#include "PoissonDiskSampler.h"
+#include "PoissonDiscSampler.h"
 #include "ResourceManager.h"
 
 struct TerrainSceneData
@@ -9,7 +9,7 @@ struct TerrainSceneData
 
     struct ModelPositionData
     {
-        Enxus::Scope<PoissonDiskSampler> RandomSampler;
+        Enxus::Scope<PoissonDiscSampler> RandomSampler;
         std::vector<glm::vec2> Positions;
         std::vector<glm::mat4> InstanceMatrix;
     };
@@ -112,7 +112,7 @@ void TerrainScene::InitModels()
         const float initialRadius = 10.0f;
         const uint32_t initialAmount = 100;
         s_Data.ModelPositions[i].RandomSampler =
-            Enxus::CreateScope<PoissonDiskSampler>(s_Data.Terrain->GetWidth() - 1,
+            Enxus::CreateScope<PoissonDiscSampler>(s_Data.Terrain->GetWidth() - 1,
                                                    s_Data.Terrain->GetHeight() - 1,
                                                    initialRadius,
                                                    initialAmount);

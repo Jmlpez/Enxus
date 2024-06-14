@@ -1,14 +1,14 @@
 
-#ifndef POISSON_DISK_SAMPLER_H
-#define POISSON_DISK_SAMPLER_H
+#ifndef POISSON_DISC_SAMPLER_H
+#define POISSON_DISC_SAMPLER_H
 
 #include "Enxus.h"
 
-class PoissonDiskSampler
+class PoissonDiscSampler
 {
 public:
-    PoissonDiskSampler(uint32_t width, uint32_t height, float radius, uint32_t amount);
-    ~PoissonDiskSampler(){};
+    PoissonDiscSampler(uint32_t width, uint32_t height, float radius, uint32_t amount);
+    ~PoissonDiscSampler(){};
 
     inline float GetRadius() const { return m_Radius; }
     inline uint32_t GetAmount() const { return m_Amount; }
