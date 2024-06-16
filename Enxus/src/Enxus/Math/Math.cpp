@@ -1,69 +1,82 @@
 #include "pch.h"
+#include "glm/glm.hpp"
 #include "Math.h"
 
 namespace Enxus::Math
 {
-    float lerp(float a, float b, float t)
+    float Lerp(float a, float b, float t)
     {
         return a * t + b * (1.0f - t);
     }
-    float smoothstep(float t)
+
+    float InverseLerp(float edge0, float edge1, float t)
+    {
+        return edge0 == edge1 ? 1 : std::clamp((t - edge0) / (edge1 - edge0), 0.0f, 1.0f);
+    }
+
+    float Smoothstep(float t)
     {
         return t * t * (3 - 2 * t);
     }
-    float blend(float t, float b)
+    float Blend(float t, float b)
     {
         float t3 = t * t * t;
         float bt = b - b * t;
         float bt3 = bt * bt * bt;
         return t3 / (t3 + bt3);
     }
-    float easeInQuad(float t)
+    float BlendPow(float t, float a)
+    {
+        float tPowA = glm::pow(t, a);
+        float compTPowA = glm::pow(1 - t, a);
+        return tPowA / (tPowA + compTPowA);
+    }
+    float EaseInQuad(float t)
     {
         return t * t;
     }
-    float easeInCubic(float t)
+    float EaseInCubic(float t)
     {
         return t * t * t;
     }
-    float easeInQuart(float t)
+    float EaseInQuart(float t)
     {
         return t * t * t * t;
     }
-    float easeInQuint(float t)
+    float EaseInQuint(float t)
     {
         return t * t * t * t * t;
     }
-    float easeInExpo(float t)
+    float EaseInExpo(float t)
     {
         return t == 0 ? 0 : powf(1024, t - 1);
     }
-    float easeInCirc(float t)
+    float EaseInCirc(float t)
     {
         return 1 - sqrtf(1 - t * t);
     }
 
-    float easeOutQuad(float t)
+    float EaseOutQuad(float t)
     {
-        return 1 - easeInQuad(1 - t);
+        return 1 - EaseInQuad(1 - t);
     }
-    float easeOutCubic(float t)
+    float EaseOutCubic(float t)
     {
-        return 1 - easeInCubic(1 - t);
+        return 1 - EaseInCubic(1 - t);
     }
-    float easeOutQuart(float t)
+    float EaseOutQuart(float t)
     {
-        return 1 - easeInQuart(1 - t);
+        return 1 - EaseInQuart(1 - t);
     }
-    float easeOutQuint(float t)
+    float EaseOutQuint(float t)
     {
-        return 1 - easeInQuint(1 - t);
+        return 1 - EaseInQuint(1 - t);
     }
-    float easeOutExpo(float t)
+    float EaseOutExpo(float t)
     {
         return t == 1 ? 1 : (1 - powf(1024, -t));
     }
-    float easeOutCirc(float t)
+    float EaseOutCirc(float t)
     {
         return sqrtf(1 - (t - 1) * (t - 1));
     }

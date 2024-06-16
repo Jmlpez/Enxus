@@ -7,32 +7,40 @@
 namespace Enxus::Math
 {
 
-    float lerp(float a, float b, float t);
-    float smoothstep(float t);
+    float Lerp(float a, float b, float t);
+    float InverseLerp(float edge0, float edge1, float t);
+    float Smoothstep(float t);
     /*
                t^a
     f(t) = --------------
             t^a - (b-t)^a
     This blend function is similar to smoothstep
+    In this case 'a' is fixed to 3.0
     */
-    float blend(float t, float b = 1.0f);
+    float Blend(float t, float b = 1.0f);
+
+    /*
+    Similar to blend but 'a' is not fixed
+    and pow is used instead
+    */
+    float BlendPow(float t, float a);
 
     // Ease-in curve animations
 
-    float easeInQuad(float t);
-    float easeInCubic(float t);
-    float easeInQuart(float t);
-    float easeInQuint(float t);
-    float easeInExpo(float t);
-    float easeInCirc(float t);
+    float EaseInQuad(float t);
+    float EaseInCubic(float t);
+    float EaseInQuart(float t);
+    float EaseInQuint(float t);
+    float EaseInExpo(float t);
+    float EaseInCirc(float t);
 
     // Ease-out curve animations
-    float easeOutQuad(float t);
-    float easeOutCubic(float t);
-    float easeOutQuart(float t);
-    float easeOutQuint(float t);
-    float easeOutExpo(float t);
-    float easeOutCirc(float t);
+    float EaseOutQuad(float t);
+    float EaseOutCubic(float t);
+    float EaseOutQuart(float t);
+    float EaseOutQuint(float t);
+    float EaseOutExpo(float t);
+    float EaseOutCirc(float t);
 
 }
 #endif

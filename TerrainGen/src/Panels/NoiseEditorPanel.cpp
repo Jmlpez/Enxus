@@ -263,20 +263,46 @@ void NoiseEditorPanel::OnImGuiRender()
     }
     if (ImGui::BeginTabItem("Falloff Settings"))
     {
+
+        static const char *falloffMapsList[] = {"Closest Edge", "Linear Gradient"};
+
         if (ImGui::Checkbox("Activate", &s_Props.FalloffMap.IsActivated))
         {
             s_Props.NoiseUpdateFlag = true;
         }
 
-        if (ImGui::DragFloat("Beta value", &s_Props.FalloffMap.Beta, 0.1f, 0.1f, 10.0f))
+        if (ImGui::Combo("Falloff Map List", &s_Props.FalloffMap.Type, falloffMapsList, IM_ARRAYSIZE(falloffMapsList)))
         {
             s_Props.NoiseUpdateFlag = true;
         }
 
-        ImGui::Image((void *)(intptr_t)s_Props.FalloffMap.Texture->GetRendererId(), ImVec2(s_Props.NoisePreviewData.ImGuiWidth, s_Props.NoisePreviewData.ImGuiHeight));
+        if (s_Props.FalloffMap.Type == (int)NoiseEditorPanelProps::FalloffMapType::ClosestEdge)
+        {
+            if (ImGui::SliderFloat("Beta value", &s_Props.FalloffMap.ClosestEdge.Beta, 0.1f, 10.0f))
+            {
+                s_Props.NoiseUpdateFlag = true;
+            }
+        }
+        if (s_Props.FalloffMap.Type == (int)NoiseEditorPanelProps::FalloffMapType::LinearGradient)
+        {
+            if (ImGui::SliderFloat("Blend", &s_Props.FalloffMap.LinearGradient.Blend, 1.0f, 5.0f))
+            {
+                s_Props.NoiseUpdateFlag = true;
+            }
+            if (ImGui::SliderFloat("Offset", &s_Props.FalloffMap.LinearGradient.Offset, -1.0f, 1.0f))
+            {
+                s_Props.NoiseUpdateFlag = true;
+            }
+            if (ImGui::DragInt("Degree", &s_Props.FalloffMap.LinearGradient.Degree, 1, 0, 360, "%d deg", ImGuiSliderFlags_AlwaysClamp))
+            {
+                s_Props.NoiseUpdateFlag = true;
+            }
+        }
 
+        ImGui::Image((void *)(intptr_t)s_Props.FalloffMap.Texture->GetRendererId(), ImVec2(s_Props.NoisePreviewData.ImGuiWidth, s_Props.NoisePreviewData.ImGuiHeight));
         ImGui::EndTabItem();
     }
+
     if (ImGui::BeginTabItem("Preview Settings"))
     {
         ImGui::Checkbox("Auto Size", &s_Props.NoisePreviewData.IsAutoSize);
@@ -366,23 +392,16 @@ void NoiseEditorPanel::UpdateNoiseMap(bool newMap)
 
             if (s_Props.FalloffMap.IsActivated)
             {
-                float nPosX = (float)x / (float)s_Props.NoiseWidth * 2.0f - 1;
-                float nPosY = (float)y / (float)s_Props.NoiseHeight * 2.0f - 1;
 
-                float falloffValue = std::max(std::abs(nPosX), std::abs(nPosY));
-                float smoothValue = Enxus::Math::blend(falloffValue, s_Props.FalloffMap.Beta);
+                float falloffValue = GetFalloffValue(x, y);
 
-                float normalizedPosX = (float)x / (float)s_Props.NoiseWidth;
-                float smoothNormalizedPosX = Enxus::Math::blend(normalizedPosX, s_Props.FalloffMap.Beta);
-                float interp = Enxus::Math::lerp(0, 1, smoothNormalizedPosX);
-
-                uint8_t falloffColor = interp * 255;
+                uint8_t falloffColor = falloffValue * 255;
                 falloffMapPixelArray[pixelArrayIndex] = falloffColor;
                 falloffMapPixelArray[pixelArrayIndex + 1] = falloffColor;
                 falloffMapPixelArray[pixelArrayIndex + 2] = falloffColor;
                 falloffMapPixelArray[pixelArrayIndex + 3] = 255;
 
-                normalizedNoise = std::clamp(normalizedNoise - interp, 0.0f, 1.0f);
+                normalizedNoise = std::clamp(normalizedNoise - falloffValue, 0.0f, 1.0f);
             }
 
             s_Props.NoiseMapArray[noiseMapIndex] = normalizedNoise;
@@ -409,4 +428,55 @@ void NoiseEditorPanel::UpdateNoiseMap(bool newMap)
 
     delete[] noiseMapPixelArray;
     delete[] falloffMapPixelArray;
+}
+
+float NoiseEditorPanel::GetFalloffValue(uint32_t x, uint32_t y)
+{
+
+    float normX = (float)x / (float)s_Props.NoiseWidth;
+    float normY = (float)y / (float)s_Props.NoiseHeight;
+
+    switch (s_Props.FalloffMap.Type)
+    {
+    case (int)NoiseEditorPanelProps::FalloffMapType::ClosestEdge:
+    {
+        float nPosX = normX * 2.0f - 1;
+        float nPosY = normY * 2.0f - 1;
+        float falloffValue = std::max(std::abs(nPosX), std::abs(nPosY));
+        float smoothValue = Enxus::Math::Blend(falloffValue, s_Props.FalloffMap.ClosestEdge.Beta);
+        return smoothValue;
+    }
+
+    case (int)NoiseEditorPanelProps::FalloffMapType::LinearGradient:
+    {
+        float desiredAngle = (float)s_Props.FalloffMap.LinearGradient.Degree;
+        // The origin is actually (0.5,0.5), but its not necessary to use another variable
+        float origin = 0.5f;
+        normX -= origin;
+        normY -= origin;
+
+        // 90 radians --> pi/2.
+        // This angle represent the Y-axis, which act as reference for the rotation
+        // float radians90 = glm::half_pi<float>();
+        float newAngle = glm::radians(90.0f) - glm::radians(desiredAngle) + glm::atan(normY, normX);
+
+        // float len = glm::sqrt(normX * normX + normY * normY);
+        float len = glm::length(glm::vec2(normX, normY));
+
+        // From polar coordinates to cartesian coordinates
+        normX = glm::cos(newAngle) * len + origin;
+        normY = glm::sin(newAngle) * len + origin;
+
+        float offsetX = std::clamp(normX + s_Props.FalloffMap.LinearGradient.Offset, 0.0f, 1.0f);
+        float smoothPosX = Enxus::Math::BlendPow(offsetX, s_Props.FalloffMap.LinearGradient.Blend);
+
+        return Enxus::Math::Lerp(0.0f, 1.0f, smoothPosX);
+    }
+
+    default:
+        break;
+    }
+    std::cout << "[NoiseEditorPanel Error]: Unknow FalloffMap type" << std::endl;
+    ASSERT(false);
+    return 0.0f;
 }

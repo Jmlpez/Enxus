@@ -21,10 +21,28 @@ struct NoiseEditorPanelProps
     //(if not, I would had used a raw array)
     std::vector<float> NoiseMapArray;
 
+    enum class FalloffMapType
+    {
+        ClosestEdge,
+        LinearGradient,
+        RadialGradient,
+    };
+
     struct FalloffMapData
     {
+        int Type;
         bool IsActivated = false;
-        float Beta = 2.2f;
+        struct ClosestEdgeData
+        {
+            float Beta = 2.2f;
+        } ClosestEdge;
+
+        struct LinearGradientData
+        {
+            float Blend = 1.0f;
+            float Offset = 0.0f;
+            int Degree = 90;
+        } LinearGradient;
 
         // same width and height that the noise map texture
         Enxus::Scope<Enxus::Texture2D> Texture;
@@ -109,6 +127,7 @@ public:
 
 private:
     static void UpdateNoiseMap(bool newMap);
+    static float GetFalloffValue(uint32_t x, uint32_t y);
 };
 
 #endif
