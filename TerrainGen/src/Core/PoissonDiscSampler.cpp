@@ -1,8 +1,8 @@
-#include "PoissonDiskSampler.h"
+#include "PoissonDiscSampler.h"
 
 static const glm::vec2 EMPTY_CELL = glm::vec2(-1, -1);
 
-PoissonDiskSampler::PoissonDiskSampler(uint32_t width, uint32_t height, float radius, uint32_t amount)
+PoissonDiscSampler::PoissonDiscSampler(uint32_t width, uint32_t height, float radius, uint32_t amount)
     : m_Width(width), m_Height(height), m_Radius(radius), m_Amount(amount), m_Seed(5489),
       m_RandomGenEngine(m_Seed)
 {
@@ -10,7 +10,7 @@ PoissonDiskSampler::PoissonDiskSampler(uint32_t width, uint32_t height, float ra
     InitGrid();
 }
 
-void PoissonDiskSampler::InitGrid()
+void PoissonDiscSampler::InitGrid()
 {
     m_CellSize = m_Radius / glm::root_two<float>();
 
@@ -26,7 +26,7 @@ void PoissonDiskSampler::InitGrid()
     AddPoint(initial);
 }
 
-void PoissonDiskSampler::CalculatePoints()
+void PoissonDiscSampler::CalculatePoints()
 {
     static const uint32_t s_MaxAttemps = 30;
     uint32_t currentAdded = 1;
@@ -50,7 +50,7 @@ void PoissonDiskSampler::CalculatePoints()
     }
 }
 
-void PoissonDiskSampler::AddPoint(glm::vec2 point)
+void PoissonDiscSampler::AddPoint(glm::vec2 point)
 {
     m_PointsQueue.emplace_back(point);
     m_FinalPointsList.emplace_back(point);
@@ -59,11 +59,11 @@ void PoissonDiskSampler::AddPoint(glm::vec2 point)
     int row = (int)(point.y / m_CellSize);
     m_Grid[row][col] = point;
 }
-bool PoissonDiskSampler::IsInBounds(glm::vec2 point)
+bool PoissonDiscSampler::IsInBounds(glm::vec2 point)
 {
     return point.x >= 0 && point.x <= m_Width && point.y >= 0 && point.y <= m_Height;
 }
-bool PoissonDiskSampler::CanPlacePoint(glm::vec2 newPoint)
+bool PoissonDiscSampler::CanPlacePoint(glm::vec2 newPoint)
 {
     int col = int(newPoint.x / m_CellSize);
     int row = int(newPoint.y / m_CellSize);
@@ -78,7 +78,7 @@ bool PoissonDiskSampler::CanPlacePoint(glm::vec2 newPoint)
     }
     return true;
 }
-glm::vec2 PoissonDiskSampler::GeneratePointAround(glm::vec2 point)
+glm::vec2 PoissonDiscSampler::GeneratePointAround(glm::vec2 point)
 {
     float random01 = std::uniform_real_distribution<float>(0.0f, 1.0f)(m_RandomGenEngine);
     float random12 = std::uniform_real_distribution<float>(1.0f, 2.0f)(m_RandomGenEngine);
@@ -88,14 +88,14 @@ glm::vec2 PoissonDiskSampler::GeneratePointAround(glm::vec2 point)
     return point + glm::vec2(r * std::cos(angle), r * std::sin(angle));
 }
 
-void PoissonDiskSampler::SetRadius(float radius)
+void PoissonDiscSampler::SetRadius(float radius)
 {
     m_Radius = radius;
     ResetValues();
     InitGrid();
     CalculatePoints();
 }
-void PoissonDiskSampler::SetAmount(uint32_t amount)
+void PoissonDiscSampler::SetAmount(uint32_t amount)
 {
     m_Amount = amount;
     ResetValues();
@@ -103,7 +103,7 @@ void PoissonDiskSampler::SetAmount(uint32_t amount)
     CalculatePoints();
 }
 
-void PoissonDiskSampler::SetSeed(uint32_t seed)
+void PoissonDiscSampler::SetSeed(uint32_t seed)
 {
     m_Seed = seed;
     m_RandomGenEngine.seed(m_Seed);
@@ -112,7 +112,7 @@ void PoissonDiskSampler::SetSeed(uint32_t seed)
     CalculatePoints();
 }
 
-void PoissonDiskSampler::ResetValues()
+void PoissonDiscSampler::ResetValues()
 {
     m_FinalPointsList.clear();
     m_PointsQueue.clear();

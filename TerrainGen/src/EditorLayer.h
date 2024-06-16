@@ -2,6 +2,7 @@
 #define EDITOR_LAYER_H
 
 #include "Enxus.h"
+#include "Erosion.h"
 
 class EditorLayer : public Enxus::Layer
 {
@@ -24,6 +25,8 @@ private:
     glm::vec2 m_ViewportSize;
     bool m_IsViewportFocused = false;
     bool m_IsViewportHovered = false;
+
+    Erosion::ErosionManager m_ErosionManager;
 
     Enxus::Scope<Enxus::FreeCameraController> m_CameraController;
     // Framebuffers

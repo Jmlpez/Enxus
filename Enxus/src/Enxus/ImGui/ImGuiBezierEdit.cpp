@@ -168,7 +168,9 @@ namespace ImGui
         Dummy(ImVec2(0, 3));
 
         // prepare canvas
-        const ImVec2 avail = GetContentRegionAvail();
+        ImVec2 avail = GetContentRegionAvail();
+        avail.x = std::max(avail.x, 100.0f);
+        avail.y = std::max(avail.y, 100.0f);
         ImVec2 Canvas(avail.x, avail.y);
 
         ImRect bb(Window->DC.CursorPos, Window->DC.CursorPos + Canvas);

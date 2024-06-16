@@ -1,5 +1,5 @@
 #include "TerrainScene.h"
-#include "PoissonDiskSampler.h"
+#include "PoissonDiscSampler.h"
 #include "ResourceManager.h"
 
 struct TerrainSceneData
@@ -9,7 +9,7 @@ struct TerrainSceneData
 
     struct ModelPositionData
     {
-        Enxus::Scope<PoissonDiskSampler> RandomSampler;
+        Enxus::Scope<PoissonDiscSampler> RandomSampler;
         std::vector<glm::vec2> Positions;
         std::vector<glm::mat4> InstanceMatrix;
     };
@@ -17,7 +17,7 @@ struct TerrainSceneData
 
     SceneCompositionPanelProps SceneCompositionData;
     ModelPlacementPanelProps ModelPlacementData;
-    TerrainBiomePanelProps TerrainBiomeData;
+    TerrainTexturePanelProps TerrainBiomeData;
 
     // Shaders
     Enxus::Ref<Enxus::Shader> TerrainShader;
@@ -112,7 +112,7 @@ void TerrainScene::InitModels()
         const float initialRadius = 10.0f;
         const uint32_t initialAmount = 100;
         s_Data.ModelPositions[i].RandomSampler =
-            Enxus::CreateScope<PoissonDiskSampler>(s_Data.Terrain->GetWidth() - 1,
+            Enxus::CreateScope<PoissonDiscSampler>(s_Data.Terrain->GetWidth() - 1,
                                                    s_Data.Terrain->GetHeight() - 1,
                                                    initialRadius,
                                                    initialAmount);
@@ -264,7 +264,7 @@ void TerrainScene::OnRenderPass()
 
         s_Data.TerrainShader->SetFloat("uMinHeight", s_Data.Terrain->GetMinHeight());
         s_Data.TerrainShader->SetFloat("uMaxHeight", s_Data.Terrain->GetMaxHeight());
-        s_Data.TerrainShader->SetInt("uNumOfLayers", s_Data.TerrainBiomeData.NumOfBiomeLayers);
+        s_Data.TerrainShader->SetInt("uNumOfLayers", s_Data.TerrainBiomeData.NumOfTextureLayers);
 
         s_Data.TerrainShader->SetMat4("uLightSpaceMatrix", s_Data.LightSpaceMatrix);
 
@@ -274,26 +274,29 @@ void TerrainScene::OnRenderPass()
         s_Data.ShadowMapFramebuffer->BindShadowTexture(0);
 
         const auto &terrainTextureList = ResourceManager::GetTexturesList();
-        for (int i = 0, textureSlot = 1; i < s_Data.TerrainBiomeData.NumOfBiomeLayers; i++, textureSlot++)
+        for (int i = 0, textureSlot = 1; i < s_Data.TerrainBiomeData.NumOfTextureLayers; i++, textureSlot++)
         {
             bool textureUsed = false;
             // Bind Textures
             std::string index = std::to_string(i);
-            if (s_Data.TerrainBiomeData.BiomeLayers[i].TextureIndex != 0)
+            if (s_Data.TerrainBiomeData.TextureLayers[i].TextureIndex != 0)
             {
-                s_Data.TerrainShader->SetFloat("uTexturesScale[" + index + "]", s_Data.TerrainBiomeData.BiomeLayers[i].TextureScale);
+                s_Data.TerrainShader->SetFloat("uTexturesScale[" + index + "]", s_Data.TerrainBiomeData.TextureLayers[i].TextureScale);
                 s_Data.TerrainShader->SetInt("uTerrainTextures[" + index + "]", textureSlot);
 
-                terrainTextureList[s_Data.TerrainBiomeData.BiomeLayers[i].TextureIndex - 1]->Bind(textureSlot);
+                terrainTextureList[s_Data.TerrainBiomeData.TextureLayers[i].TextureIndex - 1]->Bind(textureSlot);
 
                 textureUsed = true;
             }
-            s_Data.TerrainShader->SetBool("uBiomeTextureUsed[" + index + "]", textureUsed);
-
-            s_Data.TerrainShader->SetFloat("uBiomeStartHeight[" + index + "]", s_Data.TerrainBiomeData.BiomeLayers[i].StartHeight);
-            s_Data.TerrainShader->SetFloat("uBiomeBlends[" + index + "]", s_Data.TerrainBiomeData.BiomeLayers[i].BlendStrength);
-            s_Data.TerrainShader->SetFloat("uBiomeColorStrength[" + index + "]", s_Data.TerrainBiomeData.BiomeLayers[i].ColorStrength);
-            s_Data.TerrainShader->SetVec3("uBiomeColors[" + index + "]", s_Data.TerrainBiomeData.BiomeLayers[i].Color);
+            s_Data.TerrainShader->SetBool("uTextureUsed[" + index + "]", textureUsed);
+            s_Data.TerrainShader->SetFloat("uBlendBoundaries[" + index + "]", s_Data.TerrainBiomeData.TextureLayers[i].BlendBoundaries);
+            s_Data.TerrainShader->SetFloat("uColorStrength[" + index + "]", s_Data.TerrainBiomeData.TextureLayers[i].ColorStrength);
+            s_Data.TerrainShader->SetVec3("uColors[" + index + "]", s_Data.TerrainBiomeData.TextureLayers[i].Color);
+            s_Data.TerrainShader->SetFloat("uSlopeHeightBegin[" + index + "]", s_Data.TerrainBiomeData.TextureLayers[i].SlopeHeightBegin);
+            s_Data.TerrainShader->SetFloat("uSlopeHeightEnd[" + index + "]", s_Data.TerrainBiomeData.TextureLayers[i].SlopeHeightEnd);
+            s_Data.TerrainShader->SetFloat("uSlopeThreshold[" + index + "]", s_Data.TerrainBiomeData.TextureLayers[i].SlopeThreshold);
+            s_Data.TerrainShader->SetFloat("uBlendSlope[" + index + "]", s_Data.TerrainBiomeData.TextureLayers[i].BlendSlope);
+            s_Data.TerrainShader->SetFloat("uBlendLayer[" + index + "]", s_Data.TerrainBiomeData.TextureLayers[i].BlendLayer);
         }
         s_Data.Terrain->Draw();
     }
@@ -387,7 +390,7 @@ void TerrainScene::UpdateTerrainNoiseMap(const std::vector<float> &noiseMap)
     UpdateModelPositions();
 }
 
-void TerrainScene::UpdateTerrainDimensions(const TerrainDimensionPanelProps &props)
+void TerrainScene::UpdateTerrainMesh(const TerrainMeshPanelProps &props)
 {
     // update the terrain according to the new panel props...
     if ((uint32_t)props.Width != s_Data.Terrain->GetWidth())
@@ -419,7 +422,7 @@ void TerrainScene::UpdateTerrainDimensions(const TerrainDimensionPanelProps &pro
     }
 }
 
-void TerrainScene::UpdateTerrainBiome(const TerrainBiomePanelProps &props)
+void TerrainScene::UpdateTerrainTextures(const TerrainTexturePanelProps &props)
 {
     s_Data.TerrainBiomeData = props;
 }

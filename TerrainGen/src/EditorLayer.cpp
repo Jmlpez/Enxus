@@ -1,10 +1,11 @@
 #include "pch.h"
 #include "EditorLayer.h"
 #include "NoiseEditorPanel.h"
-#include "TerrainDimensionPanel.h"
+#include "TerrainMeshPanel.h"
 #include "SceneCompositionPanel.h"
-#include "TerrainBiomePanel.h"
+#include "TerrainTexturePanel.h"
 #include "ModelPlacementPanel.h"
+#include "ErosionPanel.h"
 #include "TerrainScene.h"
 #include "ResourceManager.h"
 #include "imgui/imgui.h"
@@ -39,11 +40,12 @@ void EditorLayer::OnAttach()
 
     //----------------- Terrain Panels Initialization -------------------//
 
-    TerrainDimensionPanel::Init();
-    TerrainBiomePanel::Init();
+    TerrainMeshPanel::Init();
+    TerrainTexturePanel::Init();
     SceneCompositionPanel::Init();
     ModelPlacementPanel::Init();
     NoiseEditorPanel::Init();
+    ErosionPanel::Init();
 
     //----------------- Terrain Scene Initialization -------------------//
 
@@ -52,9 +54,12 @@ void EditorLayer::OnAttach()
     // Initial values
     TerrainScene::UpdateTerrainNoiseMap(NoiseEditorPanel::GetNoiseMap());
     TerrainScene::UpdateSceneComposition(SceneCompositionPanel::GetPanelProps());
-    TerrainScene::UpdateTerrainDimensions(TerrainDimensionPanel::GetPanelProps());
-    TerrainScene::UpdateTerrainBiome(TerrainBiomePanel::GetPanelProps());
+    TerrainScene::UpdateTerrainMesh(TerrainMeshPanel::GetPanelProps());
+    TerrainScene::UpdateTerrainTextures(TerrainTexturePanel::GetPanelProps());
     TerrainScene::UpdateModelPlacement(ModelPlacementPanel::GetPanelProps());
+
+    m_ErosionManager.SetMapSize(NoiseEditorPanel::GetNoiseWidth(), NoiseEditorPanel::GetNoiseHeight());
+    m_ErosionManager.SetHeightMap(NoiseEditorPanel::GetNoiseMap());
 
     ImGui::SetWindowFocus("Viewport");
 }
@@ -63,14 +68,14 @@ void EditorLayer::OnDetach()
 {
     //----------------- Terrain Scene ShutDown -------------------//
     TerrainScene::ShutDown();
-
     //----------------- Terrain Panels ShutDown -------------------//
 
-    TerrainDimensionPanel::ShutDown();
-    TerrainBiomePanel::ShutDown();
+    TerrainMeshPanel::ShutDown();
+    TerrainTexturePanel::ShutDown();
     SceneCompositionPanel::ShutDown();
     ModelPlacementPanel::ShutDown();
     NoiseEditorPanel::ShutDown();
+    ErosionPanel::ShutDown();
 
     //----------------- Resource Manager ShutDown -------------------//
     ResourceManager::ShutDown();
@@ -196,11 +201,34 @@ void EditorLayer::OnImGuiRender()
         ImGui::Text("App average %.3f ms/frame (%.1f FPS)", Enxus::Application::Get().GetTimestep().GetMiliseconds(), 1.0f / Enxus::Application::Get().GetTimestep());
         ImGui::End();
     }
-    // The Noise is updated separately
-    NoiseEditorPanel::OnImGuiRender();
-    if (NoiseEditorPanel::HasUpdated())
+
+    // // Erosion is updated separately
+    const auto &erosionPanelProps = ErosionPanel::GetPanelProps();
     {
-        TerrainScene::UpdateTerrainNoiseMap(NoiseEditorPanel::GetNoiseMap());
+        ErosionPanel::OnImGuiRender();
+        if (erosionPanelProps.RevertErosion)
+        {
+            m_ErosionManager.SetHeightMap(NoiseEditorPanel::GetNoiseMap());
+            TerrainScene::UpdateTerrainNoiseMap(NoiseEditorPanel::GetNoiseMap());
+        }
+        if (erosionPanelProps.IsErosionOn)
+        {
+            if (m_ErosionManager.GetCurrentIterations() <= (uint32_t)erosionPanelProps.Iterations)
+            {
+                m_ErosionManager.Simulate(1000);
+                TerrainScene::UpdateTerrainNoiseMap(m_ErosionManager.GetHeightMap());
+            }
+        }
+    }
+
+    // // The Noise is updated separately
+    {
+        NoiseEditorPanel::OnImGuiRender();
+        if (NoiseEditorPanel::HasUpdated())
+        {
+            m_ErosionManager.SetHeightMap(NoiseEditorPanel::GetNoiseMap());
+            TerrainScene::UpdateTerrainNoiseMap(NoiseEditorPanel::GetNoiseMap());
+        }
     }
 
     ImGui::End();
@@ -213,12 +241,21 @@ void EditorLayer::TerrainMenuUI()
         ImGui::Begin("Terrain Menu");
         ImGui::BeginTabBar("Terrain Menu TabBar");
 
-        TerrainDimensionPanel::OnImGuiRender();
-        auto dimensionProps = TerrainDimensionPanel::GetPanelProps();
-        TerrainScene::UpdateTerrainDimensions(dimensionProps);
+        TerrainMeshPanel::OnImGuiRender();
+        auto &meshProps = TerrainMeshPanel::GetPanelProps();
 
-        TerrainBiomePanel::OnImGuiRender();
-        TerrainScene::UpdateTerrainBiome(TerrainBiomePanel::GetPanelProps());
+        TerrainScene::UpdateTerrainMesh(meshProps);
+        // In case of any change in size update the NoiseEditor and the ErosionManager
+        if (meshProps.Width != NoiseEditorPanel::GetNoiseWidth() || meshProps.Height != NoiseEditorPanel::GetNoiseHeight())
+        {
+            NoiseEditorPanel::SetNoiseSize(meshProps.Width, meshProps.Height);
+            m_ErosionManager.SetMapSize(meshProps.Width, meshProps.Height);
+            m_ErosionManager.SetHeightMap(NoiseEditorPanel::GetNoiseMap());
+            TerrainScene::UpdateTerrainNoiseMap(NoiseEditorPanel::GetNoiseMap());
+        }
+
+        TerrainTexturePanel::OnImGuiRender();
+        TerrainScene::UpdateTerrainTextures(TerrainTexturePanel::GetPanelProps());
 
         SceneCompositionPanel::OnImGuiRender();
         TerrainScene::UpdateSceneComposition(SceneCompositionPanel::GetPanelProps());

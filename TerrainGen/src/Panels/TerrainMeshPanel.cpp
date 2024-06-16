@@ -1,10 +1,10 @@
-#include "TerrainDimensionPanel.h"
+#include "TerrainMeshPanel.h"
 #include "TerrainMesh.h"
 #include "imgui/imgui.h"
 
-static TerrainDimensionPanelProps s_Props;
+static TerrainMeshPanelProps s_Props;
 
-void TerrainDimensionPanel::Init()
+void TerrainMeshPanel::Init()
 {
     s_Props.VertexScale = 0.065f;
     s_Props.Elevation = 1.5f;
@@ -13,18 +13,21 @@ void TerrainDimensionPanel::Init()
     s_Props.LevelOfDetail = 0;
 }
 
-void TerrainDimensionPanel::ShutDown()
+void TerrainMeshPanel::ShutDown()
 {
 }
 
-const TerrainDimensionPanelProps &TerrainDimensionPanel::GetPanelProps()
+const TerrainMeshPanelProps &TerrainMeshPanel::GetPanelProps()
 {
     return s_Props;
 }
 
-void TerrainDimensionPanel::OnImGuiRender()
+void TerrainMeshPanel::OnImGuiRender()
 {
-    static const char *enumTerrainAnimationCurve[] = {"Linear", "EaseInQuad", "EaseInCubic", "EaseInQuart", "EaseInQuint"};
+    static const char *sizeListId[] = {"241x241 - Small", "481x481 - Medium", "721x721 - Large"};
+    static glm::vec2 sizeList[] = {{241, 241}, {481, 481}, {721, 721}};
+    static int selectedSizeIndex = 0;
+
     static bool showAnimationCurveWindow = true;
 
     if (ImGui::BeginTabItem("Terrain Dimensions"))
@@ -32,10 +35,12 @@ void TerrainDimensionPanel::OnImGuiRender()
         ImGui::SliderInt("Level Of Detail", &s_Props.LevelOfDetail, 0, 6);
         ImGui::DragFloat("Elevation", &s_Props.Elevation, 0.01f, 0.0f);
         ImGui::DragFloat("Distance", &s_Props.VertexScale, 0.001f, 0.01f, 2.0f);
-        ImGui::BeginDisabled();
-        ImGui::SliderInt("Terrain Width", &s_Props.Width, 50, 500);
-        ImGui::SliderInt("Terrain Height", &s_Props.Height, 50, 500);
-        ImGui::EndDisabled();
+
+        if (ImGui::Combo("Size", &selectedSizeIndex, sizeListId, IM_ARRAYSIZE(sizeListId)))
+        {
+            s_Props.Width = sizeList[selectedSizeIndex].x;
+            s_Props.Height = sizeList[selectedSizeIndex].y;
+        }
 
         {
             // Animation Curve

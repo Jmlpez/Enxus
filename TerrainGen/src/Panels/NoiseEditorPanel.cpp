@@ -20,8 +20,7 @@ void NoiseEditorPanel::Init()
                                              s_Props.NoiseHeight);
 
     // Just one memory allocation
-    s_Props.NoiseMapArray.reserve(s_Props.NoiseWidth * s_Props.NoiseHeight);
-    s_Props.NoiseMapArray.assign(s_Props.NoiseWidth * s_Props.NoiseHeight, 0.0f);
+    s_Props.NoiseMapArray.resize(s_Props.NoiseWidth * s_Props.NoiseHeight);
 
     // Generate the first image
     UpdateNoiseMap(true);
@@ -49,23 +48,34 @@ const std::vector<float> &NoiseEditorPanel::GetNoiseMap()
 
 void NoiseEditorPanel::SetNoiseWidth(uint32_t width)
 {
-    (void)width;
-    std::cout << "[NoiseEditorPanel Error] : SetNoiseWidth Currently not supported" << std::endl;
-    return;
-    // if ((int)width == s_Props.GeneralNoise.Width)
-    //     return;
-    // s_Props.GeneralNoise.Width = width;
-    // UpdateNoiseMap(true);
+    if (width == s_Props.NoiseWidth)
+        return;
+    s_Props.NoiseWidth = width;
+    s_Props.NoiseMapArray.resize(s_Props.NoiseWidth * s_Props.NoiseHeight);
+    s_Props.NoisePreviewData.Texture->Resize(s_Props.NoiseWidth, s_Props.NoiseHeight);
+    s_Props.FalloffMap.Texture->Resize(s_Props.NoiseWidth, s_Props.NoiseHeight);
+    UpdateNoiseMap(true);
 }
 void NoiseEditorPanel::SetNoiseHeight(uint32_t height)
 {
-    (void)height;
-    std::cout << "[NoiseEditorPanel Error] : SetNoiseHeight Currently not supported" << std::endl;
-    return;
-    // if ((int)height == s_Props.GeneralNoise.Height)
-    //     return;
-    // s_Props.GeneralNoise.Height = height;
-    // UpdateNoiseMap(true);
+    if (height == s_Props.NoiseHeight)
+        return;
+    s_Props.NoiseHeight = height;
+    s_Props.NoiseMapArray.resize(s_Props.NoiseWidth * s_Props.NoiseHeight);
+    s_Props.NoisePreviewData.Texture->Resize(s_Props.NoiseWidth, s_Props.NoiseHeight);
+    s_Props.FalloffMap.Texture->Resize(s_Props.NoiseWidth, s_Props.NoiseHeight);
+    UpdateNoiseMap(true);
+}
+void NoiseEditorPanel::SetNoiseSize(uint32_t width, uint32_t height)
+{
+    if (height == s_Props.NoiseHeight && width == s_Props.NoiseWidth)
+        return;
+    s_Props.NoiseWidth = width;
+    s_Props.NoiseHeight = height;
+    s_Props.NoiseMapArray.resize(s_Props.NoiseWidth * s_Props.NoiseHeight);
+    s_Props.NoisePreviewData.Texture->Resize(s_Props.NoiseWidth, s_Props.NoiseHeight);
+    s_Props.FalloffMap.Texture->Resize(s_Props.NoiseWidth, s_Props.NoiseHeight);
+    UpdateNoiseMap(true);
 }
 
 void NoiseEditorPanel::OnImGuiRender()
@@ -105,18 +115,18 @@ void NoiseEditorPanel::OnImGuiRender()
                 s_Props.Fnl.SetSeed(s_Props.GeneralNoise.Seed);
                 s_Props.NoiseUpdateFlag = true;
             }
-            if (ImGui::DragFloat("Frequency", &s_Props.GeneralNoise.Frequency, 0.0001f))
+            if (ImGui::DragFloat("Frequency", &s_Props.GeneralNoise.Frequency, 0.0001f, 0.0f, 0.15f, "%.3f", ImGuiSliderFlags_AlwaysClamp))
             {
                 s_Props.Fnl.SetFrequency(s_Props.GeneralNoise.Frequency);
                 s_Props.NoiseUpdateFlag = true;
             }
             ImGui::PushItemWidth(50);
-            if (ImGui::DragFloat("Offset X", &s_Props.GeneralNoise.OffsetX, 0.1f, -100.0f, 100.0f))
+            if (ImGui::DragFloat("Offset X", &s_Props.GeneralNoise.OffsetX, 0.1f, -100.0f, 100.0f, "%.3f", ImGuiSliderFlags_AlwaysClamp))
             {
                 s_Props.NoiseUpdateFlag = true;
             }
             ImGui::SameLine();
-            if (ImGui::DragFloat("Offset Y", &s_Props.GeneralNoise.OffsetY, 0.1f, -100.0f, 100.0f))
+            if (ImGui::DragFloat("Offset Y", &s_Props.GeneralNoise.OffsetY, 0.1f, -100.0f, 100.0f, "%.3f", ImGuiSliderFlags_AlwaysClamp))
             {
                 s_Props.NoiseUpdateFlag = true;
             }
@@ -138,23 +148,23 @@ void NoiseEditorPanel::OnImGuiRender()
                 s_Props.Fnl.SetFractalOctaves(s_Props.FractalNoise.Octaves);
                 s_Props.NoiseUpdateFlag = true;
             }
-            if (ImGui::DragFloat("Lacunarity", &s_Props.FractalNoise.Lacunarity, 0.01f))
+            if (ImGui::DragFloat("Lacunarity", &s_Props.FractalNoise.Lacunarity, 0.01f, 0.0f, 10.0f, "%.3f", ImGuiSliderFlags_AlwaysClamp))
             {
                 s_Props.Fnl.SetFractalLacunarity(s_Props.FractalNoise.Lacunarity);
                 s_Props.NoiseUpdateFlag = true;
             }
-            if (ImGui::DragFloat("Gain", &s_Props.FractalNoise.Gain, 0.001f))
+            if (ImGui::DragFloat("Gain", &s_Props.FractalNoise.Gain, 0.001f, 0.0f, 1.0f, "%.3f", ImGuiSliderFlags_AlwaysClamp))
             {
                 s_Props.Fnl.SetFractalGain(s_Props.FractalNoise.Gain);
                 s_Props.NoiseUpdateFlag = true;
             }
-            if (ImGui::DragFloat("Weighted Strength", &s_Props.FractalNoise.WeightedStrength, 0.01f))
+            if (ImGui::DragFloat("Weighted Strength", &s_Props.FractalNoise.WeightedStrength, 0.01f, 0.0f, 1.5f, "%.3f", ImGuiSliderFlags_AlwaysClamp))
             {
                 s_Props.Fnl.SetFractalWeightedStrength(s_Props.FractalNoise.WeightedStrength);
                 s_Props.NoiseUpdateFlag = true;
             }
             ImGui::BeginDisabled(s_Props.FractalNoise.Type != (int)FastNoiseLite::FractalType_PingPong);
-            if (ImGui::DragFloat("Ping Pong Strength", &s_Props.FractalNoise.PingPongStrength, 0.01f))
+            if (ImGui::DragFloat("Ping Pong Strength", &s_Props.FractalNoise.PingPongStrength, 0.01f, 0.01f, 10.0f, "%.3f", ImGuiSliderFlags_AlwaysClamp))
             {
                 s_Props.Fnl.SetFractalPingPongStrength(s_Props.FractalNoise.PingPongStrength);
                 s_Props.NoiseUpdateFlag = true;
@@ -180,7 +190,7 @@ void NoiseEditorPanel::OnImGuiRender()
                 s_Props.Fnl.SetCellularReturnType((FastNoiseLite::CellularReturnType)s_Props.CellularNoise.ReturnType);
                 s_Props.NoiseUpdateFlag = true;
             }
-            if (ImGui::DragFloat("Jitter", &s_Props.CellularNoise.Jitter, 0.01f))
+            if (ImGui::DragFloat("Jitter", &s_Props.CellularNoise.Jitter, 0.01f, 0.01f, 1.5f, "%.3f", ImGuiSliderFlags_AlwaysClamp))
             {
                 s_Props.Fnl.SetCellularJitter(s_Props.CellularNoise.Jitter);
                 s_Props.NoiseUpdateFlag = true;
@@ -200,7 +210,7 @@ void NoiseEditorPanel::OnImGuiRender()
             }
             ImGui::BeginDisabled(s_Props.DomainWarp.Type == 0);
 
-            if (ImGui::DragFloat("Amplitude", &s_Props.DomainWarp.Amplitude, 0.5f))
+            if (ImGui::DragFloat("Amplitude", &s_Props.DomainWarp.Amplitude, 0.5f, 0.0f, 100.0f, "%.3f", ImGuiSliderFlags_AlwaysClamp))
             {
                 s_Props.FnlWarp.SetDomainWarpAmp(s_Props.DomainWarp.Amplitude);
                 s_Props.NoiseUpdateFlag = true;
@@ -210,7 +220,7 @@ void NoiseEditorPanel::OnImGuiRender()
                 s_Props.FnlWarp.SetSeed(s_Props.DomainWarp.Seed);
                 s_Props.NoiseUpdateFlag = true;
             }
-            if (ImGui::DragFloat("Frequency", &s_Props.DomainWarp.Frequency, 0.001f))
+            if (ImGui::DragFloat("Frequency", &s_Props.DomainWarp.Frequency, 0.001f, 0.001f, 0.15f, "%.3f", ImGuiSliderFlags_AlwaysClamp))
             {
                 s_Props.FnlWarp.SetFrequency(s_Props.DomainWarp.Frequency);
                 s_Props.NoiseUpdateFlag = true;
@@ -231,12 +241,12 @@ void NoiseEditorPanel::OnImGuiRender()
                 s_Props.FnlWarp.SetFractalOctaves(s_Props.DomainWarpFractal.Octaves);
                 s_Props.NoiseUpdateFlag = true;
             }
-            if (ImGui::DragFloat("Lacunarity", &s_Props.DomainWarpFractal.Lacunarity, 0.01f))
+            if (ImGui::DragFloat("Lacunarity", &s_Props.DomainWarpFractal.Lacunarity, 0.01f, 0.0f, 10.0f, "%.3f", ImGuiSliderFlags_AlwaysClamp))
             {
                 s_Props.FnlWarp.SetFractalLacunarity(s_Props.DomainWarpFractal.Lacunarity);
                 s_Props.NoiseUpdateFlag = true;
             }
-            if (ImGui::DragFloat("Gain", &s_Props.DomainWarpFractal.Gain, 0.01f))
+            if (ImGui::DragFloat("Gain", &s_Props.DomainWarpFractal.Gain, 0.01f, 0.0f, 1.0f, "%.3f", ImGuiSliderFlags_AlwaysClamp))
             {
                 s_Props.FnlWarp.SetFractalGain(s_Props.DomainWarpFractal.Gain);
                 s_Props.NoiseUpdateFlag = true;
@@ -319,7 +329,7 @@ void NoiseEditorPanel::UpdateNoiseMap(bool newMap)
     // For colors
     // The denominator arises from  (1 - (-1))
     // which are the maximun and minimun values of the noise (i.e the noise output is in that range)
-    float colorScale = 255.0f / 2.0f;
+    constexpr float colorScale = 255.0f / 2.0f;
 
     uint8_t *noiseMapPixelArray = new uint8_t[s_Props.NoiseWidth * s_Props.NoiseHeight * 4];
     uint8_t *falloffMapPixelArray = new uint8_t[s_Props.NoiseWidth * s_Props.NoiseHeight * 4];

@@ -4,8 +4,8 @@ out vec4 FragColor;
 
 in VS_OUT {
     vec3 vVertexPos;
-    vec2 vTexCoord;
     vec3 vNormal;
+    vec3 vBlendAxes;
     vec3 vFragPos;
     vec4 vFragPosLightSpace;
 } fs_in;
@@ -20,16 +20,20 @@ struct DirLight {
 vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir);
 uniform DirLight uDirLight;
 
-const float EPSILON = 1e-4;
+const float EPSILON = 1e-7;
 const int MAX_NUM_OF_LAYERS = 8;
 uniform int uNumOfLayers;
 
 // vVertexPos.y > biomeStartHeight --> apply biomeColor
-uniform float uBiomeStartHeight[MAX_NUM_OF_LAYERS];
-uniform float uBiomeBlends[MAX_NUM_OF_LAYERS];
-uniform float uBiomeColorStrength[MAX_NUM_OF_LAYERS];
-uniform vec3 uBiomeColors[MAX_NUM_OF_LAYERS];
-uniform bool uBiomeTextureUsed[MAX_NUM_OF_LAYERS];
+uniform float uBlendBoundaries[MAX_NUM_OF_LAYERS];
+uniform float uColorStrength[MAX_NUM_OF_LAYERS];
+uniform float uSlopeHeightBegin[MAX_NUM_OF_LAYERS];
+uniform float uSlopeHeightEnd[MAX_NUM_OF_LAYERS];
+uniform float uSlopeThreshold[MAX_NUM_OF_LAYERS];
+uniform float uBlendSlope[MAX_NUM_OF_LAYERS];
+uniform float uBlendLayer[MAX_NUM_OF_LAYERS];
+uniform vec3 uColors[MAX_NUM_OF_LAYERS];
+uniform bool uTextureUsed[MAX_NUM_OF_LAYERS];
 
 uniform float uMinHeight;
 uniform float uMaxHeight;
@@ -48,27 +52,31 @@ float CalculateShadow(vec4 fragPosLightSpace, float bias);
 void main() {
 
     float heightPercent = InverseLerp(uMinHeight, uMaxHeight, fs_in.vVertexPos.y);
+    vec3 defaultColor = vec3(heightPercent);
     // initially as gray
-    vec3 albedoColor = vec3(heightPercent);
+    vec3 albedoColor = defaultColor;
 
-    // Blend axes for triplanar mappgin
-    vec3 blendAxes = abs(fs_in.vNormal);
-    blendAxes /= blendAxes.x + blendAxes.y + blendAxes.z;
-
+    float slope = 1.0 - fs_in.vNormal.y;
     for(int i = 0; i < uNumOfLayers; i++) {
-        // blending the colors
-        float drawStrength = InverseLerp(-uBiomeBlends[i] / 2 - EPSILON, uBiomeBlends[i] / 2, heightPercent - uBiomeStartHeight[i]);
 
-        vec4 textureColor = vec4(0);
-
-        vec3 baseColor = uBiomeColors[i] * uBiomeColorStrength[i];
-        if(uBiomeTextureUsed[i]) {
-            textureColor = Triplanar(fs_in.vVertexPos, uTexturesScale[i], blendAxes, i) * (1 - uBiomeColorStrength[i]);
+        vec3 baseColor = uColors[i] * uColorStrength[i];
+        vec4 textureColor = vec4(0.0);
+        if(uTextureUsed[i]) {
+            textureColor = Triplanar(fs_in.vVertexPos, uTexturesScale[i], fs_in.vBlendAxes, i) * (1.0 - uColorStrength[i]);
         }
+        vec3 layerColor = baseColor + textureColor.xyz;
 
-        vec3 color = textureColor.xyz + baseColor;
+        // Calculate the min value for the slope  to be interpolated based on the blending factor
+        float minSlopeThreshold = uSlopeThreshold[i] * (1.0 - uBlendSlope[i]);
+        float slopeWeight = 1.0 - InverseLerp(minSlopeThreshold - EPSILON, uSlopeThreshold[i], slope);
 
-        albedoColor = mix(albedoColor, color, drawStrength);
+        vec3 slopeColor = mix(albedoColor, layerColor, slopeWeight * uBlendLayer[i]);
+
+        float drawStrength = InverseLerp(-uBlendBoundaries[i] / 2 - EPSILON, uBlendBoundaries[i] / 2, heightPercent - uSlopeHeightEnd[i]);
+        vec3 upHeightColor = mix(slopeColor, albedoColor, drawStrength);
+
+        drawStrength = InverseLerp(-uBlendBoundaries[i] / 2 - EPSILON, uBlendBoundaries[i] / 2, heightPercent - uSlopeHeightBegin[i]);
+        albedoColor = mix(albedoColor, upHeightColor, drawStrength);
     }
 
     vec3 normal = normalize(fs_in.vNormal);

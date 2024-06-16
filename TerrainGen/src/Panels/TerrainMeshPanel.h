@@ -1,25 +1,25 @@
-#ifndef TERRAIN_DIMENSION_PANEL_H
-#define TERRAIN_DIMENSION_PANEL_H
+#ifndef TERRAIN_MESH_PANEL_H
+#define TERRAIN_MESH_PANEL_H
 
 #include "Enxus.h"
 
-struct TerrainDimensionPanelProps
+struct TerrainMeshPanelProps
 {
     float VertexScale;
     float Elevation;
-    int Width;
-    int Height;
+    uint32_t Width;
+    uint32_t Height;
     int LevelOfDetail;
     Enxus::AnimationCurveEditor HeightCurve;
 };
 
-class TerrainDimensionPanel
+class TerrainMeshPanel
 {
 public:
     static void Init();
     static void ShutDown();
 
-    static const TerrainDimensionPanelProps &GetPanelProps();
+    static const TerrainMeshPanelProps &GetPanelProps();
 
     static void OnImGuiRender();
 };
