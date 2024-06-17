@@ -264,7 +264,7 @@ void NoiseEditorPanel::OnImGuiRender()
     if (ImGui::BeginTabItem("Falloff Settings"))
     {
 
-        static const char *falloffMapsList[] = {"Closest Edge", "Linear Gradient"};
+        static const char *falloffMapsList[] = {"Closest Edge", "Linear Gradient", "Radial Gradient"};
 
         if (ImGui::Checkbox("Activate", &s_Props.FalloffMap.IsActivated))
         {
@@ -285,6 +285,7 @@ void NoiseEditorPanel::OnImGuiRender()
         }
         if (s_Props.FalloffMap.Type == (int)NoiseEditorPanelProps::FalloffMapType::LinearGradient)
         {
+            ImGui::PushID("Linear Gradient");
             if (ImGui::SliderFloat("Blend", &s_Props.FalloffMap.LinearGradient.Blend, 1.0f, 5.0f))
             {
                 s_Props.NoiseUpdateFlag = true;
@@ -297,6 +298,24 @@ void NoiseEditorPanel::OnImGuiRender()
             {
                 s_Props.NoiseUpdateFlag = true;
             }
+            ImGui::PopID();
+        }
+        if (s_Props.FalloffMap.Type == (int)NoiseEditorPanelProps::FalloffMapType::RadialGradient)
+        {
+            ImGui::PushID("Radial Gradient");
+            if (ImGui::DragFloat("Blend", &s_Props.FalloffMap.RadialGradient.Blend, 0.01f, 0.01f, 1.0f, "%.3f", ImGuiSliderFlags_AlwaysClamp))
+            {
+                s_Props.NoiseUpdateFlag = true;
+            }
+            if (ImGui::DragFloat2("Offset", glm::value_ptr(s_Props.FalloffMap.RadialGradient.Offset), 0.01f, -1.0f, 1.0f, "%.3f", ImGuiSliderFlags_AlwaysClamp))
+            {
+                s_Props.NoiseUpdateFlag = true;
+            }
+            if (ImGui::DragFloat("Radius", &s_Props.FalloffMap.RadialGradient.Radius, 0.001f, 0.001f, 5.0f, "%.3f", ImGuiSliderFlags_AlwaysClamp))
+            {
+                s_Props.NoiseUpdateFlag = true;
+            }
+            ImGui::PopID();
         }
 
         ImGui::Image((void *)(intptr_t)s_Props.FalloffMap.Texture->GetRendererId(), ImVec2(s_Props.NoisePreviewData.ImGuiWidth, s_Props.NoisePreviewData.ImGuiHeight));
@@ -471,6 +490,23 @@ float NoiseEditorPanel::GetFalloffValue(uint32_t x, uint32_t y)
         float smoothPosX = Enxus::Math::BlendPow(offsetX, s_Props.FalloffMap.LinearGradient.Blend);
 
         return Enxus::Math::Lerp(0.0f, 1.0f, smoothPosX);
+    }
+    case (int)NoiseEditorPanelProps::FalloffMapType::RadialGradient:
+    {
+        // from [0, 1] to [-1, 1]
+        float nPosX = normX * 2.0f - 1.0f;
+        float nPosY = normY * 2.0f - 1.0f;
+
+        nPosX += s_Props.FalloffMap.RadialGradient.Offset.x;
+        nPosY += s_Props.FalloffMap.RadialGradient.Offset.y;
+
+        float distance = 1.0f - glm::length(glm::vec2(nPosX, nPosY));
+
+        float radius = 1.0f - s_Props.FalloffMap.RadialGradient.Radius;
+
+        float radialValue = Enxus::Math::Smoothstep(Enxus::Math::InverseLerp(radius, radius - s_Props.FalloffMap.RadialGradient.Blend, distance));
+
+        return Enxus::Math::Smoothstep(radialValue);
     }
 
     default:

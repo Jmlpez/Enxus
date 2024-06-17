@@ -50,7 +50,6 @@ void EditorLayer::OnAttach()
     //----------------- Terrain Scene Initialization -------------------//
 
     TerrainScene::Init();
-
     // Initial values
     TerrainScene::UpdateTerrainNoiseMap(NoiseEditorPanel::GetNoiseMap());
     TerrainScene::UpdateSceneComposition(SceneCompositionPanel::GetPanelProps());
