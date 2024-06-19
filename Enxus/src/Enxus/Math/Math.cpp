@@ -28,12 +28,20 @@ namespace Enxus::Math
         float bt3 = bt * bt * bt;
         return t3 / (t3 + bt3);
     }
-    float BlendPow(float t, float a)
+    float BlendAlpha(float t, float a)
     {
         float tPowA = glm::pow(t, a);
         float compTPowA = glm::pow(1 - t, a);
         return tPowA / (tPowA + compTPowA);
     }
+
+    float BlendAlphaBeta(float t, float a, float b)
+    {
+        float tPowA = glm::pow(t, a);
+        float compTPowA = glm::pow(b - b * t, a);
+        return tPowA / (tPowA + compTPowA);
+    }
+
     float EaseInQuad(float t)
     {
         return t * t;

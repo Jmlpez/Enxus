@@ -32,9 +32,11 @@ struct NoiseEditorPanelProps
     {
         int Type;
         bool IsActivated = false;
+        bool IsInverted = false;
 
         struct ClosestEdgeData
         {
+            float Alpha = 3.0f;
             float Beta = 2.2f;
         } ClosestEdge;
 

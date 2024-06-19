@@ -24,7 +24,12 @@ namespace Enxus::Math
     Similar to blend but 'a' is not fixed
     and pow is used instead
     */
-    float BlendPow(float t, float a);
+    float BlendAlpha(float t, float a);
+    /*
+    Similar to BlendAlpha but 'a' control
+    the blending factor  and 'b'
+    */
+    float BlendAlphaBeta(float t, float a, float b);
 
     // Ease-in curve animations
 

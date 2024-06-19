@@ -271,6 +271,11 @@ void NoiseEditorPanel::OnImGuiRender()
             s_Props.NoiseUpdateFlag = true;
         }
 
+        if (ImGui::Checkbox("Invert", &s_Props.FalloffMap.IsInverted))
+        {
+            s_Props.NoiseUpdateFlag = true;
+        }
+
         if (ImGui::Combo("Falloff Map List", &s_Props.FalloffMap.Type, falloffMapsList, IM_ARRAYSIZE(falloffMapsList)))
         {
             s_Props.NoiseUpdateFlag = true;
@@ -279,6 +284,10 @@ void NoiseEditorPanel::OnImGuiRender()
         if (s_Props.FalloffMap.Type == (int)NoiseEditorPanelProps::FalloffMapType::ClosestEdge)
         {
             if (ImGui::SliderFloat("Beta value", &s_Props.FalloffMap.ClosestEdge.Beta, 0.1f, 10.0f))
+            {
+                s_Props.NoiseUpdateFlag = true;
+            }
+            if (ImGui::SliderFloat("Alpha value", &s_Props.FalloffMap.ClosestEdge.Alpha, 1.0f, 10.0f))
             {
                 s_Props.NoiseUpdateFlag = true;
             }
@@ -413,6 +422,8 @@ void NoiseEditorPanel::UpdateNoiseMap(bool newMap)
             {
 
                 float falloffValue = GetFalloffValue(x, y);
+                if (s_Props.FalloffMap.IsInverted)
+                    falloffValue = 1 - falloffValue;
 
                 uint8_t falloffColor = falloffValue * 255;
                 falloffMapPixelArray[pixelArrayIndex] = falloffColor;
@@ -462,7 +473,7 @@ float NoiseEditorPanel::GetFalloffValue(uint32_t x, uint32_t y)
         float nPosX = normX * 2.0f - 1;
         float nPosY = normY * 2.0f - 1;
         float falloffValue = std::max(std::abs(nPosX), std::abs(nPosY));
-        float smoothValue = Enxus::Math::Blend(falloffValue, s_Props.FalloffMap.ClosestEdge.Beta);
+        float smoothValue = Enxus::Math::BlendAlphaBeta(falloffValue, s_Props.FalloffMap.ClosestEdge.Alpha, s_Props.FalloffMap.ClosestEdge.Beta);
         return smoothValue;
     }
 
@@ -487,7 +498,7 @@ float NoiseEditorPanel::GetFalloffValue(uint32_t x, uint32_t y)
         normY = glm::sin(newAngle) * len + origin;
 
         float offsetX = std::clamp(normX + s_Props.FalloffMap.LinearGradient.Offset, 0.0f, 1.0f);
-        float smoothPosX = Enxus::Math::BlendPow(offsetX, s_Props.FalloffMap.LinearGradient.Blend);
+        float smoothPosX = Enxus::Math::BlendAlpha(offsetX, s_Props.FalloffMap.LinearGradient.Blend);
 
         return Enxus::Math::Lerp(0.0f, 1.0f, smoothPosX);
     }
