@@ -32,6 +32,7 @@ struct NoiseEditorPanelProps
     {
         int Type;
         bool IsActivated = false;
+
         struct ClosestEdgeData
         {
             float Beta = 2.2f;
@@ -43,6 +44,13 @@ struct NoiseEditorPanelProps
             float Offset = 0.0f;
             int Degree = 90;
         } LinearGradient;
+
+        struct RadialGradientData
+        {
+            float Blend = 0.2f;
+            glm::vec2 Offset = glm::vec2(0.0f);
+            float Radius = 0.5f;
+        } RadialGradient;
 
         // same width and height that the noise map texture
         Enxus::Scope<Enxus::Texture2D> Texture;

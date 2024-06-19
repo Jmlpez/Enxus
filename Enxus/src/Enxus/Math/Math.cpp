@@ -13,7 +13,10 @@ namespace Enxus::Math
     {
         return edge0 == edge1 ? 1 : std::clamp((t - edge0) / (edge1 - edge0), 0.0f, 1.0f);
     }
-
+    float Smoothstep(float edge0, float edge1, float t)
+    {
+        return Smoothstep(InverseLerp(edge0, edge1, t));
+    }
     float Smoothstep(float t)
     {
         return t * t * (3 - 2 * t);

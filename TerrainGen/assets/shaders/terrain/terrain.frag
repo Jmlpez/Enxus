@@ -54,9 +54,10 @@ void main() {
     float heightPercent = InverseLerp(uMinHeight, uMaxHeight, fs_in.vVertexPos.y);
     vec3 defaultColor = vec3(heightPercent);
     // initially as gray
+    vec3 normal = normalize(fs_in.vNormal);
     vec3 albedoColor = defaultColor;
 
-    float slope = 1.0 - fs_in.vNormal.y;
+    float slope = 1.0 - normal.y;
     for(int i = 0; i < uNumOfLayers; i++) {
 
         vec3 baseColor = uColors[i] * uColorStrength[i];
@@ -72,14 +73,14 @@ void main() {
 
         vec3 slopeColor = mix(albedoColor, layerColor, slopeWeight * uBlendLayer[i]);
 
-        float drawStrength = InverseLerp(-uBlendBoundaries[i] / 2 - EPSILON, uBlendBoundaries[i] / 2, heightPercent - uSlopeHeightEnd[i]);
+        float halfBlend = uBlendBoundaries[i] * 0.5;
+        float drawStrength = InverseLerp(-halfBlend - EPSILON, halfBlend, heightPercent - uSlopeHeightEnd[i]);
         vec3 upHeightColor = mix(slopeColor, albedoColor, drawStrength);
 
-        drawStrength = InverseLerp(-uBlendBoundaries[i] / 2 - EPSILON, uBlendBoundaries[i] / 2, heightPercent - uSlopeHeightBegin[i]);
+        drawStrength = InverseLerp(-halfBlend - EPSILON, halfBlend, heightPercent - uSlopeHeightBegin[i]);
         albedoColor = mix(albedoColor, upHeightColor, drawStrength);
     }
 
-    vec3 normal = normalize(fs_in.vNormal);
     vec3 viewDir = normalize(uCameraPos - fs_in.vFragPos);
 
     vec3 lighting = CalcDirLight(uDirLight, normal, viewDir);

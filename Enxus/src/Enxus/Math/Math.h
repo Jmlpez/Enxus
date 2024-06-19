@@ -9,6 +9,7 @@ namespace Enxus::Math
 
     float Lerp(float a, float b, float t);
     float InverseLerp(float edge0, float edge1, float t);
+    float Smoothstep(float edge0, float edge1, float t);
     float Smoothstep(float t);
     /*
                t^a
