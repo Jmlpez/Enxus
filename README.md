@@ -2,7 +2,7 @@
 
 A game Engine created for the sake of learning 😄. Heavily inspired by [The Cherno](https://www.youtube.com/@TheCherno). 
 
-I used OpenGL as the graphics library but this can change in the future. I mainly start learning in [learnopengl.com](learnopengl.com) 
+I used OpenGL as the graphics library but this may change in the future. I mainly start learning in [learnopengl.com](learnopengl.com) 
 and also in [scratchpixel](https://www.scratchapixel.com/)
 
 ## Build
@@ -33,7 +33,7 @@ Once the engine is built then type
 make terrain
 make run-terrain
 ```
-The first line is to create terrain-app from scratch
+The first line is to create terrain-app from scratch.
 The second one to actually running it.
 
 I will post some pictures when it is a little more finished.
@@ -54,7 +54,7 @@ Those test are mostly from [learnopengl.com](learnopengl.com)
 
 
 ### Vendor dependencies
-Soon I will include how to get those libraries. 
+Right now the project can't compile because no vendor dependency is included or has instructions about how to set it correctly :). Soon I will include how to get those libraries. 
 - *Assimp*: To import/export models with several formats from softwares like blender, 3DMax etc.
 - *ImGui*: To create the UI.
 - *stb_image*: A header-only library to handle images with several formats.
